@@ -5,8 +5,8 @@ import com.mysoft.framework.mybatis.BaseEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.io.Serializable;
 
 /**
 * ${context.data.displayName} 实体对象

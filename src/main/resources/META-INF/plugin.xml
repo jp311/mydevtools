@@ -23,15 +23,19 @@
     <id>com.github.h598937749.devtools</id>
     <name>mysoft-devtools</name>
 
-    <vendor email="hezd@mingyuanyun.com" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">hezd</vendor>
+    <vendor email="hezd@mingyuanyun.com" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">
+        hezd
+    </vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <resource-bundle>messages.mysoft</resource-bundle>
 
-<!--    <extensionPoints>-->
-<!--        <extensionPoint qualifiedName="" interface="" dynamic="true"/>-->
-<!--    </extensionPoints>-->
+    <!--    <extensionPoints>-->
+    <!--        <extensionPoint qualifiedName="" interface="" dynamic="true"/>-->
+    <!--    </extensionPoints>-->
 
     <extensions defaultExtensionNs="com.intellij">
         <!--工具窗口-->
@@ -46,9 +50,9 @@
                              bundle="messages.SettingsBundle"
                              key="settings.names.home"
                              instance="com.mysoft.devtools.settings.HomeConfigurable">
-<!--            <configurable id="setting-environment" bundle="messages.SettingsBundle"-->
-<!--                          key="settings.names.environment"-->
-<!--                          instance="com.mysoft.devtools.settings.EnvironmentConfigurable"/>-->
+            <!--            <configurable id="setting-environment" bundle="messages.SettingsBundle"-->
+            <!--                          key="settings.names.environment"-->
+            <!--                          instance="com.mysoft.devtools.settings.EnvironmentConfigurable"/>-->
 
             <configurable id="setting-metadata" bundle="messages.SettingsBundle"
                           key="settings.names.metadata"
@@ -75,15 +79,15 @@
                          level="ERROR"
                          implementationClass="com.mysoft.devtools.Inspections.NewEntityInspection"/>
 
-<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ActionRightInspection" language="JAVA"-->
-<!--                         bundle="messages.InspectionsBundle"-->
-<!--                         key="inspection.platform.attributes.actionright.display.name"-->
-<!--                         groupPath="Java"-->
-<!--                         groupBundle="messages.InspectionsBundle"-->
-<!--                         groupKey="group.names.mysoft"-->
-<!--                         enabledByDefault="true"-->
-<!--                         level="ERROR"-->
-<!--        />-->
+        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ActionRightInspection" language="JAVA"-->
+        <!--                         bundle="messages.InspectionsBundle"-->
+        <!--                         key="inspection.platform.attributes.actionright.display.name"-->
+        <!--                         groupPath="Java"-->
+        <!--                         groupBundle="messages.InspectionsBundle"-->
+        <!--                         groupKey="group.names.mysoft"-->
+        <!--                         enabledByDefault="true"-->
+        <!--                         level="ERROR"-->
+        <!--        />-->
         <localInspection implementationClass="com.mysoft.devtools.Inspections.AppServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.appservice.display.name"
@@ -134,15 +138,15 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceFilterInspection"-->
-<!--                         bundle="messages.InspectionsBundle"-->
-<!--                         key="inspection.platform.service.resourcefilter.display.name"-->
-<!--                         groupPath="Java"-->
-<!--                         groupBundle="messages.InspectionsBundle"-->
-<!--                         groupKey="group.names.mysoft"-->
-<!--                         enabledByDefault="true"-->
-<!--                         level="ERROR"-->
-<!--                         language="JAVA"/>-->
+        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceFilterInspection"-->
+        <!--                         bundle="messages.InspectionsBundle"-->
+        <!--                         key="inspection.platform.service.resourcefilter.display.name"-->
+        <!--                         groupPath="Java"-->
+        <!--                         groupBundle="messages.InspectionsBundle"-->
+        <!--                         groupKey="group.names.mysoft"-->
+        <!--                         enabledByDefault="true"-->
+        <!--                         level="ERROR"-->
+        <!--                         language="JAVA"/>-->
         <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.resource.display.name"
@@ -153,19 +157,19 @@
                          enabledByDefault="true"/>
 
 
-<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->
-<!--                         bundle="messages.InspectionsBundle"-->
-<!--                         key="inspection.mybatis.mapper.display.name"-->
-<!--                         groupPath="XML"-->
-<!--                         groupBundle="messages.InspectionsBundle"-->
-<!--                         groupKey="group.names.mysoft"-->
-<!--                         level="ERROR"-->
-<!--        />-->
+        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->
+        <!--                         bundle="messages.InspectionsBundle"-->
+        <!--                         key="inspection.mybatis.mapper.display.name"-->
+        <!--                         groupPath="XML"-->
+        <!--                         groupBundle="messages.InspectionsBundle"-->
+        <!--                         groupKey="group.names.mysoft"-->
+        <!--                         level="ERROR"-->
+        <!--        />-->
     </extensions>
 
     <applicationListeners>
-        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"
-                  topic="com.intellij.ide.FrameStateListener"/>
+<!--        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"-->
+<!--                  topic="com.intellij.ide.FrameStateListener"/>-->
 
         <listener class="com.mysoft.devtools.listeners.MyProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
@@ -174,9 +178,9 @@
 
     <!-- 定义菜单组 -->
     <actions resource-bundle="messages.mysoft">
-        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">
-            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
-        </group>
+        <!--        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">-->
+        <!--            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>-->
+        <!--        </group>-->
         <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </group>
@@ -207,17 +211,14 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
-<!--        <action id="com.mysoft.devtools.actions.toolactions.TestAction"-->
-<!--                class="com.mysoft.devtools.actions.toolactions.TestAction" text="测试" >-->
-<!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
-<!--        </action>-->
+        <!--        <action id="com.mysoft.devtools.actions.toolactions.TestAction"-->
+        <!--                class="com.mysoft.devtools.actions.toolactions.TestAction" text="测试" >-->
+        <!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
+        <!--        </action>-->
 
-<!--        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"-->
-<!--                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">-->
-<!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
-<!--        </action>-->
+        <!--        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"-->
+        <!--                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">-->
+        <!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
+        <!--        </action>-->
     </actions>
-    <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.modules.java</depends>
 </idea-plugin>
