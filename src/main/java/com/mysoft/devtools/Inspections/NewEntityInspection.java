@@ -14,6 +14,7 @@ import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.lang.manifest.psi.ManifestTokenType;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -75,59 +76,60 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiParserFacade parserFacade = PsiParserFacade.SERVICE.getInstance(project);
-            PsiWhiteSpace newLine = (PsiWhiteSpace) parserFacade.createWhiteSpaceFromText("\n");
 
             PsiElement psiElement = descriptor.getPsiElement();
             PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
             PsiLocalVariable localVariable = (PsiLocalVariable) psiElement.getParent();
 
-            TextRange textRange = psiElement.getTextRange();
-
             String entityName = localVariable.getType().getPresentableText();
             String variableName = localVariable.getName();
 
-            PsiElementFactory factory = PsiElementFactory.getInstance(project);
-            String newCode = MessageFormat.format("{0} {1} = EntityFactory.create({0}.class);", entityName, variableName);
-            PsiStatement newStatement = factory.createStatementFromText(newCode, localVariable);
+            PsiNewExpression newExpr = (PsiNewExpression) psiElement;
+            PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
 
-            List<PsiStatement> properties = new ArrayList<>();
-            if (anonymousClass != null) {
-                PsiCodeBlock body = PsiTreeUtil.collectElementsOfType(anonymousClass, PsiCodeBlock.class).stream().findFirst().orElse(null);
+            PsiCodeBlock body = PsiTreeUtil.collectElementsOfType(anonymousClass, PsiCodeBlock.class).stream().findFirst().orElse(null);
 
-                if (body != null) {
-                    newStatement.addAfter(newLine, newStatement);
-                    for (PsiStatement statement : body.getStatements()) {
-                        if (statement instanceof PsiExpressionStatement) {
-                            PsiExpression expression = ((PsiExpressionStatement) statement).getExpression();
-                            if (expression instanceof PsiMethodCallExpression) {
-                                PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) expression;
-                                String setMethodName = methodCallExpression.getMethodExpression().getText();
-                                String propertyValue = PsiTreeUtil.findChildOfType(methodCallExpression, PsiExpressionList.class).getText();
+            List<PsiStatement> propertys = new ArrayList<>();
+            if (body != null) {
+                for (PsiStatement statement : body.getStatements()) {
+                    if (statement instanceof PsiExpressionStatement) {
+                        PsiExpression expression = ((PsiExpressionStatement) statement).getExpression();
+                        if (expression instanceof PsiMethodCallExpression) {
+                            PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) expression;
+                            String setMethodName = methodCallExpression.getMethodExpression().getText();
+                            String propertyValue = PsiTreeUtil.findChildOfType(methodCallExpression, PsiExpressionList.class).getText();
 
-                                newCode = MessageFormat.format("{0}.{1}{2};", variableName, setMethodName, propertyValue);
-                                PsiStatement propertySetMethod = factory.createStatementFromText(newCode, null);
-                                properties.add(propertySetMethod);
-                            }
+                            String newCode = MessageFormat.format("{0}.{1}{2};", variableName, setMethodName, propertyValue);
+                            PsiStatement propertySetMethod = elementFactory.createStatementFromText(newCode, null);
+                            propertys.add(propertySetMethod);
                         }
                     }
                 }
             }
 
+            PsiExpression createCall = elementFactory.createExpressionFromText(String.format("EntityFactory.create(%s.class)", entityName), null);
+            PsiElement result = newExpr.replace(createCall);
 
-            PsiElement replaceResult = localVariable.replace(newStatement);
-            properties.forEach(x -> {
-                PsiElement element = replaceResult.getParent().addAfter(x, localVariable);
-                element.addAfter(newLine, element);
-            });
+            PsiFile containingFile = result.getContainingFile();
+            PsiElement nextSibling = localVariable.getNextSibling();
+            if (propertys.size() > 0) {
+                for (PsiStatement property : propertys) {
+                    if (!(nextSibling instanceof PsiWhiteSpace)) {
+                        nextSibling = localVariable.addAfter(parserFacade.createWhiteSpaceFromText("\n"), result);
+                    }
+                    localVariable.getNode().addLeaf(ManifestTokenType.NEWLINE, "\n", null);
+                    localVariable.addAfter(property, nextSibling);
+                }
+            }
 
-            PsiFile containingFile = replaceResult.getContainingFile();
-            if (!(containingFile instanceof PsiJavaFile)) {
+            if (containingFile == null){
                 return;
             }
 
-            CodeStyleManager.getInstance(project).reformatText(containingFile, textRange.getStartOffset(), textRange.getEndOffset() + properties.size());
+            ((PsiJavaFile) containingFile).addImportIfNotExist("com.mysoft.framework.mybatis.EntityFactory");
 
-            ((PsiJavaFile)containingFile).addImportIfNotExist("com.mysoft.framework.mybatis.EntityFactory");
+            PsiMethod method = PsiTreeUtil.getParentOfType(localVariable, PsiMethod.class);
+            CodeStyleManager.getInstance(project).reformatText(method.getContainingFile(), method.getTextRange().getStartOffset(), method.getTextRange().getEndOffset());
         }
 
 

@@ -7,6 +7,7 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
+import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import lombok.experimental.ExtensionMethod;
 
@@ -19,27 +20,28 @@ import java.util.stream.Collectors;
  */
 @ExtensionMethod({VirtualFileExtension.class})
 public class PsiClassExtension {
-    public static String getComment(PsiClass psiClass){
+    public static String getComment(PsiClass psiClass) {
         PsiDocComment docComment = psiClass.getDocComment();
-        if (docComment == null){
+        if (docComment == null) {
             return "";
         }
         return Arrays.stream(docComment.getDescriptionElements()).map(x -> x.getText().replace(" ", "").replace("\n", "")).collect(Collectors.joining(""));
     }
-     public static String getPackageName(PsiClass psiClass) {
-         return psiClass.getContainingFile().getVirtualFile().getPackageName();
-     }
 
-     public static boolean isInheritors(PsiClass subClass,String baseName, Project project){
+    public static String getPackageName(PsiClass psiClass) {
+        return PsiUtil.getPackageName(psiClass);
+    }
+
+    public static boolean isInheritors(PsiClass subClass, String baseName, Project project) {
         GlobalSearchScope scope = ProjectScope.getAllScope(project);
         PsiClass baseClass = JavaPsiFacade.getInstance(project).findClass(baseName, scope);
-        if (baseClass == null){
+        if (baseClass == null) {
             return false;
         }
-        return isInheritors(subClass,baseClass);
-     }
+        return isInheritors(subClass, baseClass);
+    }
 
-     public static boolean isInheritors(PsiClass subClass, PsiClass baseClass){
+    public static boolean isInheritors(PsiClass subClass, PsiClass baseClass) {
         return ClassInheritorsSearch.search(baseClass).anyMatch(x -> Objects.equals(x.getQualifiedName(), subClass.getQualifiedName()));
-     }
+    }
 }
