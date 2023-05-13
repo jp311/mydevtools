@@ -17,11 +17,12 @@
 - [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+### 明源云开发工具箱 （mysoft-devtools)
+- 代码生成器
+- 代码检查器
+- 开发工具箱
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
-
-To keep everything working, do not remove `<!-- ... -->` sections. 
+##### 帮助文档 : https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299
 <!-- Plugin description end -->
 
 ## Installation

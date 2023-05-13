@@ -1,0 +1,35 @@
+﻿<html>
+<body>
+<p>继承自com.mysoft.framework.mybatis.BaseEntity的子类不能new实例化对象，应该通过EntityFactory.create(Entity.class)创建，否则枚举中文、冗余字段等功能不能正常工作；</p>
+
+<h3>修复示例代码</h3>
+<h4>案例一：</h4>
+<p>修复前：</p>
+<pre><code>
+    CgSolution solution = new CgSolution();
+</code></pre>
+
+<p>修复后：</p>
+<pre><code>
+    CgSolution solution = EntityFactory.create(CgSolution.class);
+</code></pre>
+
+<h4>案例二：</h4>
+<p>修复前：</p>
+<pre><code>
+    CgSolution solution = new CgSolution() {{
+        setAssessBidMethod("1");
+        setAssessBidMode(0);
+        setBidMode(0);
+    }};
+</code></pre>
+
+<p>修复后：</p>
+<pre><code>
+    CgSolution solution = EntityFactory.create(CgSolution.class);
+    solution.setAssessBidMethod("1");
+    solution.setAssessBidMode(0);
+    solution.setBidMode(0);
+</code></pre>
+</body>
+</html>

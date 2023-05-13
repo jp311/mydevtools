@@ -24,6 +24,18 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 //    implementation(libs.annotations)
+     //jacksonxml
+    implementation("com.fasterxml.jackson.core:jackson-core:2.11.4")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.11.4")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.4")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.4")
+
+    //freemaker
+    implementation("com.quhaodian.discover:discover-freemaker:1.8.2")
+
+    //lombok
+    implementation("org.projectlombok:lombok:1.18.26")
+    annotationProcessor("org.projectlombok:lombok:1.18.26")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

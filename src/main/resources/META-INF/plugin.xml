@@ -1,18 +1,223 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin>
-    <id>com.github.h598937749.mydevtools</id>
-    <name>mydevtools Template</name>
-    <vendor>h598937749</vendor>
+<idea-plugin require-restart="true" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">
+    <!-- IntelliJ Platform SDK Code Samples: https://github.com/JetBrains/intellij-sdk-code-samples-->
+    <!-- doc：
+    中文文档：https://www.ideaplugin.com/idea-docs/Part%20II%20%E2%80%94%20Base%20Platform/Settings/Settings%20Guide.html
+    官方文档： https://plugins.jetbrains.com/docs/intellij/welcome.html
+    UI 指南：https://jetbrains.design/intellij/
+    https://zhuanlan.zhihu.com/p/400059601
+    psi：https://www.ideaplugin.com/idea-docs/Part%20IV%20%E2%80%94%20PSI/PSI%20Cookbook.html#%E5%A6%82%E4%BD%95%E9%87%8D%E5%91%BD%E5%90%8Dpsi%E5%85%83%E7%B4%A0
+    C:\Users\h5989\.gradle\caches\modules-2\files-2.1\com.jetbrains.intellij.idea\ideaIU\2022.3.1\39ac473da83edaa9b87b08e3fe0c752766155864\ideaIU-2022.3.1
+
+    com.intellij.psi.PsiFileFactory：
+    文件相关操作，e.g.创建文件等。
+    com.intellij.psi.PsiElementFactory:
+    元素相关操作，e.g.创建java方法、注解、字段、构造方法等。
+    com.intellij.psi.PsiManager:
+    项目访问PSI服务的主要入口点，e.g.查找文件、查找文件夹等。
+    com.intellij.psi.PsiClass:
+    在java类查找元素，e.g.查找方法、字段、注解。
+    com.intellij.psi.JavaPsiFacade:
+    java元素查找等操作，e.g.查找类等。
+    -->
+    <id>com.github.h598937749.devtools</id>
+    <name>mysoft-devtools</name>
+
+    <vendor email="hezd@mingyuanyun.com" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">hezd</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.mysoft</resource-bundle>
+
+<!--    <extensionPoints>-->
+<!--        <extensionPoint qualifiedName="" interface="" dynamic="true"/>-->
+<!--    </extensionPoints>-->
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.h598937749.mydevtools.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <!--工具窗口-->
+        <toolWindow icon="AllIcons.Toolwindows.WebToolWindow" anchor="left" secondary="true"
+                    factoryClass="com.mysoft.devtools.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+
+        <!--插件设置持久化服务-->
+        <applicationService serviceImplementation="com.mysoft.devtools.services.AppSettingsStateService"/>
+
+        <!--设置窗口-->
+        <projectConfigurable id="mysoft-settings"
+                             bundle="messages.SettingsBundle"
+                             key="settings.names.home"
+                             instance="com.mysoft.devtools.settings.HomeConfigurable">
+<!--            <configurable id="setting-environment" bundle="messages.SettingsBundle"-->
+<!--                          key="settings.names.environment"-->
+<!--                          instance="com.mysoft.devtools.settings.EnvironmentConfigurable"/>-->
+
+            <configurable id="setting-metadata" bundle="messages.SettingsBundle"
+                          key="settings.names.metadata"
+                          instance="com.mysoft.devtools.settings.MetadataConfigurable"/>
+
+            <configurable id="setting-generatecodetemplate" bundle="messages.SettingsBundle"
+                          key="settings.names.generatecodetemplate"
+                          instance="com.mysoft.devtools.settings.GenerateCodeTemplateConfigurable"/>
+
+        </projectConfigurable>
+
+        <notificationGroup displayType="BALLOON" id="mysoft-balloon" key="description"/>
+        <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>
+
+        <!--代码检查  https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/comparing_string_references_inspection-->
+        <localInspection language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.entity.create.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         implementationClass="com.mysoft.devtools.Inspections.NewEntityInspection"/>
+
+<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ActionRightInspection" language="JAVA"-->
+<!--                         bundle="messages.InspectionsBundle"-->
+<!--                         key="inspection.platform.attributes.actionright.display.name"-->
+<!--                         groupPath="Java"-->
+<!--                         groupBundle="messages.InspectionsBundle"-->
+<!--                         groupKey="group.names.mysoft"-->
+<!--                         enabledByDefault="true"-->
+<!--                         level="ERROR"-->
+<!--        />-->
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.AppServiceInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.appservice.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"
+        />
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.DomainServiceInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.domainservice.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"/>
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.ControllerInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.controller.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"/>
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.DaoInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.dao.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"/>
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.DataApiInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.dataapi.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"/>
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.EntityDeclarationInspection"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.entity.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         language="JAVA"/>
+<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceFilterInspection"-->
+<!--                         bundle="messages.InspectionsBundle"-->
+<!--                         key="inspection.platform.service.resourcefilter.display.name"-->
+<!--                         groupPath="Java"-->
+<!--                         groupBundle="messages.InspectionsBundle"-->
+<!--                         groupKey="group.names.mysoft"-->
+<!--                         enabledByDefault="true"-->
+<!--                         level="ERROR"-->
+<!--                         language="JAVA"/>-->
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.resource.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="WARNING"
+                         enabledByDefault="true"/>
+
+
+<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->
+<!--                         bundle="messages.InspectionsBundle"-->
+<!--                         key="inspection.mybatis.mapper.display.name"-->
+<!--                         groupPath="XML"-->
+<!--                         groupBundle="messages.InspectionsBundle"-->
+<!--                         groupKey="group.names.mysoft"-->
+<!--                         level="ERROR"-->
+<!--        />-->
     </extensions>
 
     <applicationListeners>
-        <listener class="com.github.h598937749.mydevtools.listeners.MyFrameStateListener" topic="com.intellij.ide.FrameStateListener"/>
+        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"
+                  topic="com.intellij.ide.FrameStateListener"/>
+
+        <listener class="com.mysoft.devtools.listeners.MyProjectOpenCloseListener"
+                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
+
+
+    <!-- 定义菜单组 -->
+    <actions resource-bundle="messages.mysoft">
+        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">
+            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
+        </group>
+        <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </group>
+    </actions>
+
+    <actions>
+
+        <action id="GenerateEntity" class="com.mysoft.devtools.actions.exploreractions.GenerateEntityAction"
+                text="生成Entity"
+                description="生成Entity">
+            <add-to-group group-id="mysoft-explorer-menus" anchor="first"/>
+        </action>
+
+        <action id="com.mysoft.devtools.actions.exploreractions.GenerateJsProxyAction"
+                class="com.mysoft.devtools.actions.exploreractions.GenerateJsProxyAction" text="生成JSProxy">
+            <add-to-group group-id="mysoft-explorer-menus"/>
+        </action>
+
+        <action id="GenerateEntityDtoAction"
+                class="com.mysoft.devtools.actions.exploreractions.GenerateEntityDtoAction" text="生成EntityDto"
+                description="生成EntityDto">
+            <add-to-group group-id="mysoft-explorer-menus"/>
+        </action>
+
+        <action id="GenerateDtoAction"
+                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"
+                description="根据Json、Sql生成Dto">
+            <add-to-group group-id="mysoft-explorer-menus"/>
+        </action>
+
+<!--        <action id="com.mysoft.devtools.actions.toolactions.TestAction"-->
+<!--                class="com.mysoft.devtools.actions.toolactions.TestAction" text="测试" >-->
+<!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
+<!--        </action>-->
+
+<!--        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"-->
+<!--                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">-->
+<!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
+<!--        </action>-->
+    </actions>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.java</depends>
 </idea-plugin>

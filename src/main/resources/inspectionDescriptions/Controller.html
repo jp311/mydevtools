@@ -1,0 +1,15 @@
+﻿<html lang="zh">
+<body>
+<h3> * 针对继承自 Controller 的子类检查：</h3>
+<ul>
+    <li>是否存在Tag注解，示例： @Tag(name = "供应商应用服务")</li>
+    <li>是否存在PubService注解 示例：@PubService(value = "/Budgets", prefix = RequestPrefix.API, businessCode = "02200301") </li>
+    <li>是否继承Controller</li>
+    <li>public方法是否存在@PubAction注解，@PubAction(value = "/getBudgetsByProject", method = RequestMethod.POST)</li>
+    <li>参数不能带有buguid、oid关键字</li>
+    <li>businessCode + value全局唯一检查</li>
+    <li>PubAction.value当前controller唯一检查</li>
+    <li>RequestBody、复杂参数检查（不能同时存在2个DTO）</li>
+</ul>
+</body>
+</html>
