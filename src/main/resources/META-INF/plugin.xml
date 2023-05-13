@@ -1,5 +1,5 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin require-restart="true" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">
+<idea-plugin require-restart="false" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">
     <!-- IntelliJ Platform SDK Code Samples: https://github.com/JetBrains/intellij-sdk-code-samples-->
     <!-- doc：
     中文文档：https://www.ideaplugin.com/idea-docs/Part%20II%20%E2%80%94%20Base%20Platform/Settings/Settings%20Guide.html
@@ -27,6 +27,7 @@
         hezd
     </vendor>
 
+    <!-- 参考文档：https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html#modules-specific-to-functionality -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>

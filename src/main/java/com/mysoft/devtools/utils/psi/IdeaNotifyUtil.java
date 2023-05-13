@@ -2,6 +2,7 @@ package com.mysoft.devtools.utils.psi;
 
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -60,29 +61,29 @@ public class IdeaNotifyUtil {
         Messages.showMessageDialog(message, title, Messages.getWarningIcon());
     }
 
-    public static void notifyError(String message) {
+    public static void notifyError(String message,Project project) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("mysoft-balloon")
                 .createNotification(message, NotificationType.ERROR)
-                .notify(IdeaContext.getProject());
+                .notify(project);
 
         //Notifications.Bus.notify(notify,project)
     }
 
-    public static void notifyWarn(String message) {
+    public static void notifyWarn(String message,Project project) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("mysoft-balloon")
                 .createNotification(message, NotificationType.WARNING)
-                .notify(IdeaContext.getProject());
+                .notify(project);
 
         //Notifications.Bus.notify(notify,project)
     }
 
-    public static void notifyInfo(String message) {
+    public static void notifyInfo(String message,Project project) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("mysoft-balloon")
                 .createNotification(message, NotificationType.INFORMATION)
-                .notify(IdeaContext.getProject());
+                .notify(project);
 
         //Notifications.Bus.notify(notify,project)
     }
