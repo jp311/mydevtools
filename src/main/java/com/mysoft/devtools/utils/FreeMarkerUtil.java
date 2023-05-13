@@ -13,8 +13,7 @@ import java.util.Map;
 /**
  * <a href="http://freemarker.foofun.cn/pgui_config_sharedvariables.html">中文文档</a>
  *
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public class FreeMarkerUtil {
     public static void generate(GenerateContextDTO context) throws IOException, TemplateException {

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * https://plugins.jetbrains.com/docs/intellij/settings.html
+ * <a href="https://plugins.jetbrains.com/docs/intellij/settings.html">...</a>
  * @author hezd 2023/4/22
  */
 public class HomeConfigurable implements Configurable {
@@ -49,6 +49,7 @@ public class HomeConfigurable implements Configurable {
     @Override
     public void reset() {
 
+        Configurable.super.reset();
     }
 
     @Override

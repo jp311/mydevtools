@@ -6,6 +6,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.utils.psi.IdeaContext;
@@ -29,12 +30,12 @@ public class MetadataComponent extends BaseSettingsComponent {
 
         ExtendableTextComponent.Extension browseExtension =
                 ExtendableTextComponent.Extension.create(AllIcons.General.OpenDisk, AllIcons.General.OpenDiskHover,
-                        "选择元数据目录", () -> {
+                        LocalBundle.message("devtools.settings.metadata.tooltip"), () -> {
                             FileChooserDescriptor dirChooser = FileChooserDescriptorFactory.createSingleFolderDescriptor();
                             dirChooser.setShowFileSystemRoots(true);
                             dirChooser.setHideIgnored(true);
-                            dirChooser.setTitle("选择元数据目录");
-                            FileChooser.chooseFiles(dirChooser,IdeaContext.getProject(),null,paths ->{
+                            dirChooser.setTitle(LocalBundle.message("devtools.settings.metadata.tooltip"));
+                            FileChooser.chooseFiles(dirChooser,IdeaContext.getActiveProject(),null, paths ->{
                                 if (paths.size() == 0){
                                     return;
                                 }

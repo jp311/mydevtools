@@ -20,8 +20,8 @@ public class EnvironmentConfigurable implements Configurable {
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
-        ResourceBundle bundle = ResourceBundle.getBundle("SettingsBundle");
-        return bundle.getString("settings.names.environment");
+        ResourceBundle bundle = ResourceBundle.getBundle("CommonBundle");
+        return bundle.getString("devtools.settings.environment.name");
     }
 
     @Override

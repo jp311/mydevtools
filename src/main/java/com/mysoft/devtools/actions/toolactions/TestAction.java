@@ -69,7 +69,7 @@ public class TestAction extends AnAction {
                     continue;
                 }
                 boolean hasTableIdAnnotaion = Arrays.stream(entityClass.getFields()).anyMatch(field -> field.hasAnnotation("com.baomidou.mybatisplus.annotation.TableId"));
-                if (hasTableIdAnnotaion == false) {
+                if (!hasTableIdAnnotaion) {
 
                     String tableName = tableNameAnnotationValue.getText().replace("\"", "");
                     EntityDTO entityDTO = entityDTOS.stream().filter(entity -> Objects.equals(entity.getName().toLowerCase(), tableName.toLowerCase())).findFirst().orElse(null);
@@ -108,8 +108,6 @@ public class TestAction extends AnAction {
                 e.printStackTrace();
             }
         }
-
-        System.out.println("");
     }
 
     void removeAbstractModifier(PsiClass psiClass) {
@@ -150,7 +148,6 @@ public class TestAction extends AnAction {
                 .entrySet().stream()
                 .filter(entry -> entry.getValue() > 1)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        System.out.println("");
     }
 
     private void checkResource(Project project) {
@@ -228,13 +225,13 @@ public class TestAction extends AnAction {
     }
 
     private boolean findImplClass(PsiClass psiClass, SearchScope scope, List<PsiClass> result) {
-        List<PsiClass> implClasses = ClassInheritorsSearch.search(psiClass, scope, true).findAll().stream().collect(Collectors.toList()); // 查找实现类
+        List<PsiClass> implClasses = new ArrayList<>(ClassInheritorsSearch.search(psiClass, scope, true).findAll()); // 查找实现类
         if (implClasses.size() == 0) {
             return false;
         }
         for (PsiClass implClass : implClasses) {
             boolean res = findImplClass(implClass, scope, result);
-            if (res == false) {
+            if (!res) {
                 result.add(implClass);
             }
         }
@@ -244,7 +241,7 @@ public class TestAction extends AnAction {
     /**
      * 检查PubService value相同的类
      *
-     * @param project
+     * @param project 1
      */
     private void checkPubService(Project project) {
         Map<String, List<String>> tempClass = new HashMap<>();

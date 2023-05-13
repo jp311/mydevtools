@@ -3,8 +3,7 @@ package com.mysoft.devtools.dtos;
 import java.util.function.Function;
 
 /**
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public final class GenerateDialogDTO {
     /**

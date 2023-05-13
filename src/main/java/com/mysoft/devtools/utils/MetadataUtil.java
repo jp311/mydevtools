@@ -1,6 +1,7 @@
 package com.mysoft.devtools.utils;
 
 import com.intellij.openapi.project.Project;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.medatas.EntityDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
@@ -13,8 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public class MetadataUtil {
     public static <T> List<T> loadAll(Class<T> clazz) {
@@ -22,15 +22,15 @@ public class MetadataUtil {
 
         if (clazz == EntityDTO.class) {
             String path = getMetadataPath(clazz);
-            List<File> allEntitys = FileUtil.getAllFiles(path);
+            List<File> allEntity = FileUtil.getAllFiles(path);
 
             //处理.metadata.design.config的情况
-            List<File> entitys = allEntitys.stream()
-                    .filter(file -> !file.getName().endsWith(".metadata.config") || allEntitys.stream().noneMatch(n -> file.getName().startsWith(n.getName().substring(0, n.getName().indexOf('.'))) && n.getName().endsWith(".metadata.design.config")))
+            List<File> entities = allEntity.stream()
+                    .filter(file -> !file.getName().endsWith(".metadata.config") || allEntity.stream().noneMatch(n -> file.getName().startsWith(n.getName().substring(0, n.getName().indexOf('.'))) && n.getName().endsWith(".metadata.design.config")))
                     .distinct()
                     .collect(Collectors.toList());
 
-            entitys.forEach(file -> {
+            entities.forEach(file -> {
                 try {
                     T entity = XmlUtil.fromFile(file.getAbsolutePath(), clazz);
                     result.add(entity);
@@ -46,27 +46,33 @@ public class MetadataUtil {
 
     public static <T> String getMetadataPath(Class<T> clazz) {
         MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
-
-        String metadataType = null;
+        if (settings == null){
+            throw new RuntimeException(LocalBundle.message("devtools.generate.settings.notfound"));
+        }
+        String metadataType;
         if (clazz == EntityDTO.class) {
             metadataType = "Entity";
         } else {
-            throw new RuntimeException("不支持的元数据类型！");
+            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notsupport"));
         }
 
         String path = FileUtil.combine(settings.metadataPath, metadataType);
+
         if (FileUtil.isExist(path)) {
             return path;
         }
 
-        Project project = IdeaContext.getProject();
+        Project project = IdeaContext.getActiveProject();
         String basePath = project.getBasePath();
+        if(basePath == null || basePath.isEmpty()){
+            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
+        }
         if (basePath.toLowerCase().endsWith("src")) {
             basePath = FileUtil.getParent(basePath);
         }
         path = FileUtil.combine(basePath, settings.metadataPath, metadataType);
         if (!FileUtil.isExist(path)) {
-            throw new RuntimeException("元数据目录获取失败！");
+            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
         }
         return path;
     }

@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public class VirtualFileExtension {
     public static void addImportIfNotExist(PsiJavaFile psiJavaFile, String importStatement) {
@@ -27,14 +26,14 @@ public class VirtualFileExtension {
     }
 
     public static String getPackageName(VirtualFile file) {
-        String packageName = "";
+        StringBuilder packageName = new StringBuilder();
         VirtualFile directory = file.isDirectory() ? file : file.getParent();
-        while (directory != null && !directory.getName().equals("src")) {
-            packageName = "." + directory.getName() + packageName;
+        while (directory != null && !"src".equals(directory.getName())) {
+            packageName.insert(0, "." + directory.getName());
             directory = directory.getParent();
         }
-        packageName = packageName.substring(1);
-        return packageName.replaceAll("main\\.java\\.", "");
+        packageName = new StringBuilder(packageName.substring(1));
+        return packageName.toString().replaceAll("main\\.java\\.", "");
     }
 
     public static  GenerateContextDTO getContext(VirtualFile file) {

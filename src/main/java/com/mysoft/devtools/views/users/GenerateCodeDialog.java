@@ -17,8 +17,7 @@ import java.util.function.Function;
 
 /**
  * <a href="https://plugins.jetbrains.com/docs/intellij/popups.html">Dialog</a>
- * @author hezd
- * @date 2023/4/27
+ * @author hezd 2023/4/27
  */
 public class GenerateCodeDialog extends BaseDialogComponent {
     private JPanel contentPanel;
@@ -35,15 +34,15 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     }
     
 
-    public MyVector getSelected() {
-        MyVector MyVector = new MyVector();
+    public MyVector<MyVector<Object>> getSelected() {
+        MyVector<MyVector<Object>> myVector = new MyVector<>();
         CheckTableModle model = (CheckTableModle) table.getModel();
         model.getDataVector().forEach(x->{
             if (x.get(0).equals(true)){
-                MyVector.add(x);
+                myVector.add((MyVector<Object>) x);
             }
         });
-        return MyVector;
+        return myVector;
     }
 
     private void createUIComponents() {
@@ -69,16 +68,16 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         // 为文本框添加监听器，每当文本框内容发生变化时，过滤行
         txtFilter.setTextToTriggerEmptyTextStatus("输入关键字可对数据过滤");
         txtFilter.getDocument().addDocumentListener(new DocumentListener() {
-            private Timer timer = new Timer(500, evt -> newFilter());
-
+            private final Timer timer = new Timer(500, evt -> newFilter());
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 restartTimer();
             }
-
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 restartTimer();
             }
-
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 restartTimer();
             }
@@ -111,19 +110,19 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     
     @Override
     protected void doOKAction() {
-        Function<MyVector<MyVector<Object>>, Boolean> doOKAction = generateDialogDTO.getDoOKAction();
-        if (doOKAction == null) {
+        Function<MyVector<MyVector<Object>>, Boolean> doOkAction = generateDialogDTO.getDoOKAction();
+        if (doOkAction == null) {
             return;
         }
-        MyVector selected = getSelected();
+        MyVector<MyVector<Object>> selected = getSelected();
         if (selected.size() == 0){
             IdeaNotifyUtil.dialogError("请选择需要生成的数据！");
             return;
         }
-        doOKAction.apply(selected);
+        doOkAction.apply(selected);
     }
 
-    private final class CheckHeaderCellRenderer implements TableCellRenderer {
+    private static final class CheckHeaderCellRenderer implements TableCellRenderer {
         CheckTableModle tableModel;
         JTableHeader tableHeader;
         final JCheckBox selectBox;
@@ -192,7 +191,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         }
     }
 
-    private final class CheckTableModle extends DefaultTableModel {
+    private static final class CheckTableModle extends DefaultTableModel {
         public CheckTableModle(MyVector data, MyVector columnNames) {
             super(data, columnNames);
         }

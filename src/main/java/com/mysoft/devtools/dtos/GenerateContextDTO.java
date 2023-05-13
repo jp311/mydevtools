@@ -3,8 +3,7 @@ package com.mysoft.devtools.dtos;
 import lombok.Data;
 
 /**
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 @Data
 public class GenerateContextDTO {

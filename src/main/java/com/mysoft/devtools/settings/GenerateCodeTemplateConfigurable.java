@@ -8,8 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * @author hezd
- * @date 2023/4/30
+ * @author hezd 2023/4/30
  */
 public class GenerateCodeTemplateConfigurable implements Configurable {
     private GenerateCodeTemplateComponent generateCodeTemplateComponent;

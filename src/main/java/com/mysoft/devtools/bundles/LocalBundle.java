@@ -7,16 +7,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
 /**
- * @author hezd 2023/4/24
+ * @author hezd   2023/5/13
  */
-public final class InspectionBundle extends DynamicBundle {
+public class LocalBundle extends DynamicBundle {
 
-    private static final InspectionBundle OUR_INSTANCE = new InspectionBundle();
+    private static final LocalBundle OUR_INSTANCE = new LocalBundle();
 
     @NonNls
-    public static final String BUNDLE = "messages.InspectionsBundle";
+    public static final String BUNDLE = "messages.LocalBundle";
 
-    private InspectionBundle() {
+    private LocalBundle() {
         super(BUNDLE);
     }
 
@@ -24,5 +24,4 @@ public final class InspectionBundle extends DynamicBundle {
                                       Object @NotNull ... params) {
         return OUR_INSTANCE.getMessage(key, params);
     }
-
 }

@@ -32,23 +32,26 @@ public abstract class BaseGenerateAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // 获取当前选中的文件
-        virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-        project = e.getProject();
-        context = virtualFile.getContext();
+        try {
+            // 获取当前选中的文件
+            virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
+            project = e.getProject();
+            context = virtualFile.getContext();
 
-        GenerateDialogDTO generateDialogDTO = new GenerateDialogDTO();
-        generateDialogDTO.setDialogTitle(getDialogTitle());
+            GenerateDialogDTO generateDialogDTO = new GenerateDialogDTO();
+            generateDialogDTO.setDialogTitle(getDialogTitle());
 
-        generateDialogDTO.setHeaders(getHeaders());
+            generateDialogDTO.setHeaders(getHeaders());
 
 
-        generateDialogDTO.setDataSource(getDataSource());
-        generateDialogDTO.setDoOKAction(this::generate);
+            generateDialogDTO.setDataSource(getDataSource());
+            generateDialogDTO.setDoOKAction(this::generate);
 
-        dialog = new GenerateCodeDialog(generateDialogDTO);
-        dialog.show();
-
+            dialog = new GenerateCodeDialog(generateDialogDTO);
+            dialog.show();
+        } catch (Exception ex) {
+            IdeaNotifyUtil.dialogError(ex.getMessage());
+        }
     }
 
     @Override
@@ -83,9 +86,9 @@ public abstract class BaseGenerateAction extends AnAction {
 
         virtualFile.refreshFiles(project);
         if (!isSuccess) {
-            return isSuccess;
+            return false;
         }
         dialog.close(DialogWrapper.OK_EXIT_CODE);
-        return isSuccess;
+        return true;
     }
 }

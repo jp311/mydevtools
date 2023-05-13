@@ -40,27 +40,27 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!--工具窗口-->
-        <toolWindow icon="AllIcons.Toolwindows.WebToolWindow" anchor="left" secondary="true"
-                    factoryClass="com.mysoft.devtools.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+<!--        <toolWindow icon="AllIcons.Toolwindows.WebToolWindow" anchor="left" secondary="true"-->
+<!--                    factoryClass="com.mysoft.devtools.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>-->
 
         <!--插件设置持久化服务-->
         <applicationService serviceImplementation="com.mysoft.devtools.services.AppSettingsStateService"/>
 
         <!--设置窗口-->
         <projectConfigurable id="mysoft-settings"
-                             bundle="messages.SettingsBundle"
-                             key="settings.names.home"
+                             bundle="messages.LocalBundle"
+                             key="devtools.settings.home.name"
                              instance="com.mysoft.devtools.settings.HomeConfigurable">
-            <!--            <configurable id="setting-environment" bundle="messages.SettingsBundle"-->
-            <!--                          key="settings.names.environment"-->
+            <!--            <configurable id="setting-environment" bundle="messages.CommonBundle"-->
+            <!--                          key="devtools.settings.environment.name"-->
             <!--                          instance="com.mysoft.devtools.settings.EnvironmentConfigurable"/>-->
 
-            <configurable id="setting-metadata" bundle="messages.SettingsBundle"
-                          key="settings.names.metadata"
+            <configurable id="setting-metadata" bundle="messages.LocalBundle"
+                          key="devtools.settings.metadata.name"
                           instance="com.mysoft.devtools.settings.MetadataConfigurable"/>
 
-            <configurable id="setting-generatecodetemplate" bundle="messages.SettingsBundle"
-                          key="settings.names.generatecodetemplate"
+            <configurable id="setting-generatecodetemplate" bundle="messages.LocalBundle"
+                          key="devtools.settings.generatecodetemplate.name"
                           instance="com.mysoft.devtools.settings.GenerateCodeTemplateConfigurable"/>
 
         </projectConfigurable>
@@ -206,11 +206,11 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
-        <action id="GenerateDtoAction"
-                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"
-                description="根据Json、Sql生成Dto">
-            <add-to-group group-id="mysoft-explorer-menus"/>
-        </action>
+<!--        <action id="GenerateDtoAction"-->
+<!--                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"-->
+<!--                description="根据Json、Sql生成Dto">-->
+<!--            <add-to-group group-id="mysoft-explorer-menus"/>-->
+<!--        </action>-->
 
         <!--        <action id="com.mysoft.devtools.actions.toolactions.TestAction"-->
         <!--                class="com.mysoft.devtools.actions.toolactions.TestAction" text="测试" >-->

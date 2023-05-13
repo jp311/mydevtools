@@ -16,10 +16,9 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 
 /**
- * https://plugins.jetbrains.com/docs/intellij/notifications.html
+ * <a href="https://plugins.jetbrains.com/docs/intellij/notifications.html">...</a>
  *
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public class IdeaNotifyUtil {
     private final static String title = "明源开发工具箱";
@@ -91,10 +90,10 @@ public class IdeaNotifyUtil {
     /**
      * <a href="https://jetbrains.design/intellij/controls/balloon/">官方文档</a>
      * 用完后请手动释放： balloon.dispose()
-     * @param component
-     * @param message
-     * @param listener
-     * @return
+     * @param component 组件
+     * @param message 消息
+     * @param listener x
+     * @return x
      */
     public static Balloon balloonMessage(JComponent component, String message, HyperlinkListener listener) {
         BalloonBuilder balloonBuilder = JBPopupFactory.getInstance().createHtmlTextBalloonBuilder(message, MessageType.INFO, listener);

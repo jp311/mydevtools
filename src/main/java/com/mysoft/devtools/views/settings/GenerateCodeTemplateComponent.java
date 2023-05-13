@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.ContextHelpLabel;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.components.JBTextField;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.controls.FreeMarkerEditor;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
@@ -35,7 +36,7 @@ public class GenerateCodeTemplateComponent extends BaseSettingsComponent {
 
     @Override
     public JComponent getContentPanel() {
-        Project project = IdeaContext.getProject();
+        Project project = IdeaContext.getActiveProject();
 
         JPanel entityPanel = new JPanel();
         entityPanel.setLayout(new BorderLayout());
@@ -100,7 +101,9 @@ public class GenerateCodeTemplateComponent extends BaseSettingsComponent {
     }
 
     private void createUIComponents() {
-        help = ContextHelpLabel.createWithLink("代码生成说明", "通过FreeMarker模板库生成代码，关于模板语法请参考", "官方文档", () -> {
+        help = ContextHelpLabel.createWithLink(LocalBundle.message("devtools.settings.generatecodetemplate.title")
+                , LocalBundle.message("devtools.settings.generatecodetemplate.description")
+                , LocalBundle.message("devtools.settings.generatecodetemplate.help"), () -> {
             try {
                 Desktop.getDesktop().browse(new URI("http://freemarker.foofun.cn/pgui_config_sharedvariables.html"));
             } catch (IOException | URISyntaxException e) {

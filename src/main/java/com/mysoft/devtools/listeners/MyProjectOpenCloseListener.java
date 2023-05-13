@@ -5,8 +5,7 @@ import com.intellij.openapi.project.ProjectManagerListener;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author hezd
- * @date 2023/4/24
+ * @author hezd 2023/4/24
  */
 public class MyProjectOpenCloseListener implements ProjectManagerListener {
 //    /**

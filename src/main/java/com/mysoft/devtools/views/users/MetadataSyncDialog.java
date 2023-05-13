@@ -5,6 +5,8 @@ import com.intellij.ui.ContextHelpLabel;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.mysoft.devtools.bundles.LocalBundle.message;
+
 /**
  * @author hezd   2023/5/7
  */
@@ -29,9 +31,8 @@ public class MetadataSyncDialog extends BaseDialogComponent {
     }
 
     private void createUIComponents() {
-
-        contextHelpLabel1 = ContextHelpLabel.createWithLink("元数据同步", "向目标服务器同步元数据，如需创建新数据源点击下方超链接", "创建新数据源", () -> {
-            System.out.printf("", "");
-        });
+        contextHelpLabel1 = ContextHelpLabel.createWithLink(message("devtools.menutools.syncmetadata.title")
+                , message("devtools.menutools.syncmetadata.description")
+                , message("devtools.menutools.syncmetadata.createdatasource"), System.out::println);
     }
 }

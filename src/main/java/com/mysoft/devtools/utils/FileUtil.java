@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public class FileUtil {
     public static String readAllText(String path) throws IOException {
@@ -30,7 +29,7 @@ public class FileUtil {
     }
 
     public static List<File> getAllFiles(String path) {
-        List<File> fileList = new ArrayList<File>();
+        List<File> fileList = new ArrayList<>();
         File file = new File(path);
         if (!file.exists()) {
             return fileList;

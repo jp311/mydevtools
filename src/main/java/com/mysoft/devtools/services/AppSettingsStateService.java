@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * https://www.ideaplugin.com/idea-docs/Part%20II%20%E2%80%94%20Base%20Platform/Settings/Settings%20Tutorial.html#%E6%A6%82%E8%BF%B0
+ * <a href="https://www.ideaplugin.com/idea-docs/Part%20II%20%E2%80%94%20Base%20Platform/Settings/Settings%20Tutorial.html#%E6%A6%82%E8%BF%B0">...</a>
  * 插件设置持久化服务
  *
  * @author hezd 2023/4/22

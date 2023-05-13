@@ -12,8 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author hezd
- * @date 2023/5/3
+ * @author hezd 2023/5/3
  */
 public class XmlUtil {
     private static final XmlMapper xmlMapper;

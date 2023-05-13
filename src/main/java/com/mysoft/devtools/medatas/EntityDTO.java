@@ -11,8 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author hezd
- * @date 2023/5/2
+ * @author hezd 2023/5/2
  */
 @Data
 @JacksonXmlRootElement(localName = "MetadataEntity")

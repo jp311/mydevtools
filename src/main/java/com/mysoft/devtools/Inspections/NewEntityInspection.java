@@ -11,6 +11,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
+import com.mysoft.devtools.utils.psi.VirtualFileExtension;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
@@ -22,6 +24,7 @@ import java.util.List;
  *
  * @author hezd 2023/4/24
  */
+@ExtensionMethod(VirtualFileExtension.class)
 public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
     private final ReplaceWithEntityFactoryQuickFix myQuickFix = new ReplaceWithEntityFactoryQuickFix();
 
@@ -74,7 +77,8 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
             PsiParserFacade parserFacade = PsiParserFacade.SERVICE.getInstance(project);
             PsiWhiteSpace newLine = (PsiWhiteSpace) parserFacade.createWhiteSpaceFromText("\n");
 
-            PsiNewExpressionImpl psiElement = (PsiNewExpressionImpl) descriptor.getPsiElement();
+            PsiElement psiElement = descriptor.getPsiElement();
+            PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
             PsiLocalVariable localVariable = (PsiLocalVariable) psiElement.getParent();
 
             TextRange textRange = psiElement.getTextRange();
@@ -85,15 +89,13 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
             PsiElementFactory factory = PsiElementFactory.getInstance(project);
             String newCode = MessageFormat.format("{0} {1} = EntityFactory.create({0}.class);", entityName, variableName);
             PsiStatement newStatement = factory.createStatementFromText(newCode, localVariable);
-            newStatement.addAfter(newLine, newStatement);
-
-            PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
 
             List<PsiStatement> properties = new ArrayList<>();
             if (anonymousClass != null) {
                 PsiCodeBlock body = PsiTreeUtil.collectElementsOfType(anonymousClass, PsiCodeBlock.class).stream().findFirst().orElse(null);
 
                 if (body != null) {
+                    newStatement.addAfter(newLine, newStatement);
                     for (PsiStatement statement : body.getStatements()) {
                         if (statement instanceof PsiExpressionStatement) {
                             PsiExpression expression = ((PsiExpressionStatement) statement).getExpression();
@@ -125,14 +127,7 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
 
             CodeStyleManager.getInstance(project).reformatText(containingFile, textRange.getStartOffset(), textRange.getEndOffset() + properties.size());
 
-            PsiImportList importList = ((PsiJavaFile) containingFile).getImportList();
-            PsiClass fooClass = JavaPsiFacade.getInstance(project).findClass(QualifiedNames.ENTITY_FACTORY_QUALIFIED_NAME, GlobalSearchScope.allScope(project));
-            if (fooClass != null) {
-                PsiImportStatement importStatement = factory.createImportStatement(fooClass);
-                if (importList != null) {
-                    importList.add(importStatement);
-                }
-            }
+            ((PsiJavaFile)containingFile).addImportIfNotExist("com.mysoft.framework.mybatis.EntityFactory");
         }
 
 

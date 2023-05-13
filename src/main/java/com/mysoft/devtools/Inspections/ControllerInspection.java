@@ -36,13 +36,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     @Override
     public ProblemDescriptor @Nullable [] checkClass(@NotNull PsiClass aClass, @NotNull InspectionManager manager, boolean isOnTheFly) {
         Project project = aClass.getProject();
-        GlobalSearchScope scope = ProjectScope.getAllScope(project);
-        PsiClass baseEntityClass = JavaPsiFacade.getInstance(project).findClass(QualifiedNames.CONTROLLER_QUALIFIED_NAME, scope);
-        if (baseEntityClass == null){
-            return super.checkClass(aClass, manager, isOnTheFly);
-        }
-
-        boolean isController = ClassInheritorsSearch.search(baseEntityClass).anyMatch(x -> Objects.equals(x.getQualifiedName(), aClass.getQualifiedName()));
+        boolean isController = aClass.isInheritors(QualifiedNames.CONTROLLER_QUALIFIED_NAME,project);
         if (!isController){
             return super.checkClass(aClass, manager, isOnTheFly);
         }

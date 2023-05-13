@@ -1,5 +1,7 @@
 package com.mysoft.devtools.actions.exploreractions;
 
+import com.intellij.CommonBundle;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.medatas.EntityDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
@@ -21,15 +23,15 @@ public class GenerateEntityAction extends BaseGenerateAction {
 
     @Override
     protected String getDialogTitle() {
-        return "Entity生成器";
+        return LocalBundle.message("devtools.generate.entity.dialogtitle");
     }
 
     @Override
     protected MyVector<String> getHeaders() {
         MyVector<String> headerNames = new MyVector<>();
         headerNames.add(""); //全选列
-        headerNames.add("英文名称");
-        headerNames.add("中文名称");
+        headerNames.add(LocalBundle.message("devtools.generate.entity.header1"));
+        headerNames.add(LocalBundle.message("devtools.generate.entity.header2"));
         return headerNames;
     }
 
