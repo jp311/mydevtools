@@ -154,7 +154,7 @@
                          groupPath="Java"
                          groupBundle="messages.InspectionsBundle"
                          groupKey="group.names.mysoft"
-                         level="WARNING"
+                         level="ERROR"
                          enabledByDefault="true"/>
 
 
