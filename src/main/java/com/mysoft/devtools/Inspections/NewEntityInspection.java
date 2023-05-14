@@ -2,15 +2,14 @@ package com.mysoft.devtools.Inspections;
 
 import com.intellij.codeInspection.*;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.impl.source.tree.java.PsiNewExpressionImpl;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
+import com.mysoft.devtools.utils.psi.IdeaSdkAdapter;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
@@ -47,10 +46,6 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
 
     /**
      * 判断是否BaseEntity的子类
-     *
-     * @param type
-     * @param project
-     * @return
      */
     private boolean isSubclassOfBaseEntity(PsiType type, Project project) {
         PsiClass psiClass = PsiUtil.resolveClassInType(type);
@@ -75,8 +70,6 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
 
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
-            PsiParserFacade parserFacade = PsiParserFacade.SERVICE.getInstance(project);
-
             PsiElement psiElement = descriptor.getPsiElement();
             PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
             PsiLocalVariable localVariable = (PsiLocalVariable) psiElement.getParent();
@@ -89,7 +82,7 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
 
             PsiCodeBlock body = PsiTreeUtil.collectElementsOfType(anonymousClass, PsiCodeBlock.class).stream().findFirst().orElse(null);
 
-            List<PsiStatement> propertys = new ArrayList<>();
+            List<PsiStatement> properties = new ArrayList<>();
             if (body != null) {
                 for (PsiStatement statement : body.getStatements()) {
                     if (statement instanceof PsiExpressionStatement) {
@@ -97,11 +90,14 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
                         if (expression instanceof PsiMethodCallExpression) {
                             PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) expression;
                             String setMethodName = methodCallExpression.getMethodExpression().getText();
-                            String propertyValue = PsiTreeUtil.findChildOfType(methodCallExpression, PsiExpressionList.class).getText();
-
+                            String propertyValue = "";
+                            PsiExpressionList childOfType = PsiTreeUtil.findChildOfType(methodCallExpression, PsiExpressionList.class);
+                            if (childOfType != null){
+                                propertyValue = childOfType.getText();
+                            }
                             String newCode = MessageFormat.format("{0}.{1}{2};", variableName, setMethodName, propertyValue);
                             PsiStatement propertySetMethod = elementFactory.createStatementFromText(newCode, null);
-                            propertys.add(propertySetMethod);
+                            properties.add(propertySetMethod);
                         }
                     }
                 }
@@ -112,8 +108,9 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
 
             PsiFile containingFile = result.getContainingFile();
             PsiElement nextSibling = localVariable.getNextSibling();
-            if (propertys.size() > 0) {
-                for (PsiStatement property : propertys) {
+            if (properties.size() > 0) {
+                PsiParserFacade parserFacade = IdeaSdkAdapter.getPsiParserFacade(project);
+                for (PsiStatement property : properties) {
                     if (!(nextSibling instanceof PsiWhiteSpace)) {
                         nextSibling = localVariable.addAfter(parserFacade.createWhiteSpaceFromText("\n"), result);
                     }
@@ -122,14 +119,16 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
                 }
             }
 
-            if (containingFile == null){
+            if (containingFile == null) {
                 return;
             }
 
             ((PsiJavaFile) containingFile).addImportIfNotExist("com.mysoft.framework.mybatis.EntityFactory");
 
             PsiMethod method = PsiTreeUtil.getParentOfType(localVariable, PsiMethod.class);
-            CodeStyleManager.getInstance(project).reformatText(method.getContainingFile(), method.getTextRange().getStartOffset(), method.getTextRange().getEndOffset());
+            if (method != null) {
+                CodeStyleManager.getInstance(project).reformatText(containingFile, method.getTextRange().getStartOffset(), method.getTextRange().getEndOffset());
+            }
         }
 
 
