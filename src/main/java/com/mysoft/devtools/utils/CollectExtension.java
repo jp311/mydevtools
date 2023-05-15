@@ -6,7 +6,7 @@ import java.util.Collection;
 /**
  * @author hezd 2023/5/3
  */
-public class CollectExtention {
+public class CollectExtension {
     public static <T> T lastOrDefault(Collection<T> source){
         return source.stream().reduce((first,second) -> second).orElse(null);
     }

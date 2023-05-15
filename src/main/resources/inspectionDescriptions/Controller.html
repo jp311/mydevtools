@@ -2,14 +2,19 @@
 <body>
 <h3> * 针对继承自 Controller 的子类检查：</h3>
 <ul>
-    <li>是否存在Tag注解，示例： @Tag(name = "供应商应用服务")</li>
-    <li>是否存在PubService注解 示例：@PubService(value = "/Budgets", prefix = RequestPrefix.API, businessCode = "02200301") </li>
-    <li>是否继承Controller</li>
-    <li>public方法是否存在@PubAction注解，@PubAction(value = "/getBudgetsByProject", method = RequestMethod.POST)</li>
-    <li>参数不能带有buguid、oid关键字</li>
-    <li>businessCode + value全局唯一检查</li>
-    <li>PubAction.value当前controller唯一检查</li>
-    <li>RequestBody、复杂参数检查（不能同时存在2个DTO）</li>
+    <li>是否存在Tag注解，示例： @Tag(name = "供应商应用服务")；级别：警告；有快速修复</li>
+    <li>是否Tag注解缺少name属性；示例： @Tag，级别：警告；无快速修复</li>
+    <li>是否Tag注解name属性为空，示例： @Tag(name = "")，级别：警告；无快速修复</li>
+    <li>是否存在PubService注解 示例：@PubService(value = "/Budgets", prefix = RequestPrefix.API, businessCode = "02200301")；级别：错误；有快速修复 </li>
+    <li>PubService注解是否缺失value属性或值为空 示例：@PubService(prefix = RequestPrefix.API, businessCode = "02200301")；级别：错误；无快速修复 </li>
+    <li>PubService注解是否缺失prefix属性或值为空 示例：@PubService(value = "/Budgets", businessCode = "02200301")；级别：错误；无快速修复 </li>
+    <li>PubService注解是否缺失businessCode属性或值为空 示例：@PubService(value = "/Budgets",prefix = RequestPrefix.API)；级别：错误；无快速修复 </li>
+    <li>方法是否存在@PubAction注解（非public、static、abstract等修饰符不检查），示例：@PubAction(value = "/getBudgetsByProject", method = RequestMethod.POST)；级别：警告；有快速修复</li>
+    <li>@PubAction注解是否缺失value属性或值为空，示例：@PubAction(value = "", method = RequestMethod.POST)；级别：警告；无快速修复</li>
+    <li>方法参数不能带有buguid、oid关键字，防止和平台关键字冲突（非public、static、abstract等修饰符不检查）</li>
+    <li>businessCode + value全局唯一检查；级别：错误；无快速修复</li>
+    <li>PubAction.value当前controller唯一检查；级别：错误；无快速修复</li>
+    <li>RequestBody、复杂参数检查（不能同时存在2个DTO）；级别：错误；支持快速修复</li>
 </ul>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.mysoft.devtools.utils.psi;
 
+import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiModifier;
 import com.intellij.psi.PsiModifierList;
@@ -19,11 +20,26 @@ public class PsiMethodExtension {
         return psiModifierList.hasModifierProperty(PsiModifier.PUBLIC);
     }
 
-    public static String getComment(PsiMethod method){
+    public static boolean isStatic(PsiMethod psiMethod) {
+        PsiModifierList psiModifierList = psiMethod.getModifierList();
+        return psiModifierList.hasModifierProperty(PsiModifier.STATIC);
+    }
+
+    public static boolean isAbstract(PsiMethod psiMethod) {
+        PsiModifierList psiModifierList = psiMethod.getModifierList();
+        return psiModifierList.hasModifierProperty(PsiModifier.ABSTRACT);
+    }
+
+    public static String getComment(PsiMethod method) {
         PsiDocComment docComment = method.getDocComment();
-        if (docComment == null){
+        if (docComment == null) {
             return "";
         }
         return Arrays.stream(docComment.getDescriptionElements()).map(x -> x.getText().replace(" ", "").replace("\n", "")).collect(Collectors.joining(""));
+    }
+
+    public static void addAnnotation(PsiMethod method, PsiAnnotation annotation) {
+        PsiModifierList modifierList = method.getModifierList();
+        modifierList.addAfter(annotation,null);
     }
 }

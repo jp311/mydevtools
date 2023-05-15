@@ -1,8 +1,8 @@
 package com.mysoft.devtools.utils.psi;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.psi.*;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
@@ -20,6 +20,14 @@ import java.util.stream.Collectors;
  */
 @ExtensionMethod({VirtualFileExtension.class})
 public class PsiClassExtension {
+    public static boolean isAbstract(PsiClass psiClass){
+        PsiModifierList modifierList = psiClass.getModifierList();
+        if (modifierList == null){
+            return false;
+        }
+
+        return modifierList.hasModifierProperty(PsiModifier.ABSTRACT);
+    }
     public static String getComment(PsiClass psiClass) {
         PsiDocComment docComment = psiClass.getDocComment();
         if (docComment == null) {
@@ -43,5 +51,17 @@ public class PsiClassExtension {
 
     public static boolean isInheritors(PsiClass subClass, PsiClass baseClass) {
         return ClassInheritorsSearch.search(baseClass).anyMatch(x -> Objects.equals(x.getQualifiedName(), subClass.getQualifiedName()));
+    }
+
+    /**
+     * 是否本项目的文件
+     */
+    public static boolean isInSourceContent(PsiClass psiClass,Project project){
+        return ProjectRootManager.getInstance(project).getFileIndex().isInSourceContent(psiClass.getContainingFile().getVirtualFile());
+    }
+
+    public static void addAnnotation(PsiClass aClass, PsiAnnotation annotation) {
+        PsiModifierList modifierList = aClass.getModifierList();
+        modifierList.addAfter(annotation,null);
     }
 }
