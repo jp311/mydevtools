@@ -80,15 +80,6 @@
                          level="ERROR"
                          implementationClass="com.mysoft.devtools.Inspections.NewEntityInspection"/>
 
-        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ActionRightInspection" language="JAVA"-->
-        <!--                         bundle="messages.InspectionsBundle"-->
-        <!--                         key="inspection.platform.attributes.actionright.display.name"-->
-        <!--                         groupPath="Java"-->
-        <!--                         groupBundle="messages.InspectionsBundle"-->
-        <!--                         groupKey="group.names.mysoft"-->
-        <!--                         enabledByDefault="true"-->
-        <!--                         level="ERROR"-->
-        <!--        />-->
         <localInspection implementationClass="com.mysoft.devtools.Inspections.AppServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.appservice.display.name"
