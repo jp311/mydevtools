@@ -3,7 +3,7 @@ package com.mysoft.devtools.medatas;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import com.mysoft.devtools.utils.CollectExtention;
+import com.mysoft.devtools.utils.CollectExtension;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @JacksonXmlRootElement(localName = "MetadataEntity")
-@ExtensionMethod({CollectExtention.class})
+@ExtensionMethod({CollectExtension.class})
 public class EntityDTO implements Serializable {
     /**
      * 根节点属性

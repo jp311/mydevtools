@@ -17,16 +17,23 @@
 - [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
 
 <!-- Plugin description -->
-## 明源云开发工具箱 （mysoft-devtools)
-### 功能简介 
+## mysoft-devtools
+### Plugin Features 
+- Code generator
+- Code checker/Code inspector
+- Development Toolkit
+
+## 明源云开发工具箱
+### 功能简介
 - 代码生成器
 - 代码检查器
 - 开发工具箱
 
-### 帮助文档 : 
-https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299
 
-### bug反馈：
+### Doc : 
+https://github.com/h598937749/mydevtools/wiki
+
+### issues：
 https://github.com/h598937749/mydevtools/issues
 <!-- Plugin description end -->
 

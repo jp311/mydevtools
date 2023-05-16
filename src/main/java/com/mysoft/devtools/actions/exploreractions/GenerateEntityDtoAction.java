@@ -8,7 +8,7 @@ import com.mysoft.devtools.dtos.EntityGenerateDTO;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.CollectExtention;
+import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.NameConventValidateUtil;
 import com.mysoft.devtools.utils.psi.*;
 import lombok.experimental.ExtensionMethod;
@@ -20,7 +20,7 @@ import java.util.Objects;
 /**
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, CollectExtention.class, ProjectExtension.class, PsiMethodExtension.class, PsiParameterExtension.class, PsiFieldExtension.class})
+@ExtensionMethod({PsiClassExtension.class, PsiAnnotationValueExtension.class, CollectExtension.class, ProjectExtension.class, PsiMethodExtension.class, PsiParameterExtension.class, PsiFieldExtension.class})
 public class GenerateEntityDtoAction extends BaseGenerateAction {
     @Override
     protected String getCodeTemplate() {
@@ -76,7 +76,7 @@ public class GenerateEntityDtoAction extends BaseGenerateAction {
             if (tableidAnnotation != null){
                 PsiAnnotationMemberValue value = tableidAnnotation.findAttributeValue("value");
                 if (value != null){
-                    jsonFieldName = value.getText().replace("\"","").trim();
+                    jsonFieldName = value.getValue();
                 }
             }
 
@@ -84,7 +84,7 @@ public class GenerateEntityDtoAction extends BaseGenerateAction {
             if (tableFieldAnnotation != null){
                 PsiAnnotationMemberValue value = tableFieldAnnotation.findAttributeValue("value");
                 if (value != null){
-                    String tmp = value.getText().replace("\"","").trim();
+                    String tmp = value.getValue();
                     if (!tmp.isBlank()){
                         jsonFieldName = tmp;
                     }

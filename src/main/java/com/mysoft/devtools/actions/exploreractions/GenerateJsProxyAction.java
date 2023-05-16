@@ -5,7 +5,7 @@ import com.mysoft.devtools.dtos.ControllerGenerateDTO;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.CollectExtention;
+import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.NameConventValidateUtil;
 import com.mysoft.devtools.utils.psi.ProjectExtension;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * @author hezd   2023/5/7
  */
-@ExtensionMethod({PsiClassExtension.class, CollectExtention.class, ProjectExtension.class, PsiMethodExtension.class, PsiParameterExtension.class})
+@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, ProjectExtension.class, PsiMethodExtension.class, PsiParameterExtension.class})
 public class GenerateJsProxyAction extends BaseGenerateAction {
     @Override
     protected String getDialogTitle() {

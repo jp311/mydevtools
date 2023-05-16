@@ -1,11 +1,10 @@
 package com.mysoft.devtools.actions.exploreractions;
 
-import com.intellij.CommonBundle;
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.medatas.EntityDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.CollectExtention;
+import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.MetadataUtil;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
@@ -18,7 +17,7 @@ import java.util.Objects;
  *
  * @author hezd 2023/4/26
  */
-@ExtensionMethod({VirtualFileExtension.class, CollectExtention.class})
+@ExtensionMethod({VirtualFileExtension.class, CollectExtension.class})
 public class GenerateEntityAction extends BaseGenerateAction {
 
     @Override

@@ -26,4 +26,10 @@ public class QualifiedNames {
     public static final String COMPONENT_QUALIFIED_NAME = "org.springframework.stereotype.Component";
 
     public static final String SERVICE_QUALIFIED_NAME = "org.springframework.stereotype.Service";
+
+    public static final String AUTOWIRED_QUALIFIED_NAME = "org.springframework.beans.factory.annotation.Autowired";
+
+    public static final String RESOURCE_QUALIFIED_NAME = "javax.annotation.Resource";
+
+    public static final String TAG_QUALIFIED_NAME = "io.swagger.v3.oas.annotations.tags.Tag";
 }
