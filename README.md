@@ -31,7 +31,7 @@
 
 
 ### Doc : 
-https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299
+https://github.com/h598937749/mydevtools/wiki
 
 ### issues：
 https://github.com/h598937749/mydevtools/issues

@@ -1,5 +1,5 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
-<idea-plugin require-restart="false" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">
+<idea-plugin require-restart="false" url="https://github.com/h598937749/mydevtools/wiki">
     <!-- IntelliJ Platform SDK Code Samples: https://github.com/JetBrains/intellij-sdk-code-samples-->
     <!-- doc：
     中文文档：https://www.ideaplugin.com/idea-docs/Part%20II%20%E2%80%94%20Base%20Platform/Settings/Settings%20Guide.html
@@ -23,7 +23,7 @@
     <id>com.github.h598937749.devtools</id>
     <name>mysoft-devtools</name>
 
-    <vendor email="hezd@mingyuanyun.com" url="https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229299">
+    <vendor email="hezd@mingyuanyun.com" url="https://github.com/h598937749/mydevtools/wiki">
         hezd
     </vendor>
 
