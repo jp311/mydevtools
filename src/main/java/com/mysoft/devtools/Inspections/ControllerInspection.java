@@ -7,16 +7,17 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
+import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.StringExtension;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.PsiMethodExtension;
-import com.mysoft.devtools.utils.psi.VirtualFileExtension;
+import com.mysoft.devtools.utils.psi.*;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Controller检查：
@@ -31,7 +32,7 @@ import java.util.Objects;
  *
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, StringExtension.class, VirtualFileExtension.class, PsiMethodExtension.class})
+@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, VirtualFileExtension.class, PsiMethodExtension.class, PsiAnnotationValueExtension.class})
 public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     private final AddTagAnnotationQuickFix addTagAnnotationQuickFix = new AddTagAnnotationQuickFix();
     private final AddPubServiceAnnotationQuickFix addPubServiceAnnotationQuickFix = new AddPubServiceAnnotationQuickFix();
@@ -46,16 +47,16 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                 boolean isController = isController(aClass, project);
                 //未继承Controller不检查
                 if (!isController) {
-                    return false;
+                    return true;
                 }
 
                 //抽象类不检查
-                return !aClass.isAbstract();
+                return aClass.isAbstract();
             }
 
             @Override
             public void visitClass(PsiClass aClass) {
-                if (!isChecker(aClass)) {
+                if (isChecker(aClass)) {
                     return;
                 }
 
@@ -76,7 +77,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                     return;
                 }
 
-                if (!isChecker(aClass)) {
+                if (isChecker(aClass)) {
                     return;
                 }
 
@@ -91,7 +92,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                 checkerPubAction(method, holder);
 
                 //检查value是否在当前类中唯一
-                checkerPubActionIsUnique(method,holder);
+                checkerPubActionIsUnique(method, holder);
             }
         };
     }
@@ -100,14 +101,81 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查value是否在当前类中唯一
      */
     private void checkerPubActionIsUnique(PsiMethod method, ProblemsHolder holder) {
-        //todo 待实现 检查value是否在当前类中唯一
+        PsiClass aClass = method.getContainingClass();
+        if (aClass == null) {
+            return;
+        }
+
+        PsiAnnotation annotation = method.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
+        if (annotation == null) {
+            return;
+        }
+        PsiAnnotationMemberValue valueAttr = annotation.findAttributeValue("value");
+        if (valueAttr == null || valueAttr.getValue().isNullOrEmpty()) {
+            return;
+        }
+
+        PsiMethod[] methods = aClass.getMethods();
+        List<PsiMethod> repeatUsages = Arrays.stream(methods).filter(x -> !Objects.equals(x, method) && comprePubActionAnnotation(valueAttr.getValue(), x)).collect(Collectors.toList());
+        if (repeatUsages.size() > 0) {
+            holder.registerProblem(valueAttr, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.unique.descriptor"), ProblemHighlightType.ERROR);
+        }
+
+    }
+
+    private boolean comprePubActionAnnotation(String value, PsiMethod psiMethod) {
+        PsiAnnotation annotation = psiMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
+        if (annotation == null) {
+            return false;
+        }
+        PsiAnnotationMemberValue valueAttr = annotation.findAttributeValue("value");
+        if (valueAttr == null || valueAttr.getValue().isNullOrEmpty()) {
+            return false;
+        }
+        return Objects.equals(value, valueAttr.getValue());
     }
 
     /**
      * 检查value + businessCode是否全局唯一
      */
     private void checkerPubServiceIsUnique(PsiClass aClass, ProblemsHolder holder) {
-        //todo 待实现 检查是否缺失PubAction注解
+        PsiAnnotation annotation = aClass.getAnnotation(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
+        if (annotation == null) {
+            return;
+        }
+        PsiAnnotationMemberValue valueAttr = annotation.findAttributeValue("value");
+        if (valueAttr == null || valueAttr.getValue().isNullOrEmpty()) {
+            return;
+        }
+
+        PsiAnnotationMemberValue businessCodeAttr = annotation.findAttributeValue("businessCode");
+        if (businessCodeAttr == null || businessCodeAttr.getValue().isNullOrEmpty()) {
+            return;
+        }
+        Project project = aClass.getProject();
+        List<PsiClass> usages = PsiAnnotationExtension.findUsages(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME, project).ofType(PsiClass.class);
+        List<PsiClass> repeatUsages = usages.stream().filter(x -> !Objects.equals(x, aClass) && comprePubServiceAnnotation(valueAttr.getValue(), businessCodeAttr.getValue(), x)).collect(Collectors.toList());
+        if (repeatUsages.size() > 0) {
+            holder.registerProblem(annotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.unique.descriptor"), ProblemHighlightType.ERROR);
+        }
+    }
+
+    private boolean comprePubServiceAnnotation(String value, String businessCode, PsiClass psiClass) {
+        PsiAnnotation annotation = psiClass.getAnnotation(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
+        if (annotation == null) {
+            return false;
+        }
+        PsiAnnotationMemberValue valueAttr = annotation.findAttributeValue("value");
+        if (valueAttr == null || valueAttr.getValue().isNullOrEmpty()) {
+            return false;
+        }
+
+        PsiAnnotationMemberValue businessCodeAttr = annotation.findAttributeValue("businessCode");
+        if (businessCodeAttr == null || businessCodeAttr.getValue().isNullOrEmpty()) {
+            return false;
+        }
+
+        return Objects.equals(valueAttr.getValue(), value) && Objects.equals(businessCodeAttr.getValue(), businessCode);
     }
 
     private boolean isController(PsiClass psiClass, Project project) {
@@ -130,7 +198,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             return;
         }
 
-        if (nameAttr.getText().replace("\"", "").isNullOrEmpty()) {
+        if (nameAttr.getValue().isNullOrEmpty()) {
             holder.registerProblem(tagAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.tagnameempty.descriptor"), ProblemHighlightType.WARNING);
         }
     }
@@ -151,7 +219,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             return;
         }
 
-        if (valueAttr.getText().replace("\"", "").isNullOrEmpty()) {
+        if (valueAttr.getValue().isNullOrEmpty()) {
             holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.valueempty.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
@@ -167,7 +235,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.businesscode.descriptor"), ProblemHighlightType.ERROR);
         }
 
-        if (businessCodeAttr != null && businessCodeAttr.getText().replace("\"", "").isNullOrEmpty()) {
+        if (businessCodeAttr != null && businessCodeAttr.getValue().isNullOrEmpty()) {
             holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.businesscodeempty.descriptor"), ProblemHighlightType.ERROR);
         }
     }
@@ -188,7 +256,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             return;
         }
 
-        if (valueAttr.getText().replace("/", "").replace("\"", "").isNullOrEmpty()) {
+        if (valueAttr.getValue().replace("/", "").isNullOrEmpty()) {
             holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueempty.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
