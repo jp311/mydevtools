@@ -20,14 +20,15 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Controller检查：
+ * Controller检查（前置条件：继承自Controller的子类）：
  * 1、是否存在Tag注解 @Tag(name = "供应商应用服务")
  * 2、是否存在PubService注解 @PubService(value = "/Budgets", prefix = RequestPrefix.API, businessCode = "02200301")
  * 3、public方法是否存在@PubAction注解，@PubAction(value = "/getBudgetsByProject", method = RequestMethod.POST)
  * 4、参数不能带有buguid、oid关键字
  * 5、businessCode + value全局唯一检查
  * 6、PubAction.value当前controller唯一检查
- * 7、RequestBody、复杂参数检查（不能同时存在2个DTO）
+ * 7、RequestBody、复杂参数检查（不能同时存在2个DTO） TODO 待实现
+ * 8、命名需要以Controller结尾
  * <a href="https://dploeger.github.io/intellij-api-doc/com/intellij/codeInspection/AbstractBaseJavaLocalInspectionTool.html">...</a>
  *
  * @author hezd 2023/4/27
@@ -68,6 +69,11 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
                 //检查value + businessCode是否全局唯一
                 checkerPubServiceIsUnique(aClass, holder);
+
+                //命名规范检查：以Controller结尾
+                if (aClass.getName() != null && !aClass.getName().endsWith("Controller")) {
+                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.name.descriptor"), ProblemHighlightType.WARNING);
+                }
             }
 
             @Override
@@ -244,6 +250,9 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查是否存在PubAction注解
      */
     private void checkerPubAction(PsiMethod aMethod, ProblemsHolder holder) {
+        if (aMethod.getNameIdentifier() == null) {
+            return;
+        }
         PsiAnnotation pubActionAnnotation = aMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (pubActionAnnotation == null) {
             holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
@@ -252,12 +261,12 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
         PsiAnnotationMemberValue valueAttr = pubActionAnnotation.findAttributeValue("value");
         if (valueAttr == null) {
-            holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueattr.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueattr.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
 
         if (valueAttr.getValue().replace("/", "").isNullOrEmpty()) {
-            holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueempty.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueempty.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
     }

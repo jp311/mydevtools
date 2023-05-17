@@ -7,6 +7,7 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
+import com.intellij.psi.util.InheritanceUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import lombok.experimental.ExtensionMethod;
@@ -50,7 +51,7 @@ public class PsiClassExtension {
     }
 
     public static boolean isInheritors(PsiClass subClass, PsiClass baseClass) {
-        return ClassInheritorsSearch.search(baseClass).anyMatch(x -> Objects.equals(x.getQualifiedName(), subClass.getQualifiedName()));
+         return InheritanceUtil.isInheritorOrSelf(subClass,baseClass,true);
     }
 
     /**

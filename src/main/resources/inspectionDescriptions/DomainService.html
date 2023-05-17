@@ -1,21 +1,10 @@
-<html>
+<html lang="zh">
 <body>
-Write your description here.
-Start the description with a verb in 3rd person singular, like reports, detects, highlights.
-In the first sentence, briefly explain what exactly the inspection helps you detect.
-Make sure the sentence is not very long and complicated.
-<p>
-    The first sentence must be in a dedicated paragraph separated from the rest of the text. This will make the
-    description easier to read.
-    Make sure the description doesn’t just repeat the inspection title.
-</p>
-<p>
-    See https://jetbrains.design/intellij/text/inspections/#descriptions for more information.
-</p>
-<!-- tooltip end -->
-<p>Text after this comment will only be shown in the settings of the inspection.</p>
-
-<p>To open related settings directly from the description, add a link with `settings://$` optionally followed by `?$` to
-    pre-select a UI element.</p>
+<h3> * 针对继承自 DomainService 的子类检查：</h3>
+<ul>
+    <li>非abstract类必须增加@Service注解；级别：错误；支持快速修复</li>
+    <li>命名不是以DomainService结尾；级别：警告；无快速修复</li>
+</ul>
+<a href="https://github.com/h598937749/mydevtools/wiki/%E4%BB%A3%E7%A0%81%E6%A3%80%E6%9F%A5%E5%99%A8" target="_blank">详情</a>
 </body>
 </html>

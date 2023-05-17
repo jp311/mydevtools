@@ -32,4 +32,8 @@ public class QualifiedNames {
     public static final String RESOURCE_QUALIFIED_NAME = "javax.annotation.Resource";
 
     public static final String TAG_QUALIFIED_NAME = "io.swagger.v3.oas.annotations.tags.Tag";
+
+    public static final String TABLE_NAME_QUALIFIED_NAME = "com.baomidou.mybatisplus.annotation.TableName";
+
+    public static final String TABLE_ID_QUALIFIED_NAME = "com.baomidou.mybatisplus.annotation.TableId";
 }
