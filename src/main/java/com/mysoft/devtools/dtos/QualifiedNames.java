@@ -36,4 +36,8 @@ public class QualifiedNames {
     public static final String TABLE_NAME_QUALIFIED_NAME = "com.baomidou.mybatisplus.annotation.TableName";
 
     public static final String TABLE_ID_QUALIFIED_NAME = "com.baomidou.mybatisplus.annotation.TableId";
+
+    public static final String RESOURCE_FILTER_QUALIFIED_NAME = "com.mysoft.framework.modeling.ResourceFilterController";
+
+    public static final String PROJECT_FILTER_QUALIFIED_NAME = "com.mysoft.framework.modeling.ProjectFilterController";
 }

@@ -54,10 +54,6 @@ public class EntityDTO implements Serializable {
     @JacksonXmlProperty(localName = "enableSoftDelete", isAttribute = true)
     private String enableSoftDelete;
 
-    public String getSimpleName() {
-        return name.split("_").lastOrDefault();
-    }
-
     /**
      * 元数据属性
      */

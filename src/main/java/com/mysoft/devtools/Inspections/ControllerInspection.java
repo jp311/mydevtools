@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  *
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, VirtualFileExtension.class, PsiMethodExtension.class, PsiAnnotationValueExtension.class})
+@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, PsiMethodExtension.class, PsiElementExtension.class, PsiAnnotationValueExtension.class})
 public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     private final AddTagAnnotationQuickFix addTagAnnotationQuickFix = new AddTagAnnotationQuickFix();
     private final AddPubServiceAnnotationQuickFix addPubServiceAnnotationQuickFix = new AddPubServiceAnnotationQuickFix();
@@ -185,6 +185,13 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     }
 
     private boolean isController(PsiClass psiClass, Project project) {
+        if (psiClass.isInheritors(QualifiedNames.RESOURCE_FILTER_QUALIFIED_NAME, project)) {
+            return false;
+        }
+
+        if (psiClass.isInheritors(QualifiedNames.PROJECT_FILTER_QUALIFIED_NAME, project)) {
+            return false;
+        }
         return psiClass.isInheritors(QualifiedNames.CONTROLLER_QUALIFIED_NAME, project);
     }
 
@@ -192,9 +199,12 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查是否有Tag注解
      */
     private void checkerTagAnnotation(PsiClass psiClass, ProblemsHolder holder) {
+        if (psiClass.getNameIdentifier() == null) {
+            return;
+        }
         PsiAnnotation tagAnnotation = psiClass.getAnnotation(QualifiedNames.TAG_QUALIFIED_NAME);
         if (tagAnnotation == null) {
-            holder.registerProblem(psiClass, InspectionBundle.message("inspection.platform.service.controller.problem.tagannotation.descriptor"), ProblemHighlightType.WARNING, addTagAnnotationQuickFix);
+            holder.registerProblem(psiClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.tagannotation.descriptor"), ProblemHighlightType.WARNING, addTagAnnotationQuickFix);
             return;
         }
 
@@ -213,9 +223,12 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查是否存在PubService注解
      */
     private void checkerPubServiceAnnotation(PsiClass psiClass, ProblemsHolder holder) {
+        if (psiClass.getNameIdentifier() == null) {
+            return;
+        }
         PsiAnnotation pubServiceAnnotation = psiClass.getAnnotation(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
         if (pubServiceAnnotation == null) {
-            holder.registerProblem(psiClass, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.annotation.descriptor"), ProblemHighlightType.ERROR, addPubServiceAnnotationQuickFix);
+            holder.registerProblem(psiClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.annotation.descriptor"), ProblemHighlightType.ERROR, addPubServiceAnnotationQuickFix);
             return;
         }
 
@@ -255,7 +268,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         }
         PsiAnnotation pubActionAnnotation = aMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (pubActionAnnotation == null) {
-            holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
+            holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
             return;
         }
 
@@ -297,13 +310,13 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                 return;
             }
 
-            PsiClass psiClass = (PsiClass) psiElement;
+            PsiClass psiClass = (PsiClass) psiElement.getParent();
 
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             String annString = MessageFormat.format("@Tag(name = \"{0}\")", psiClass.getComment());
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             psiClass.addAnnotation(pubAnnotation);
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.TAG_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.TAG_QUALIFIED_NAME);
         }
     }
 
@@ -321,14 +334,14 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                 return;
             }
 
-            PsiClass psiClass = (PsiClass) psiElement;
+            PsiClass psiClass = (PsiClass) psiElement.getParent();
 
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             String annString = MessageFormat.format("@PubService(value = \"/{0}\", prefix = RequestPrefix.API, businessCode = \"这里输入业务单元元数据编码\")", psiClass.getName());
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             psiClass.addAnnotation(pubAnnotation);
 
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
         }
     }
 
@@ -345,7 +358,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                 return;
             }
 
-            PsiMethod method = (PsiMethod) psiElement;
+            PsiMethod method = (PsiMethod) psiElement.getParent();
 
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             String annString = MessageFormat.format("@PubAction(value = \"/{0}\", method = RequestMethod.POST)", method.getName());

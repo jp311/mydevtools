@@ -105,14 +105,6 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.DaoInspection" language="JAVA"
-                         bundle="messages.InspectionsBundle"
-                         key="inspection.platform.service.dao.display.name"
-                         groupPath="Java"
-                         groupBundle="messages.InspectionsBundle"
-                         groupKey="group.names.mysoft"
-                         level="ERROR"
-                         enabledByDefault="true"/>
         <localInspection implementationClass="com.mysoft.devtools.Inspections.DataApiInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.dataapi.display.name"
@@ -130,15 +122,6 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceFilterInspection"-->
-        <!--                         bundle="messages.InspectionsBundle"-->
-        <!--                         key="inspection.platform.service.resourcefilter.display.name"-->
-        <!--                         groupPath="Java"-->
-        <!--                         groupBundle="messages.InspectionsBundle"-->
-        <!--                         groupKey="group.names.mysoft"-->
-        <!--                         enabledByDefault="true"-->
-        <!--                         level="ERROR"-->
-        <!--                         language="JAVA"/>-->
 <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"-->
 <!--                         bundle="messages.InspectionsBundle"-->
 <!--                         key="inspection.platform.service.resource.display.name"-->
