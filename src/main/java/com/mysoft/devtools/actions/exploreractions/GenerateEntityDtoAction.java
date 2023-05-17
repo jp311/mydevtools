@@ -4,6 +4,7 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiField;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.EntityGenerateDTO;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.dtos.QualifiedNames;
@@ -34,7 +35,7 @@ public class GenerateEntityDtoAction extends BaseGenerateAction {
 
     @Override
     protected String getDialogTitle() {
-        return "EntityDto生成器";
+        return LocalBundle.message("devtools.userview.generate.entitydto.dialogtitle");
     }
 
     @Override

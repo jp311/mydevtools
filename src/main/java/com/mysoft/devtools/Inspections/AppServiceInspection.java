@@ -7,6 +7,7 @@ import com.intellij.psi.*;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.psi.PsiElementExtension;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, VirtualFileExtension.class})
+@ExtensionMethod({PsiClassExtension.class, VirtualFileExtension.class, PsiElementExtension.class})
 public class AppServiceInspection extends AbstractBaseJavaLocalInspectionTool {
     private final AddAnnotationQuickFix addAnnotationQuickFix = new AddAnnotationQuickFix();
 
@@ -73,7 +74,7 @@ public class AppServiceInspection extends AbstractBaseJavaLocalInspectionTool {
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             PsiAnnotation serviceAnnotation = elementFactory.createAnnotationFromText("@Service", null);
             psiClass.addAnnotation(serviceAnnotation);
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.SERVICE_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.SERVICE_QUALIFIED_NAME);
         }
     }
 }

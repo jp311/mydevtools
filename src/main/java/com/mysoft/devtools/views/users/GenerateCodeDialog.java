@@ -2,6 +2,7 @@ package com.mysoft.devtools.views.users;
 
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.table.JBTable;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.GenerateDialogDTO;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
@@ -116,7 +117,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         }
         MyVector<MyVector<Object>> selected = getSelected();
         if (selected.size() == 0){
-            IdeaNotifyUtil.dialogError("请选择需要生成的数据！");
+            IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.userview.generate.noselected.message"));
             return;
         }
         doOkAction.apply(selected);

@@ -7,7 +7,7 @@ import com.intellij.psi.*;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.VirtualFileExtension;
+import com.mysoft.devtools.utils.psi.PsiElementExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * 2、命名应以DomainService结尾
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, VirtualFileExtension.class})
+@ExtensionMethod({PsiClassExtension.class, PsiElementExtension.class})
 public class DomainServiceInspection extends AbstractBaseJavaLocalInspectionTool {
     private final AddAnnotationQuickFix addAnnotationQuickFix = new AddAnnotationQuickFix();
 
@@ -72,7 +72,7 @@ public class DomainServiceInspection extends AbstractBaseJavaLocalInspectionTool
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             PsiAnnotation serviceAnnotation = elementFactory.createAnnotationFromText("@Service", null);
             psiClass.addAnnotation(serviceAnnotation);
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.SERVICE_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.SERVICE_QUALIFIED_NAME);
         }
     }
 }

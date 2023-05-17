@@ -11,7 +11,7 @@
 
 ## [0.0.2] - 2023-05-21
 
-- 代码规范检查&修复：Controller、AppService、DomainService、Dao、Entity、DataApi、ResourceFilter
+- 代码规范检查&修复：Controller、AppService、DomainService、Entity、DataApi、EntityFactory.create
 
 ## [0.0.3] - 2023-05-28
 

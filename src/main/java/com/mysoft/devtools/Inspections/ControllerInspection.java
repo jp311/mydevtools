@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  *
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, VirtualFileExtension.class, PsiMethodExtension.class, PsiAnnotationValueExtension.class})
+@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, PsiMethodExtension.class, PsiElementExtension.class, PsiAnnotationValueExtension.class})
 public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     private final AddTagAnnotationQuickFix addTagAnnotationQuickFix = new AddTagAnnotationQuickFix();
     private final AddPubServiceAnnotationQuickFix addPubServiceAnnotationQuickFix = new AddPubServiceAnnotationQuickFix();
@@ -303,7 +303,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             String annString = MessageFormat.format("@Tag(name = \"{0}\")", psiClass.getComment());
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             psiClass.addAnnotation(pubAnnotation);
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.TAG_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.TAG_QUALIFIED_NAME);
         }
     }
 
@@ -328,7 +328,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             psiClass.addAnnotation(pubAnnotation);
 
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
         }
     }
 
