@@ -11,7 +11,7 @@
 
 [//]: # (## [0.0.2] - 2023-05-28)
 
-[//]: # ()
+- 代码规范检查&修复：Controller、AppService、DomainService、Entity、DataApi、EntityFactory.create
 
 [//]: # (- lombok 扩展方法智能提示)
 
