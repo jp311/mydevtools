@@ -11,15 +11,11 @@
 
 [//]: # (## [0.0.2] - 2023-05-28)
 
-- 代码规范检查&修复：Controller、AppService、DomainService、Entity、DataApi、EntityFactory.create
+[//]: # (- 代码规范检查&修复：EntityFactory.create)
 
 [//]: # (- lombok 扩展方法智能提示)
 
-[//]: # ()
-
 [//]: # (## [0.0.3] - 2023-06-04)
-
-[//]: # ()
 
 [//]: # (- 资源管理器增加虚拟目录显示元数据、js)
 
