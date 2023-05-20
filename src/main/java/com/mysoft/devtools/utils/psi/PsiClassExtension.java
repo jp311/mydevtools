@@ -12,6 +12,7 @@ import com.intellij.psi.util.PsiUtil;
 import lombok.experimental.ExtensionMethod;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +54,20 @@ public class PsiClassExtension {
         return InheritanceUtil.isInheritorOrSelf(subClass, baseClass, true);
     }
 
+    public static boolean isImpl(PsiClass psiClass, String interfaceName) {
+        return Arrays.stream(psiClass.getInterfaces()).anyMatch(x -> Objects.equals(x.getQualifiedName(), interfaceName));
+    }
+
+    public static void addImplInterface(PsiClass psiClass, String interfaceName, Project project) {
+        PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
+        PsiClass enumFieldInterface = elementFactory.createInterface(interfaceName);
+        PsiJavaCodeReferenceElement classReferenceElement = elementFactory.createClassReferenceElement(enumFieldInterface);
+        PsiReferenceList implementsList = psiClass.getImplementsList();
+        if (implementsList != null) {
+            implementsList.add(classReferenceElement);
+        }
+    }
+
     /**
      * 是否本项目的文件
      */
@@ -62,6 +77,9 @@ public class PsiClassExtension {
 
     public static void addAnnotation(PsiClass aClass, PsiAnnotation annotation) {
         PsiModifierList modifierList = aClass.getModifierList();
+        if (modifierList == null) {
+            return;
+        }
         modifierList.addAfter(annotation, null);
     }
 

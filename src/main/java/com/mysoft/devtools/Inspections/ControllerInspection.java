@@ -1,10 +1,12 @@
 package com.mysoft.devtools.Inspections;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.CollectExtension;
@@ -43,21 +45,20 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
         return new JavaElementVisitor() {
-            private boolean isChecker(PsiClass aClass) {
-                Project project = aClass.getProject();
-                boolean isController = isController(aClass, project);
-                //未继承Controller不检查
-                if (!isController) {
-                    return true;
-                }
 
-                //抽象类不检查
-                return aClass.isAbstract();
-            }
 
             @Override
             public void visitClass(PsiClass aClass) {
-                if (isChecker(aClass)) {
+                if (!isController(aClass, aClass.getProject())) {
+                    return;
+                }
+
+                //命名规范检查：以Controller结尾
+                if (aClass.getName() != null && !aClass.getName().endsWith("Controller")) {
+                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.name.descriptor"), ProblemHighlightType.WARNING);
+                }
+
+                if (aClass.isAbstract()) {
                     return;
                 }
 
@@ -69,11 +70,6 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
                 //检查value + businessCode是否全局唯一
                 checkerPubServiceIsUnique(aClass, holder);
-
-                //命名规范检查：以Controller结尾
-                if (aClass.getName() != null && !aClass.getName().endsWith("Controller")) {
-                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.name.descriptor"), ProblemHighlightType.WARNING);
-                }
             }
 
             @Override
@@ -83,24 +79,59 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                     return;
                 }
 
-                if (isChecker(aClass)) {
+                if (!isController(aClass, aClass.getProject())) {
                     return;
                 }
 
-                if (!method.isPublic() || method.isStatic() || method.isAbstract()) {
+                if (!method.isPublic() || method.isStatic()) {
                     return;
                 }
 
                 //参数命名关键字冲突检查
                 checkerKeyword(method, holder);
 
-                //检查是否缺失PubAction注解
-                checkerPubAction(method, holder);
+                //检查返回值不能是Entity,防止前端大小写的问题
+                checkerReturnValue(method, holder);
 
-                //检查value是否在当前类中唯一
-                checkerPubActionIsUnique(method, holder);
+                if (!method.isAbstract()) {
+                    //检查是否缺失PubAction注解
+                    checkerPubAction(method, holder);
+
+                    //检查value是否在当前类中唯一
+                    checkerPubActionIsUnique(method, holder);
+                }
             }
         };
+    }
+
+    private void checkerReturnValue(PsiMethod method, ProblemsHolder holder) {
+        if (method.getReturnTypeElement() == null) {
+            return;
+        }
+
+        PsiClass psiClass = PsiUtil.resolveClassInType(method.getReturnType());
+        if (psiClass == null) {
+            return;
+        }
+        Project project = psiClass.getProject();
+
+        //普通实体类型
+        if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+            holder.registerProblem(method.getReturnTypeElement(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.return.descriptor"), ProblemHighlightType.ERROR);
+        }
+
+        //泛型实体类型
+        if (method.getReturnType() instanceof PsiClassType) {
+            PsiType[] parameters = ((PsiClassType) method.getReturnType()).getParameters();
+            for (PsiType parameterType : parameters) {
+
+                psiClass = PsiUtil.resolveClassInType(parameterType);
+                if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+                    holder.registerProblem(method.getReturnTypeElement(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.return.descriptor"), ProblemHighlightType.ERROR);
+                }
+            }
+        }
+
     }
 
     /**
@@ -184,14 +215,8 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         return Objects.equals(valueAttr.getValue(), value) && Objects.equals(businessCodeAttr.getValue(), businessCode);
     }
 
-    private boolean isController(PsiClass psiClass, Project project) {
-        if (psiClass.isInheritors(QualifiedNames.RESOURCE_FILTER_QUALIFIED_NAME, project)) {
-            return false;
-        }
 
-        if (psiClass.isInheritors(QualifiedNames.PROJECT_FILTER_QUALIFIED_NAME, project)) {
-            return false;
-        }
+    private boolean isController(PsiClass psiClass, Project project) {
         return psiClass.isInheritors(QualifiedNames.CONTROLLER_QUALIFIED_NAME, project);
     }
 
@@ -234,7 +259,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
         PsiAnnotationMemberValue valueAttr = pubServiceAnnotation.findAttributeValue("value");
         if (valueAttr == null) {
-            holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.valueattr.descriptor"), ProblemHighlightType.ERROR, addPubServiceAnnotationQuickFix);
+            holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.valueattr.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
 
@@ -266,9 +291,19 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         if (aMethod.getNameIdentifier() == null) {
             return;
         }
+
         PsiAnnotation pubActionAnnotation = aMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (pubActionAnnotation == null) {
-            holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
+            List<PsiMethod> superAnnotationOwners = AnnotationUtil.getSuperAnnotationOwners(aMethod);
+            boolean anyMatch = superAnnotationOwners.stream().anyMatch(x ->
+                    x.hasAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME)
+                            || x.hasAnnotation(QualifiedNames.GET_MAPPING_QUALIFIED_NAME)
+                            || x.hasAnnotation(QualifiedNames.POST_MAPPING_QUALIFIED_NAME)
+            );
+            if (!anyMatch) {
+                holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
+            }
+
             return;
         }
 
@@ -306,7 +341,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            if (!(psiElement instanceof PsiClass)) {
+            if (!(psiElement.getParent() instanceof PsiClass)) {
                 return;
             }
 
@@ -330,7 +365,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            if (!(psiElement instanceof PsiClass)) {
+            if (!(psiElement.getParent() instanceof PsiClass)) {
                 return;
             }
 
@@ -354,7 +389,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            if (!(psiElement instanceof PsiMethod)) {
+            if (!(psiElement.getParent() instanceof PsiMethod)) {
                 return;
             }
 

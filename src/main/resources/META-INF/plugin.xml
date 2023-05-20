@@ -105,14 +105,6 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.DataApiInspection" language="JAVA"
-                         bundle="messages.InspectionsBundle"
-                         key="inspection.platform.service.dataapi.display.name"
-                         groupPath="Java"
-                         groupBundle="messages.InspectionsBundle"
-                         groupKey="group.names.mysoft"
-                         level="ERROR"
-                         enabledByDefault="true"/>
         <localInspection implementationClass="com.mysoft.devtools.Inspections.EntityDeclarationInspection"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.entity.display.name"
@@ -122,14 +114,23 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"-->
-<!--                         bundle="messages.InspectionsBundle"-->
-<!--                         key="inspection.platform.service.resource.display.name"-->
-<!--                         groupPath="Java"-->
-<!--                         groupBundle="messages.InspectionsBundle"-->
-<!--                         groupKey="group.names.mysoft"-->
-<!--                         level="ERROR"-->
-<!--                         enabledByDefault="true"/>-->
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.EnumInspection"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.enum.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         language="JAVA"/>
+        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"-->
+        <!--                         bundle="messages.InspectionsBundle"-->
+        <!--                         key="inspection.platform.service.resource.display.name"-->
+        <!--                         groupPath="Java"-->
+        <!--                         groupBundle="messages.InspectionsBundle"-->
+        <!--                         groupKey="group.names.mysoft"-->
+        <!--                         level="ERROR"-->
+        <!--                         enabledByDefault="true"/>-->
 
 
         <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->

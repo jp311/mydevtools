@@ -9,9 +9,10 @@
 - 代码生成器：Entity、EntityDTO、JsProxy
 - 代码规范检查&修复：NewEntity、Controller、AppService、DomainService、Entity Declare
 
-[//]: # (## [0.0.2] - 2023-05-28)
+## [0.0.2] - 2023-05-28
 
-[//]: # (- 代码规范检查&修复：EntityFactory.create)
+- 修复Controller增加注解失效
+- 代码规范检查&修复：Enum
 
 [//]: # (- lombok 扩展方法智能提示)
 

@@ -40,4 +40,12 @@ public class QualifiedNames {
     public static final String RESOURCE_FILTER_QUALIFIED_NAME = "com.mysoft.framework.modeling.ResourceFilterController";
 
     public static final String PROJECT_FILTER_QUALIFIED_NAME = "com.mysoft.framework.modeling.ProjectFilterController";
+
+    public static final String GET_MAPPING_QUALIFIED_NAME = "org.springframework.web.bind.annotation.GetMapping";
+
+    public static final String POST_MAPPING_QUALIFIED_NAME = "org.springframework.web.bind.annotation.PostMapping";
+
+    public static final String ENUM_OPTION_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.annotation.EnumOption";
+
+    public static final String ENUM_FIELD_INTERFACE_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.interfaces.EnumFieldInterface";
 }
