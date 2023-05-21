@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * <a href="https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/simple_language_plugin">...</a>
+ * lombokMethod@x.svg 扩展方法智能提示
+ *
  * @author hezd   2023/5/21
  */
 @ExtensionMethod({PsiMethodExtension.class, PsiClassObjectAccessExpressionExtension.class})
@@ -65,14 +68,17 @@ public class LombokCompletionContributor extends CompletionContributor {
                     elementType = qualifierExpression.getType();
                 }
             }
-
+            if (elementType == null) {
+                return;
+            }
             PsiType finalElementType = elementType;
+
             List<PsiClassObjectAccessExpression> extensionClasses = Arrays.stream(attributeValue.getChildren()).filter(x -> x instanceof PsiClassObjectAccessExpression).map(x -> (PsiClassObjectAccessExpression) x).collect(Collectors.toList());
             List<PsiMethod> extensionMethods = extensionClasses.stream().flatMap(x ->
                     Arrays.stream(x.getPsiClass().getAllMethods()).filter(m ->
                             m.isPublic() && m.isStatic()
                                     && m.getParameterList().getParameters().length > 0
-                                    && m.getParameterList().getParameters()[0].getType().equals(finalElementType)
+                                    && finalElementType.isConvertibleFrom(m.getParameterList().getParameters()[0].getType())
                     )
             ).collect(Collectors.toList());
 
