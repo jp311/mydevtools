@@ -22,15 +22,15 @@ public class GenerateEntityAction extends BaseGenerateAction {
 
     @Override
     protected String getDialogTitle() {
-        return LocalBundle.message("devtools.generate.entity.dialogtitle");
+        return LocalBundle.message("devtools.userview.generate.entity.dialogtitle");
     }
 
     @Override
     protected MyVector<String> getHeaders() {
         MyVector<String> headerNames = new MyVector<>();
         headerNames.add(""); //全选列
-        headerNames.add(LocalBundle.message("devtools.generate.entity.header1"));
-        headerNames.add(LocalBundle.message("devtools.generate.entity.header2"));
+        headerNames.add(LocalBundle.message("devtools.userview.generate.entity.header1"));
+        headerNames.add(LocalBundle.message("devtools.userview.generate.entity.header2"));
         return headerNames;
     }
 

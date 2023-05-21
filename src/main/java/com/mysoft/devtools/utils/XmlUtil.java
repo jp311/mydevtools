@@ -55,6 +55,11 @@ public class XmlUtil {
         return fromXml(xml, clazz);
     }
 
+    public static void toFile(String fileName, Object xmlObj) throws IOException {
+        String xml = toXml(xmlObj);
+        FileUtil.writeAllText(fileName, xml);
+    }
+
     /**
      * 转大写并加下划线
      */

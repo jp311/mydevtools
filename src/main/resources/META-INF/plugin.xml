@@ -65,6 +65,10 @@
 
         </projectConfigurable>
 
+        <!-- 代码提示 -->
+        <completion.contributor implementationClass="com.mysoft.devtools.intellisense.LombokCompletionContributor"
+                                language="JAVA"/>
+
         <notificationGroup displayType="BALLOON" id="mysoft-balloon" key="description"/>
         <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
         <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>
@@ -105,22 +109,6 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.DaoInspection" language="JAVA"
-                         bundle="messages.InspectionsBundle"
-                         key="inspection.platform.service.dao.display.name"
-                         groupPath="Java"
-                         groupBundle="messages.InspectionsBundle"
-                         groupKey="group.names.mysoft"
-                         level="ERROR"
-                         enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.DataApiInspection" language="JAVA"
-                         bundle="messages.InspectionsBundle"
-                         key="inspection.platform.service.dataapi.display.name"
-                         groupPath="Java"
-                         groupBundle="messages.InspectionsBundle"
-                         groupKey="group.names.mysoft"
-                         level="ERROR"
-                         enabledByDefault="true"/>
         <localInspection implementationClass="com.mysoft.devtools.Inspections.EntityDeclarationInspection"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.entity.display.name"
@@ -130,23 +118,23 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceFilterInspection"-->
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.EnumInspection"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.enum.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         enabledByDefault="true"
+                         level="ERROR"
+                         language="JAVA"/>
+        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"-->
         <!--                         bundle="messages.InspectionsBundle"-->
-        <!--                         key="inspection.platform.service.resourcefilter.display.name"-->
+        <!--                         key="inspection.platform.service.resource.display.name"-->
         <!--                         groupPath="Java"-->
         <!--                         groupBundle="messages.InspectionsBundle"-->
         <!--                         groupKey="group.names.mysoft"-->
-        <!--                         enabledByDefault="true"-->
         <!--                         level="ERROR"-->
-        <!--                         language="JAVA"/>-->
-<!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"-->
-<!--                         bundle="messages.InspectionsBundle"-->
-<!--                         key="inspection.platform.service.resource.display.name"-->
-<!--                         groupPath="Java"-->
-<!--                         groupBundle="messages.InspectionsBundle"-->
-<!--                         groupKey="group.names.mysoft"-->
-<!--                         level="ERROR"-->
-<!--                         enabledByDefault="true"/>-->
+        <!--                         enabledByDefault="true"/>-->
 
 
         <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->

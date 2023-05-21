@@ -1,10 +1,12 @@
 package com.mysoft.devtools.Inspections;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.CollectExtension;
@@ -20,19 +22,20 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Controller检查：
+ * Controller检查（前置条件：继承自Controller的子类）：
  * 1、是否存在Tag注解 @Tag(name = "供应商应用服务")
  * 2、是否存在PubService注解 @PubService(value = "/Budgets", prefix = RequestPrefix.API, businessCode = "02200301")
  * 3、public方法是否存在@PubAction注解，@PubAction(value = "/getBudgetsByProject", method = RequestMethod.POST)
  * 4、参数不能带有buguid、oid关键字
  * 5、businessCode + value全局唯一检查
  * 6、PubAction.value当前controller唯一检查
- * 7、RequestBody、复杂参数检查（不能同时存在2个DTO）
+ * 7、RequestBody、复杂参数检查（不能同时存在2个DTO） TODO 待实现
+ * 8、命名需要以Controller结尾
  * <a href="https://dploeger.github.io/intellij-api-doc/com/intellij/codeInspection/AbstractBaseJavaLocalInspectionTool.html">...</a>
  *
  * @author hezd 2023/4/27
  */
-@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, VirtualFileExtension.class, PsiMethodExtension.class, PsiAnnotationValueExtension.class})
+@ExtensionMethod({PsiClassExtension.class, CollectExtension.class, StringExtension.class, PsiMethodExtension.class, PsiElementExtension.class, PsiAnnotationValueExtension.class})
 public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     private final AddTagAnnotationQuickFix addTagAnnotationQuickFix = new AddTagAnnotationQuickFix();
     private final AddPubServiceAnnotationQuickFix addPubServiceAnnotationQuickFix = new AddPubServiceAnnotationQuickFix();
@@ -42,21 +45,20 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
         return new JavaElementVisitor() {
-            private boolean isChecker(PsiClass aClass) {
-                Project project = aClass.getProject();
-                boolean isController = isController(aClass, project);
-                //未继承Controller不检查
-                if (!isController) {
-                    return true;
-                }
 
-                //抽象类不检查
-                return aClass.isAbstract();
-            }
 
             @Override
             public void visitClass(PsiClass aClass) {
-                if (isChecker(aClass)) {
+                if (!isController(aClass, aClass.getProject())) {
+                    return;
+                }
+
+                //命名规范检查：以Controller结尾
+                if (aClass.getName() != null && !aClass.getName().endsWith("Controller")) {
+                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.name.descriptor"), ProblemHighlightType.WARNING);
+                }
+
+                if (aClass.isAbstract()) {
                     return;
                 }
 
@@ -77,24 +79,59 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                     return;
                 }
 
-                if (isChecker(aClass)) {
+                if (!isController(aClass, aClass.getProject())) {
                     return;
                 }
 
-                if (!method.isPublic() || method.isStatic() || method.isAbstract()) {
+                if (!method.isPublic() || method.isStatic()) {
                     return;
                 }
 
                 //参数命名关键字冲突检查
                 checkerKeyword(method, holder);
 
-                //检查是否缺失PubAction注解
-                checkerPubAction(method, holder);
+                //检查返回值不能是Entity,防止前端大小写的问题
+                checkerReturnValue(method, holder);
 
-                //检查value是否在当前类中唯一
-                checkerPubActionIsUnique(method, holder);
+                if (!method.isAbstract()) {
+                    //检查是否缺失PubAction注解
+                    checkerPubAction(method, holder);
+
+                    //检查value是否在当前类中唯一
+                    checkerPubActionIsUnique(method, holder);
+                }
             }
         };
+    }
+
+    private void checkerReturnValue(PsiMethod method, ProblemsHolder holder) {
+        if (method.getReturnTypeElement() == null) {
+            return;
+        }
+
+        PsiClass psiClass = PsiUtil.resolveClassInType(method.getReturnType());
+        if (psiClass == null) {
+            return;
+        }
+        Project project = psiClass.getProject();
+
+        //普通实体类型
+        if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+            holder.registerProblem(method.getReturnTypeElement(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.return.descriptor"), ProblemHighlightType.ERROR);
+        }
+
+        //泛型实体类型
+        if (method.getReturnType() instanceof PsiClassType) {
+            PsiType[] parameters = ((PsiClassType) method.getReturnType()).getParameters();
+            for (PsiType parameterType : parameters) {
+
+                psiClass = PsiUtil.resolveClassInType(parameterType);
+                if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+                    holder.registerProblem(method.getReturnTypeElement(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.return.descriptor"), ProblemHighlightType.ERROR);
+                }
+            }
+        }
+
     }
 
     /**
@@ -178,6 +215,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         return Objects.equals(valueAttr.getValue(), value) && Objects.equals(businessCodeAttr.getValue(), businessCode);
     }
 
+
     private boolean isController(PsiClass psiClass, Project project) {
         return psiClass.isInheritors(QualifiedNames.CONTROLLER_QUALIFIED_NAME, project);
     }
@@ -186,9 +224,12 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查是否有Tag注解
      */
     private void checkerTagAnnotation(PsiClass psiClass, ProblemsHolder holder) {
+        if (psiClass.getNameIdentifier() == null) {
+            return;
+        }
         PsiAnnotation tagAnnotation = psiClass.getAnnotation(QualifiedNames.TAG_QUALIFIED_NAME);
         if (tagAnnotation == null) {
-            holder.registerProblem(psiClass, InspectionBundle.message("inspection.platform.service.controller.problem.tagannotation.descriptor"), ProblemHighlightType.WARNING, addTagAnnotationQuickFix);
+            holder.registerProblem(psiClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.tagannotation.descriptor"), ProblemHighlightType.WARNING, addTagAnnotationQuickFix);
             return;
         }
 
@@ -207,15 +248,18 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查是否存在PubService注解
      */
     private void checkerPubServiceAnnotation(PsiClass psiClass, ProblemsHolder holder) {
+        if (psiClass.getNameIdentifier() == null) {
+            return;
+        }
         PsiAnnotation pubServiceAnnotation = psiClass.getAnnotation(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
         if (pubServiceAnnotation == null) {
-            holder.registerProblem(psiClass, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.annotation.descriptor"), ProblemHighlightType.ERROR, addPubServiceAnnotationQuickFix);
+            holder.registerProblem(psiClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.annotation.descriptor"), ProblemHighlightType.ERROR, addPubServiceAnnotationQuickFix);
             return;
         }
 
         PsiAnnotationMemberValue valueAttr = pubServiceAnnotation.findAttributeValue("value");
         if (valueAttr == null) {
-            holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.valueattr.descriptor"), ProblemHighlightType.ERROR, addPubServiceAnnotationQuickFix);
+            holder.registerProblem(pubServiceAnnotation, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.valueattr.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
 
@@ -244,20 +288,33 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查是否存在PubAction注解
      */
     private void checkerPubAction(PsiMethod aMethod, ProblemsHolder holder) {
+        if (aMethod.getNameIdentifier() == null) {
+            return;
+        }
+
         PsiAnnotation pubActionAnnotation = aMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (pubActionAnnotation == null) {
-            holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
+            List<PsiMethod> superAnnotationOwners = AnnotationUtil.getSuperAnnotationOwners(aMethod);
+            boolean anyMatch = superAnnotationOwners.stream().anyMatch(x ->
+                    x.hasAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME)
+                            || x.hasAnnotation(QualifiedNames.GET_MAPPING_QUALIFIED_NAME)
+                            || x.hasAnnotation(QualifiedNames.POST_MAPPING_QUALIFIED_NAME)
+            );
+            if (!anyMatch) {
+                holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
+            }
+
             return;
         }
 
         PsiAnnotationMemberValue valueAttr = pubActionAnnotation.findAttributeValue("value");
         if (valueAttr == null) {
-            holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueattr.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueattr.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
 
         if (valueAttr.getValue().replace("/", "").isNullOrEmpty()) {
-            holder.registerProblem(aMethod, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueempty.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueempty.descriptor"), ProblemHighlightType.ERROR);
             return;
         }
     }
@@ -284,17 +341,17 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            if (!(psiElement instanceof PsiClass)) {
+            if (!(psiElement.getParent() instanceof PsiClass)) {
                 return;
             }
 
-            PsiClass psiClass = (PsiClass) psiElement;
+            PsiClass psiClass = (PsiClass) psiElement.getParent();
 
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             String annString = MessageFormat.format("@Tag(name = \"{0}\")", psiClass.getComment());
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             psiClass.addAnnotation(pubAnnotation);
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.TAG_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.TAG_QUALIFIED_NAME);
         }
     }
 
@@ -308,18 +365,18 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            if (!(psiElement instanceof PsiClass)) {
+            if (!(psiElement.getParent() instanceof PsiClass)) {
                 return;
             }
 
-            PsiClass psiClass = (PsiClass) psiElement;
+            PsiClass psiClass = (PsiClass) psiElement.getParent();
 
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             String annString = MessageFormat.format("@PubService(value = \"/{0}\", prefix = RequestPrefix.API, businessCode = \"这里输入业务单元元数据编码\")", psiClass.getName());
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             psiClass.addAnnotation(pubAnnotation);
 
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
+            psiElement.addImportIfNotExist(QualifiedNames.PUB_SERVICE_QUALIFIED_NAME);
         }
     }
 
@@ -332,11 +389,11 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            if (!(psiElement instanceof PsiMethod)) {
+            if (!(psiElement.getParent() instanceof PsiMethod)) {
                 return;
             }
 
-            PsiMethod method = (PsiMethod) psiElement;
+            PsiMethod method = (PsiMethod) psiElement.getParent();
 
             PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
             String annString = MessageFormat.format("@PubAction(value = \"/{0}\", method = RequestMethod.POST)", method.getName());

@@ -1,6 +1,7 @@
 package com.mysoft.devtools.actions.exploreractions;
 
 import com.intellij.psi.*;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.ControllerGenerateDTO;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.dtos.QualifiedNames;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 public class GenerateJsProxyAction extends BaseGenerateAction {
     @Override
     protected String getDialogTitle() {
-        return "JS代理类生成器";
+        return LocalBundle.message("devtools.userview.generate.jsproxy.dialogtitle");
     }
 
     @Override

@@ -32,4 +32,22 @@ public class QualifiedNames {
     public static final String RESOURCE_QUALIFIED_NAME = "javax.annotation.Resource";
 
     public static final String TAG_QUALIFIED_NAME = "io.swagger.v3.oas.annotations.tags.Tag";
+
+    public static final String TABLE_NAME_QUALIFIED_NAME = "com.baomidou.mybatisplus.annotation.TableName";
+
+    public static final String TABLE_ID_QUALIFIED_NAME = "com.baomidou.mybatisplus.annotation.TableId";
+
+    public static final String RESOURCE_FILTER_QUALIFIED_NAME = "com.mysoft.framework.modeling.ResourceFilterController";
+
+    public static final String PROJECT_FILTER_QUALIFIED_NAME = "com.mysoft.framework.modeling.ProjectFilterController";
+
+    public static final String GET_MAPPING_QUALIFIED_NAME = "org.springframework.web.bind.annotation.GetMapping";
+
+    public static final String POST_MAPPING_QUALIFIED_NAME = "org.springframework.web.bind.annotation.PostMapping";
+
+    public static final String ENUM_OPTION_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.annotation.EnumOption";
+
+    public static final String ENUM_FIELD_INTERFACE_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.interfaces.EnumFieldInterface";
+
+    public static final String EXTENSION_METHOD_QUALIFIED_NAME = "lombok.experimental.ExtensionMethod";
 }

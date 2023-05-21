@@ -1,0 +1,40 @@
+<html lang="zh">
+<body>
+<h3> Enum定义规范检查：</h3>
+<p>反例1：存在EnumOption注解，类型是class而不是<span style="color: red;font-weight: bold">enum</span>，并且没有实现EnumFieldInterface接口
+</p>
+<pre><code>
+    @EnumOption(application = "0220", description = "采购计划状态枚举")
+    public class CgPlanStateEnum {
+        ...
+    }
+</code></pre>
+
+<p>反例2：存在EnumOption注解并且实现EnumFieldInterface接口，类型是class而不是<span style="color: red;font-weight: bold">enum</span>
+</p>
+<pre><code>
+    @EnumOption(application = "0220", description = "采购计划状态枚举")
+    public class CgPlanStateEnum implements EnumFieldInterface {
+        ...
+    }
+</code></pre>
+
+<p>反例3：类型是enum并且实现EnumFieldInterface接口，缺少@EnumOption注解</p>
+<pre><code>
+    public enum CgPlanStateEnum implements EnumFieldInterface {
+        ...
+    }
+</code></pre>
+
+<p>枚举的正确定义方式：</p>
+<pre><code>
+    @EnumOption(application = "0220", description = "采购计划状态枚举")
+    public enum CgPlanStateEnum implements EnumFieldInterface {
+        ...
+    }
+</code></pre>
+
+<a href="https://github.com/h598937749/mydevtools/wiki/%E4%BB%A3%E7%A0%81%E6%A3%80%E6%9F%A5%E5%99%A8"
+   target="_blank">详情</a>
+</body>
+</html>
