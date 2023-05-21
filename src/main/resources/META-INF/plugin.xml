@@ -65,6 +65,10 @@
 
         </projectConfigurable>
 
+        <!-- 代码提示 -->
+        <completion.contributor implementationClass="com.mysoft.devtools.intellisense.LombokCompletionContributor"
+                                language="JAVA"/>
+
         <notificationGroup displayType="BALLOON" id="mysoft-balloon" key="description"/>
         <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
         <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>

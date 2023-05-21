@@ -48,4 +48,6 @@ public class QualifiedNames {
     public static final String ENUM_OPTION_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.annotation.EnumOption";
 
     public static final String ENUM_FIELD_INTERFACE_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.interfaces.EnumFieldInterface";
+
+    public static final String EXTENSION_METHOD_QUALIFIED_NAME = "lombok.experimental.ExtensionMethod";
 }
