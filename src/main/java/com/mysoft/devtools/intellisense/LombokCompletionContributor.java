@@ -82,7 +82,6 @@ public class LombokCompletionContributor extends CompletionContributor {
                     )
             ).collect(Collectors.toList());
 
-
             extensionMethods.forEach(m -> {
                 List<String> parameterTokenList = Arrays.stream(m.getParameterList().getParameters()).skip(1).map(p -> p.getType().getPresentableText() + " " + p.getName()).collect(Collectors.toList());
                 String paramterTokenString = "(" + String.join(", ", parameterTokenList) + ")";
@@ -91,7 +90,15 @@ public class LombokCompletionContributor extends CompletionContributor {
                 if (m.getReturnType() != null) {
                     returnType = m.getReturnType().getPresentableText();
                 }
-                result.addElement(LookupElementBuilder.create(m).withIcon(LOMBOK_METHOD_ICON).withTypeText(returnType).withTailText(paramterTokenString));
+                result.addElement(LookupElementBuilder.create(m)
+                        .withIcon(LOMBOK_METHOD_ICON)
+                        .withTypeText(returnType, true)
+                        .withTailText(paramterTokenString)
+                        .withInsertHandler((insertionContext, lookupElement) -> {
+                            insertionContext.getDocument().insertString(insertionContext.getSelectionEndOffset(), "()");
+                            insertionContext.getEditor().getCaretModel().moveToOffset(insertionContext.getSelectionEndOffset() - 1);
+                        })
+                );
             });
         }
     }
