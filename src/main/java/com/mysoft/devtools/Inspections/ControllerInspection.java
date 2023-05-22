@@ -53,11 +53,6 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
                     return;
                 }
 
-                //命名规范检查：以Controller结尾
-                if (aClass.getName() != null && !aClass.getName().endsWith("Controller")) {
-                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.name.descriptor"), ProblemHighlightType.WARNING);
-                }
-
                 if (aClass.isAbstract()) {
                     return;
                 }

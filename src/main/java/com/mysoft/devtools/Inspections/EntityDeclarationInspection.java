@@ -45,6 +45,9 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
                     return;
                 }
 
+                if (aClass instanceof PsiTypeParameter) {
+                    return;
+                }
                 //非BaseEntity子类不检查
                 if (!aClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
                     return;
