@@ -145,6 +145,7 @@
         <!--                         groupKey="group.names.mysoft"-->
         <!--                         level="ERROR"-->
         <!--        />-->
+        <errorHandler implementation="com.mysoft.devtools.listeners.MyErrorReportSubmitter"/>
     </extensions>
 
     <applicationListeners>
