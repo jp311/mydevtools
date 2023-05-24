@@ -7,6 +7,8 @@ import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.util.Consumer;
 import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.dtos.ProblemEmailDTO;
+import com.mysoft.devtools.utils.FreeMarkerUtil;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -16,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -68,22 +72,27 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject("mysoft-devtools error report");
 
-            ApplicationInfo application = ApplicationInfo.getInstance();
-            StringBuilder sb = new StringBuilder();
-            sb.append("environment：").append(System.lineSeparator())
-                    .append("user：").append(System.getProperty("user.name")).append(System.lineSeparator())
-                    .append(MessageFormat.format("ide product name：{0}", application.getVersionName())).append(System.lineSeparator())
-                    .append(MessageFormat.format("ide product code：{0}", application.getBuild().getProductCode())).append(System.lineSeparator())
-                    .append(MessageFormat.format("ide version：{0}", application.getFullVersion())).append(System.lineSeparator())
-                    .append("plugin version：").append(Objects.requireNonNull(PluginManager.getPluginByClass(MyErrorReportSubmitter.class)).getVersion()).append(System.lineSeparator()).append(System.lineSeparator()).append(System.lineSeparator());
-
+            StringBuilder stack = new StringBuilder();
             for (IdeaLoggingEvent event : events
             ) {
-                sb.append("error infomation：").append(System.lineSeparator()).append(event.toString()).append(System.lineSeparator()).append(System.lineSeparator());
+                stack.append(event.toString()).append(System.lineSeparator());
             }
 
-
-            message.setText(sb.toString());
+            ApplicationInfo application = ApplicationInfo.getInstance();
+            ProblemEmailDTO problemEmailDTO = ProblemEmailDTO.builder()
+                    .pluginUrl("https://plugins.jetbrains.com/plugin/21811-mysoft-devtools/versions")
+                    .pluginVersion(Objects.requireNonNull(PluginManager.getPluginByClass(MyErrorReportSubmitter.class)).getVersion())
+                    .ideInfo(MessageFormat.format("{0} （{1}）{2}", application.getVersionName(), application.getBuild().getProductCode(), application.getFullVersion()))
+                    .osInfo(MessageFormat.format("{0} （{1}）", System.getProperty("os.name"), System.getProperty("os.arch")))
+                    .jvmInfo(MessageFormat.format("{0} （{1}）", System.getProperty("java.vm.name"), System.getProperty("java.vm.version")))
+                    .area(MessageFormat.format("{0}/{1}", System.getProperty("user.language"), System.getProperty("user.country")))
+                    .osUser(System.getProperty("user.name"))
+                    .operateTime(getOperateTime())
+                    .additionalInfo(additionalInfo == null ? "" : additionalInfo)
+                    .stack(stack.toString())
+                    .build();
+            String content = FreeMarkerUtil.sendEmail(problemEmailDTO);
+            message.setText(content, "utf-8", "html");
 
             // 发送邮件
             Transport.send(message);
@@ -95,9 +104,15 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             consumer.consume(new SubmittedReportInfo(SubmittedReportInfo.SubmissionStatus.NEW_ISSUE));
             return true;
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error submitting error report: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
+    }
+
+    private String getOperateTime() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return now.format(formatter);
     }
 }
