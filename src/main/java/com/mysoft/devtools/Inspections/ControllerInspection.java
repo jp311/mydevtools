@@ -1,6 +1,5 @@
 package com.mysoft.devtools.Inspections;
 
-import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.openapi.project.Project;
@@ -289,11 +288,12 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
         PsiAnnotation pubActionAnnotation = aMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (pubActionAnnotation == null) {
-            List<PsiMethod> superAnnotationOwners = AnnotationUtil.getSuperAnnotationOwners(aMethod);
-            boolean anyMatch = superAnnotationOwners.stream().anyMatch(x ->
+            PsiMethod[] superMethods = aMethod.findDeepestSuperMethods();
+            boolean anyMatch = Arrays.stream(superMethods).anyMatch(x ->
                     x.hasAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME)
                             || x.hasAnnotation(QualifiedNames.GET_MAPPING_QUALIFIED_NAME)
                             || x.hasAnnotation(QualifiedNames.POST_MAPPING_QUALIFIED_NAME)
+                            || x.hasAnnotation(QualifiedNames.REQUEST_MAPPING_QUALIFIED_NAME)
             );
             if (!anyMatch) {
                 holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
@@ -395,7 +395,8 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             method.addAnnotation(pubAnnotation);
 
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
+
+            psiElement.addImportIfNotExist(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         }
     }
 }
