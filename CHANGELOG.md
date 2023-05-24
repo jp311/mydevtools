@@ -4,7 +4,15 @@
 
 ## [Unreleased]
 
+## [0.0.3] - 2023-05-28
+
+- bug fix
+- 增加插件错误上报入口
+- 增加检查：new Service、Resource注解字段名称规范检查
+-
+
 ## [0.0.2] - 2023-05-21
+
 - 修复Controller增加注解失效
 - 代码规范检查&修复：Enum
 - lombok 扩展方法智能提示

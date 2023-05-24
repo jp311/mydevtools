@@ -82,7 +82,7 @@
                          groupKey="group.names.mysoft"
                          enabledByDefault="true"
                          level="ERROR"
-                         implementationClass="com.mysoft.devtools.Inspections.NewEntityInspection"/>
+                         implementationClass="com.mysoft.devtools.Inspections.NewExpressionInspection"/>
 
         <localInspection implementationClass="com.mysoft.devtools.Inspections.AppServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
@@ -127,14 +127,14 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"-->
-        <!--                         bundle="messages.InspectionsBundle"-->
-        <!--                         key="inspection.platform.service.resource.display.name"-->
-        <!--                         groupPath="Java"-->
-        <!--                         groupBundle="messages.InspectionsBundle"-->
-        <!--                         groupKey="group.names.mysoft"-->
-        <!--                         level="ERROR"-->
-        <!--                         enabledByDefault="true"/>-->
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.resource.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"/>
 
 
         <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->
@@ -146,6 +146,7 @@
         <!--                         level="ERROR"-->
         <!--        />-->
         <errorHandler implementation="com.mysoft.devtools.listeners.MyErrorReportSubmitter"/>
+        <!--        <treeStructureProvider implementation="com.mysoft.devtools.listeners.MysoftTreeStructureProvider" />-->
     </extensions>
 
     <applicationListeners>

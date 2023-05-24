@@ -168,7 +168,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
     private final static class AddWhiteQuickFix implements LocalQuickFix {
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {
-            return InspectionBundle.message("inspection.platform.service.entity.addwhite.quickfix");
+            return InspectionBundle.message("inspection.platform.service.addwhite.quickfix");
         }
 
         @Override

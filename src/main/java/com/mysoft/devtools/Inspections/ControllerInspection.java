@@ -319,7 +319,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      */
     private void checkerKeyword(PsiMethod aMethod, ProblemsHolder holder) {
         PsiParameterList parameterList = aMethod.getParameterList();
-        String[] keywords = new String[]{"buguid", "oid"};
+        String[] keywords = new String[]{"oid"};
         for (PsiParameter parameter : parameterList.getParameters()) {
             if (Arrays.stream(keywords).anyMatch(x -> Objects.equals(parameter.getName().toLowerCase(), x))) {
                 holder.registerProblem(parameter, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.keyword.descriptor", parameter.getName()), ProblemHighlightType.ERROR);
