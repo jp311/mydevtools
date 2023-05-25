@@ -22,15 +22,19 @@ public class InspectionWhiteUtil {
 
     private static List<String> INIT_PROJECTS = new ArrayList<>();
 
-    private static void loadSettings(Project project) {
+    private synchronized static void loadSettings(Project project) {
         if (INIT_PROJECTS.contains(project.getBasePath())) {
             return;
         }
-        FILE_NAME = FileUtil.combine(project.getCIDirectory(), "white_settings.xml");
+        String ciDirectory = project.getCIDirectory();
+        //可能是非明源项目
+        if (ciDirectory == null) {
+            return;
+        }
+        FILE_NAME = FileUtil.combine(ciDirectory, "white_settings.xml");
         try {
             if (FileUtil.isExist(FILE_NAME)) {
                 WHITE_CACHE = XmlUtil.fromFile(FILE_NAME, WhiteSettingsDTO.class);
-                INIT_PROJECTS.add(project.getBasePath());
             } else {
                 WHITE_CACHE = new WhiteSettingsDTO();
             }
@@ -40,6 +44,9 @@ public class InspectionWhiteUtil {
             if (WHITE_CACHE.getQualifiedNames() == null) {
                 WHITE_CACHE.setQualifiedNames(new ArrayList<>());
             }
+
+            INIT_PROJECTS.add(project.getBasePath());
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

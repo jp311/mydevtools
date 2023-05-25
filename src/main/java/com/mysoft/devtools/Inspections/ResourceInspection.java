@@ -4,20 +4,17 @@ import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
-import com.intellij.refactoring.listeners.RefactoringElementListener;
-import com.intellij.refactoring.rename.RenameUtil;
-import com.intellij.usageView.UsageInfo;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.StringExtension;
 import com.mysoft.devtools.utils.psi.ProjectExtension;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.psi.PsiCommonUtil;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -31,6 +28,8 @@ import java.util.Objects;
 @ExtensionMethod({PsiClassExtension.class, ProjectExtension.class, StringExtension.class})
 public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
     private final RemoveResourceQuickFix removeResourceQuickFix = new RemoveResourceQuickFix();
+
+    private final RenameAllFieldsQuickFix renameAllFieldsQuickFix = new RenameAllFieldsQuickFix();
 
     @Override
     public @NotNull PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
@@ -50,7 +49,7 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
 
                 //字段命名规范
                 if (fieldTypeClass != null && !Objects.equals(getTypeNameFirstLowerCase(fieldType), field.getName())) {
-                    holder.registerProblem(field.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.resource.name.problem.descriptor"), ProblemHighlightType.ERROR, new RenameFieldQuickFix(field));
+                    holder.registerProblem(field.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.resource.name.problem.descriptor"), ProblemHighlightType.ERROR, new RenameFieldQuickFix(field), renameAllFieldsQuickFix);
                 }
 
 //                Project project = fieldTypeClass.getProject();
@@ -88,13 +87,6 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
         return psiClass.getName().firstLowerCase();
     }
 
-    private boolean isServiceOrComponent(PsiClass psiClass) {
-        PsiAnnotation serviceAnnotation = psiClass.getAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME);
-        PsiAnnotation componentAnnotation = psiClass.getAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME);
-
-        return serviceAnnotation == null && componentAnnotation == null;
-    }
-
     private static class RemoveResourceQuickFix implements LocalQuickFix {
         @Override
         public @IntentionFamilyName
@@ -120,6 +112,40 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
         }
     }
 
+    private static class RenameAllFieldsQuickFix implements LocalQuickFix {
+        @Override
+        public @IntentionFamilyName @NotNull String getFamilyName() {
+            return InspectionBundle.message("inspection.platform.service.resource.allfields.use.quickfix_rename");
+        }
+
+        @Override
+        public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+            PsiElement psiElement = descriptor.getPsiElement();
+            if (!(psiElement.getParent() instanceof PsiField)) {
+                return;
+            }
+
+            PsiClass psiClass = PsiTreeUtil.getParentOfType(psiElement, PsiClass.class);
+            if (psiClass == null || psiClass.getNameIdentifier() == null || psiClass instanceof PsiTypeParameter) {
+                return;
+            }
+
+            PsiField[] fields = psiClass.getFields();
+
+            for (PsiField psiField : fields) {
+                if (!psiField.hasAnnotation(QualifiedNames.AUTOWIRED_QUALIFIED_NAME) && !psiField.hasAnnotation(QualifiedNames.RESOURCE_QUALIFIED_NAME)) {
+                    continue;
+                }
+                PsiType fieldType = psiField.getType();
+                String newName = getTypeNameFirstLowerCase(fieldType);
+
+                if (Objects.equals(psiField.getName(), newName)) {
+                    continue;
+                }
+                PsiCommonUtil.rename(psiField, newName, true, false);
+            }
+        }
+    }
 
     private static class RenameFieldQuickFix implements LocalQuickFix {
 
@@ -146,19 +172,8 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
             if (Objects.equals(newName, "")) {
                 return;
             }
-            Map<? extends PsiElement, String> allRenames = Collections.emptyMap();
-            UsageInfo[] usages = RenameUtil.findUsages(psiField, newName, true, false, allRenames);
-            RenameUtil.doRename(psiField, newName, usages, psiField.getProject(), new RefactoringElementListener() {
-                @Override
-                public void elementMoved(@NotNull PsiElement newElement) {
 
-                }
-
-                @Override
-                public void elementRenamed(@NotNull PsiElement newElement) {
-
-                }
-            });
+            PsiCommonUtil.rename(psiField, newName, true, false);
         }
     }
 }

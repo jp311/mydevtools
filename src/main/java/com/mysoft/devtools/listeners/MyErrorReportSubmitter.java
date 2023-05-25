@@ -20,6 +20,7 @@ import java.awt.*;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -70,7 +71,7 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject("mysoft-devtools error report");
+            message.setSubject(LocalBundle.message("devtools.exception.report.title.vendor", new Date().getTime()));
 
             StringBuilder stack = new StringBuilder();
             for (IdeaLoggingEvent event : events
@@ -87,7 +88,7 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
                     .jvmInfo(MessageFormat.format("{0} （{1}）", System.getProperty("java.vm.name"), System.getProperty("java.vm.version")))
                     .area(MessageFormat.format("{0}/{1}", System.getProperty("user.language"), System.getProperty("user.country")))
                     .osUser(System.getProperty("user.name"))
-                    .operateTime(getOperateTime())
+                    .operateTime(getOperateTime("yyyy-MM-dd HH:mm:ss"))
                     .additionalInfo(additionalInfo == null ? "" : additionalInfo)
                     .stack(stack.toString())
                     .build();
@@ -110,9 +111,9 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
         }
     }
 
-    private String getOperateTime() {
+    private String getOperateTime(String format) {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return now.format(formatter);
     }
 }
