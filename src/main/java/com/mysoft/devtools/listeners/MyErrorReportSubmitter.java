@@ -20,7 +20,6 @@ import java.awt.*;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -34,14 +33,6 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
 
     // 邮件地址和密码
     private final String email = "121136180@qq.com";
-    // 邮件发送设置
-    private final String smtpHost = "smtp.qq.com";
-    private final String smtpPort = "465";
-    private final boolean sslEnabled = true;
-
-    // 发件人和收件人
-    private final String from = "121136180@qq.com";
-    private final String to = "hezd@mingyuanyun.com";
 
     @Override
     public @NotNull String getReportActionText() {
@@ -54,9 +45,13 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
         try {
             // 创建邮件会话
             Properties props = new Properties();
+            // 邮件发送设置
+            String smtpHost = "smtp.qq.com";
             props.put("mail.smtp.host", smtpHost);
+            String smtpPort = "465";
             props.put("mail.smtp.port", smtpPort);
             props.put("mail.smtp.auth", "true");
+            boolean sslEnabled = true;
             if (sslEnabled) {
                 props.put("mail.smtp.ssl.enable", "true");
             }
@@ -69,9 +64,12 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             });
             // 创建邮件内容
             MimeMessage message = new MimeMessage(session);
+            // 发件人和收件人
+            String from = "121136180@qq.com";
             message.setFrom(new InternetAddress(from));
+            String to = "hezd@mingyuanyun.com";
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject(LocalBundle.message("devtools.exception.report.title.vendor", new Date().getTime()));
+            message.setSubject(LocalBundle.message("devtools.exception.report.title.vendor", System.currentTimeMillis()));
 
             StringBuilder stack = new StringBuilder();
             for (IdeaLoggingEvent event : events
@@ -88,7 +86,7 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
                     .jvmInfo(MessageFormat.format("{0} （{1}）", System.getProperty("java.vm.name"), System.getProperty("java.vm.version")))
                     .area(MessageFormat.format("{0}/{1}", System.getProperty("user.language"), System.getProperty("user.country")))
                     .osUser(System.getProperty("user.name"))
-                    .operateTime(getOperateTime("yyyy-MM-dd HH:mm:ss"))
+                    .operateTime(getOperateTime())
                     .additionalInfo(additionalInfo == null ? "" : additionalInfo)
                     .stack(stack.toString())
                     .build();
@@ -111,9 +109,9 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
         }
     }
 
-    private String getOperateTime(String format) {
+    private String getOperateTime() {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return now.format(formatter);
     }
 }

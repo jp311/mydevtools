@@ -125,7 +125,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
         }
 
         //白名单检查
-        boolean isWhite = InspectionWhiteUtil.isWhite(aClass.getQualifiedName(), aClass.getPackageName(), aClass.getProject());
+        boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.ABSTRACT_ENTITY, aClass.getQualifiedName(), aClass.getPackageName(), aClass.getProject());
         if (isWhite) {
             return;
         }
@@ -177,7 +177,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
             PsiClass aClass = (PsiClass) psiElement.getParent();
 
 
-            InspectionWhiteDialog dialog = new InspectionWhiteDialog(aClass.getQualifiedName(), aClass.getPackageName());
+            InspectionWhiteDialog dialog = new InspectionWhiteDialog(InspectionWhiteUtil.ABSTRACT_ENTITY, aClass.getQualifiedName(), aClass.getPackageName());
             if (dialog.showAndGet()) {
                 aClass.refresh();
             }

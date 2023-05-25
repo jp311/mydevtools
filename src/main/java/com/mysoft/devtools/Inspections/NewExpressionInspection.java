@@ -11,6 +11,7 @@ import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.InspectionWhiteUtil;
+import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
 import com.mysoft.devtools.utils.psi.IdeaSdkAdapter;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
@@ -31,7 +32,7 @@ import java.util.List;
 @ExtensionMethod({VirtualFileExtension.class, PsiClassExtension.class})
 public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool {
     private final ReplaceWithEntityFactoryQuickFix myQuickFix = new ReplaceWithEntityFactoryQuickFix();
-    private final AddWhiteQuickFix addWhiteQuickFix = new AddWhiteQuickFix();
+    private AddWhiteQuickFix addWhiteQuickFix;
 
     @NotNull
     @Override
@@ -53,13 +54,13 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
                 }
                 Project project = psiClass.getProject();
 
-                //白名单检查
-                boolean isWhite = InspectionWhiteUtil.isWhite(psiClass.getQualifiedName(), psiClass.getPackageName(), project);
-                if (isWhite) {
-                    return;
-                }
-
                 if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+                    //白名单检查
+                    boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_ENTITY, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
+                    if (isWhite) {
+                        return;
+                    }
+                    addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_ENTITY);
                     String message = InspectionBundle.message("inspection.platform.entity.create.problem.descriptor");
                     holder.registerProblem(expression, message, ProblemHighlightType.ERROR, myQuickFix, addWhiteQuickFix);
                 }
@@ -71,6 +72,12 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
                 );
 
                 if (isService) {
+                    //白名单检查
+                    boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_SERVICE, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
+                    if (isWhite) {
+                        return;
+                    }
+                    addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_SERVICE);
                     String message = InspectionBundle.message("inspection.platform.service.create.problem.descriptor");
                     holder.registerProblem(expression, message, ProblemHighlightType.ERROR, addWhiteQuickFix);
                 }
@@ -93,8 +100,13 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
+            if (psiElement.getParent() == null || !(psiElement.getParent() instanceof PsiLocalVariable)) {
+                IdeaNotifyUtil.dialogError(InspectionBundle.message("inspection.platform.common.quickfix.fail"));
+                return;
+            }
+
             PsiLocalVariable localVariable = (PsiLocalVariable) psiElement.getParent();
+            PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
 
             String entityName = localVariable.getType().getPresentableText();
             String variableName = localVariable.getName();
@@ -162,6 +174,12 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
     }
 
     public final static class AddWhiteQuickFix implements LocalQuickFix {
+        private final String scope;
+
+        public AddWhiteQuickFix(String scope) {
+            this.scope = scope;
+        }
+
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {
             return InspectionBundle.message("inspection.platform.service.addwhite.quickfix");
@@ -185,7 +203,7 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
             if (aClass == null) {
                 return;
             }
-            InspectionWhiteDialog dialog = new InspectionWhiteDialog(aClass.getQualifiedName(), aClass.getPackageName());
+            InspectionWhiteDialog dialog = new InspectionWhiteDialog(scope, aClass.getQualifiedName(), aClass.getPackageName());
             if (dialog.showAndGet()) {
                 aClass.refresh();
             }
