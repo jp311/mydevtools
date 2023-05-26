@@ -2,11 +2,11 @@ package com.mysoft.devtools.intellisense;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.ui.IconManager;
 import com.intellij.util.ProcessingContext;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassObjectAccessExpressionExtension;
@@ -35,7 +35,7 @@ public class LombokCompletionContributor extends CompletionContributor {
 
     private static class LombokCompletionProvider extends CompletionProvider<CompletionParameters> {
 
-        private final static Icon LOMBOK_METHOD_ICON = IconManager.getInstance().getIcon("/icons/lombokMethod", LombokCompletionContributor.class);
+        private final static Icon LOMBOK_METHOD_ICON = IconLoader.getIcon("/icons/lombokMethod", LombokCompletionContributor.class);
 
         @Override
         protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {

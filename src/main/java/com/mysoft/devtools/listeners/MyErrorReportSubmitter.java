@@ -46,15 +46,10 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             // 创建邮件会话
             Properties props = new Properties();
             // 邮件发送设置
-            String smtpHost = "smtp.qq.com";
-            props.put("mail.smtp.host", smtpHost);
-            String smtpPort = "465";
-            props.put("mail.smtp.port", smtpPort);
+            props.put("mail.smtp.host", "smtp.qq.com");
+            props.put("mail.smtp.port", "465");
             props.put("mail.smtp.auth", "true");
-            boolean sslEnabled = true;
-            if (sslEnabled) {
-                props.put("mail.smtp.ssl.enable", "true");
-            }
+            props.put("mail.smtp.ssl.enable", "true");
 
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override
@@ -69,7 +64,7 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             message.setFrom(new InternetAddress(from));
             String to = "hezd@mingyuanyun.com";
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            message.setSubject(LocalBundle.message("devtools.exception.report.title.vendor", System.currentTimeMillis()));
+            message.setSubject(LocalBundle.message("devtools.exception.report.title.vendor", String.valueOf(System.currentTimeMillis())));
 
             StringBuilder stack = new StringBuilder();
             for (IdeaLoggingEvent event : events
