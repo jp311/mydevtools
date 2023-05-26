@@ -1,5 +1,6 @@
 package com.mysoft.devtools.intellisense;
 
+import com.intellij.codeInsight.AutoPopupController;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.IconLoader;
@@ -7,6 +8,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.ProcessingContext;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassObjectAccessExpressionExtension;
@@ -36,6 +38,16 @@ public class LombokCompletionContributor extends CompletionContributor {
     private static class LombokCompletionProvider extends CompletionProvider<CompletionParameters> {
 
         private final static Icon LOMBOK_METHOD_ICON = IconLoader.getIcon("/icons/lombokMethod", LombokCompletionContributor.class);
+
+        private boolean compareType(PsiType sourceType, PsiType targetType) {
+            PsiClass srcClass = PsiTypesUtil.getPsiClass(sourceType);
+            PsiClass tarClass = PsiTypesUtil.getPsiClass(targetType);
+            return PsiTypesUtil.compareTypes(sourceType, targetType, true)
+                    || sourceType.isAssignableFrom(targetType)
+                    || (srcClass != null && srcClass.isEquivalentTo(tarClass))
+                    || (srcClass != null && tarClass != null && srcClass.isInheritor(tarClass, true))
+                    ;
+        }
 
         @Override
         protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
@@ -78,7 +90,7 @@ public class LombokCompletionContributor extends CompletionContributor {
                     Arrays.stream(x.getPsiClass().getAllMethods()).filter(m ->
                             m.isPublic() && m.isStatic()
                                     && m.getParameterList().getParameters().length > 0
-                                    && finalElementType.isConvertibleFrom(m.getParameterList().getParameters()[0].getType())
+                                    && compareType(finalElementType, m.getParameterList().getParameters()[0].getType())
                     )
             ).collect(Collectors.toList());
 
@@ -90,6 +102,20 @@ public class LombokCompletionContributor extends CompletionContributor {
                 if (m.getReturnType() != null) {
                     returnType = m.getReturnType().getPresentableText();
                 }
+
+//                JavaMethodCallElement javaMethodCallElement = new JavaMethodCallElement(m);
+//                javaMethodCallElement.setIcon(LOMBOK_METHOD_ICON);
+//                javaMethodCallElement.setTailText(paramterTokenString,true);
+//                result.addElement(javaMethodCallElement);
+
+
+//                result.addElement(LookupElementBuilder.create(m)
+//                        .withIcon(LOMBOK_METHOD_ICON)
+//                        .withTypeText(returnType, true)
+//                        .withTailText(paramterTokenString)
+//                        .withInsertHandler(new MethodParenthesesHandler(m, true))
+//                );
+
                 result.addElement(LookupElementBuilder.create(m)
                         .withIcon(LOMBOK_METHOD_ICON)
                         .withTypeText(returnType, true)
@@ -97,6 +123,8 @@ public class LombokCompletionContributor extends CompletionContributor {
                         .withInsertHandler((insertionContext, lookupElement) -> {
                             insertionContext.getDocument().insertString(insertionContext.getSelectionEndOffset(), "()");
                             insertionContext.getEditor().getCaretModel().moveToOffset(insertionContext.getSelectionEndOffset() - 1);
+
+                            AutoPopupController.getInstance(insertionContext.getProject()).scheduleAutoPopup(insertionContext.getEditor(), CompletionType.BASIC, null);
                         })
                 );
             });

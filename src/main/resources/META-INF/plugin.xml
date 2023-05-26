@@ -38,7 +38,6 @@
     <!--    <extensionPoints>-->
     <!--        <extensionPoint qualifiedName="" interface="" dynamic="true"/>-->
     <!--    </extensionPoints>-->
-
     <extensions defaultExtensionNs="com.intellij">
         <!--工具窗口-->
         <!--        <toolWindow icon="AllIcons.Toolwindows.WebToolWindow" anchor="left" secondary="true"-->
@@ -46,9 +45,10 @@
 
         <!--插件设置持久化服务-->
         <applicationService serviceImplementation="com.mysoft.devtools.services.AppSettingsStateService"/>
-
+        <!--项目启动活动-->
         <postStartupActivity implementation="com.mysoft.devtools.listeners.MyStartupActivity"/>
-
+        <!--项目结构-->
+        <!--        <treeStructureProvider implementation="com.mysoft.devtools.projectview.controller.MysoftTreeStructureProvider"/>-->
         <!--设置窗口-->
         <projectConfigurable id="mysoft-settings"
                              bundle="messages.LocalBundle"
@@ -68,9 +68,11 @@
 
         </projectConfigurable>
 
-        <!-- 代码提示 -->
+        <!-- lombok扩展方法代码提示 -->
         <completion.contributor implementationClass="com.mysoft.devtools.intellisense.LombokCompletionContributor"
                                 language="JAVA"/>
+        <!--错误上报接口-->
+        <errorHandler implementation="com.mysoft.devtools.listeners.MyErrorReportSubmitter"/>
 
         <notificationGroup displayType="BALLOON" id="mysoft-balloon" key="description"/>
         <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
@@ -96,6 +98,7 @@
                          level="ERROR"
                          enabledByDefault="true"
         />
+
         <localInspection implementationClass="com.mysoft.devtools.Inspections.DomainServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.domainservice.display.name"
@@ -148,7 +151,6 @@
         <!--                         groupKey="group.names.mysoft"-->
         <!--                         level="ERROR"-->
         <!--        />-->
-        <errorHandler implementation="com.mysoft.devtools.listeners.MyErrorReportSubmitter"/>
     </extensions>
 
     <applicationListeners>
