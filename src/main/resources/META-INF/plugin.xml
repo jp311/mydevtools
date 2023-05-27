@@ -151,6 +151,14 @@
         <!--                         groupKey="group.names.mysoft"-->
         <!--                         level="ERROR"-->
         <!--        />-->
+        <localInspection implementationClass="com.mysoft.devtools.Inspections.LambdaWrapperInspection" language="JAVA"
+                         bundle="messages.InspectionsBundle"
+                         key="inspection.platform.service.lambdawrapper.display.name"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.mysoft"
+                         level="ERROR"
+                         enabledByDefault="true"/>
     </extensions>
 
     <applicationListeners>

@@ -1,18 +1,16 @@
 package com.mysoft.devtools.intellisense;
 
-import com.intellij.codeInsight.AutoPopupController;
 import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.ProcessingContext;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassObjectAccessExpressionExtension;
 import com.mysoft.devtools.utils.psi.PsiMethodExtension;
+import com.mysoft.devtools.utils.psi.PsiTypeExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,16 +36,6 @@ public class LombokCompletionContributor extends CompletionContributor {
     private static class LombokCompletionProvider extends CompletionProvider<CompletionParameters> {
 
         private final static Icon LOMBOK_METHOD_ICON = IconLoader.getIcon("/icons/lombokMethod", LombokCompletionContributor.class);
-
-        private boolean compareType(PsiType sourceType, PsiType targetType) {
-            PsiClass srcClass = PsiTypesUtil.getPsiClass(sourceType);
-            PsiClass tarClass = PsiTypesUtil.getPsiClass(targetType);
-            return PsiTypesUtil.compareTypes(sourceType, targetType, true)
-                    || sourceType.isAssignableFrom(targetType)
-                    || (srcClass != null && srcClass.isEquivalentTo(tarClass))
-                    || (srcClass != null && tarClass != null && srcClass.isInheritor(tarClass, true))
-                    ;
-        }
 
         @Override
         protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
@@ -90,43 +78,29 @@ public class LombokCompletionContributor extends CompletionContributor {
                     Arrays.stream(x.getPsiClass().getAllMethods()).filter(m ->
                             m.isPublic() && m.isStatic()
                                     && m.getParameterList().getParameters().length > 0
-                                    && compareType(finalElementType, m.getParameterList().getParameters()[0].getType())
+                                    && PsiTypeExtension.compareTypes(finalElementType, m.getParameterList().getParameters()[0].getType())
                     )
             ).collect(Collectors.toList());
 
             extensionMethods.forEach(m -> {
-                List<String> parameterTokenList = Arrays.stream(m.getParameterList().getParameters()).skip(1).map(p -> p.getType().getPresentableText() + " " + p.getName()).collect(Collectors.toList());
-                String paramterTokenString = "(" + String.join(", ", parameterTokenList) + ")";
+                JavaMethodCallElement javaMethodCallElement = new JavaMethodCallElement(m);
+                javaMethodCallElement.setIcon(LOMBOK_METHOD_ICON);
+                result.addElement(javaMethodCallElement);
 
-                String returnType = "void";
-                if (m.getReturnType() != null) {
-                    returnType = m.getReturnType().getPresentableText();
-                }
-
-//                JavaMethodCallElement javaMethodCallElement = new JavaMethodCallElement(m);
-//                javaMethodCallElement.setIcon(LOMBOK_METHOD_ICON);
-//                javaMethodCallElement.setTailText(paramterTokenString,true);
-//                result.addElement(javaMethodCallElement);
-
-
+//                List<String> parameterTokenList = Arrays.stream(m.getParameterList().getParameters()).skip(1).map(p -> p.getType().getPresentableText() + " " + p.getName()).collect(Collectors.toList());
+//                String paramterTokenString = "(" + String.join(", ", parameterTokenList) + ")";
+//
+//                String returnType = "void";
+//                if (m.getReturnType() != null) {
+//                    returnType = m.getReturnType().getPresentableText();
+//                }
+//
 //                result.addElement(LookupElementBuilder.create(m)
 //                        .withIcon(LOMBOK_METHOD_ICON)
 //                        .withTypeText(returnType, true)
 //                        .withTailText(paramterTokenString)
 //                        .withInsertHandler(new MethodParenthesesHandler(m, true))
 //                );
-
-                result.addElement(LookupElementBuilder.create(m)
-                        .withIcon(LOMBOK_METHOD_ICON)
-                        .withTypeText(returnType, true)
-                        .withTailText(paramterTokenString)
-                        .withInsertHandler((insertionContext, lookupElement) -> {
-                            insertionContext.getDocument().insertString(insertionContext.getSelectionEndOffset(), "()");
-                            insertionContext.getEditor().getCaretModel().moveToOffset(insertionContext.getSelectionEndOffset() - 1);
-
-                            AutoPopupController.getInstance(insertionContext.getProject()).scheduleAutoPopup(insertionContext.getEditor(), CompletionType.BASIC, null);
-                        })
-                );
             });
         }
     }

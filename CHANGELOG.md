@@ -4,16 +4,13 @@
 
 ## [Unreleased]
 
-## [0.0.4]
-
-- bug fix
 
 ## [0.0.3]
 
 - bug fix
 - 增加插件错误上报入口
-- 增加检查：new Service、Resource注解字段名称规范检查
-- 将IDEA自带：数组、对象、数字、字符串等类型的比较检查器严重性设置为Error
+- 增加检查：LambdaWrapper、new Service、Resource注解字段名称规范检查
+- 将IDEA自带：枚举、数组、对象、数字、字符串等类型的比较检查器严重性设置为Error
 
 ## [0.0.2]
 

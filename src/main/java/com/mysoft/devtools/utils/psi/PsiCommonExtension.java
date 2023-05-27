@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author hezd 2023/5/25
  */
-public class PsiCommonUtil {
+public class PsiCommonExtension {
     /**
      * 重命名操作
      *

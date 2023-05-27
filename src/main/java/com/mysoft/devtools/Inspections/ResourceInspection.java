@@ -11,7 +11,7 @@ import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.StringExtension;
 import com.mysoft.devtools.utils.psi.ProjectExtension;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.PsiCommonUtil;
+import com.mysoft.devtools.utils.psi.PsiCommonExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
@@ -142,7 +142,7 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
                 if (Objects.equals(psiField.getName(), newName)) {
                     continue;
                 }
-                PsiCommonUtil.rename(psiField, newName, true, false);
+                PsiCommonExtension.rename(psiField, newName, true, false);
             }
         }
     }
@@ -173,7 +173,7 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
                 return;
             }
 
-            PsiCommonUtil.rename(psiField, newName, true, false);
+            PsiCommonExtension.rename(psiField, newName, true, false);
         }
     }
 }

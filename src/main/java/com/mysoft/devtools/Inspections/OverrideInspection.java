@@ -17,7 +17,7 @@ public class OverrideInspection {
         InspectionProfileManager manager = InspectionProfileManager.getInstance(project);
         InspectionProfileImpl profile = manager.getCurrentProfile();
 
-        List<String> names = Arrays.asList("ArrayEquality", "ArrayObjectsEquals", "NewObjectEquality", "NumberEquality", "ObjectEquality", "StringEquality");
+        List<String> names = Arrays.asList("EqualsBetweenInconvertibleTypes", "ArrayEquality", "ArrayObjectsEquals", "NewObjectEquality", "NumberEquality", "ObjectEquality", "StringEquality");
         names.forEach(x -> setErrorLevel(profile, project, x));
     }
 
