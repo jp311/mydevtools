@@ -90,7 +90,7 @@
                                 <tr>
                                     <th>
                                         <div style="margin:0;width:112px;height:36px;line-height:36px;color:#222;font-weight:normal;font-size:14px;text-align:left;overflow:hidden;">
-                                            os账号：
+                                            OS账号：
                                         </div>
                                     </th>
                                     <td>

@@ -20,6 +20,7 @@ import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.lang.manifest.psi.ManifestTokenType;
 
+import javax.swing.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -203,10 +204,13 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
             if (aClass == null) {
                 return;
             }
-            InspectionWhiteDialog dialog = new InspectionWhiteDialog(scope, aClass.getQualifiedName(), aClass.getPackageName());
-            if (dialog.showAndGet()) {
-                aClass.refresh();
-            }
+
+            SwingUtilities.invokeLater(() -> {
+                InspectionWhiteDialog dialog = new InspectionWhiteDialog(scope, aClass.getQualifiedName(), aClass.getPackageName());
+                if (dialog.showAndGet()) {
+                    aClass.refresh();
+                }
+            });
         }
     }
 }

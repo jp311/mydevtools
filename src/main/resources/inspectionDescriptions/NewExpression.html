@@ -1,22 +1,26 @@
-<html>
+﻿<html>
 <body>
+<h3> 使用new创建对象实例规范检查：</h3>
 <p>
-    继承自com.mysoft.framework.mybatis.BaseEntity的子类不能new实例化对象，应该通过EntityFactory.create(Entity.class)创建，否则枚举中文、冗余字段等功能不能正常工作；</p>
+<p>检查范围：</p>
+<ul>
+    <li>实体实例创建（前置条件：继承自BaseEntity的子类）</li>
+    <li>服务实例创建（前置条件：标记@Service或@Component）</li>
+</ul>
 
-<h3>修复示例代码</h3>
-<h4>案例一：</h4>
-<p>修复前：</p>
+<h4>
+    问题1：不能通过new创建实体，应该通过EntityFactory.create(Entity.class)创建，否则枚举中文、冗余字段等功能不能正常工作；</h4>
+<p>场景1修复前：</p>
 <pre><code>
     CgSolution solution = new CgSolution();
 </code></pre>
 
-<p>修复后：</p>
+<p>场景1修复后：</p>
 <pre><code>
     CgSolution solution = EntityFactory.create(CgSolution.class);
 </code></pre>
 
-<h4>案例二：</h4>
-<p>修复前：</p>
+<p>场景2修复前：</p>
 <pre><code>
     CgSolution solution = new CgSolution() {{
         setAssessBidMethod("1");
@@ -25,12 +29,37 @@
     }};
 </code></pre>
 
-<p>修复后：</p>
+<p>场景2修复后：</p>
 <pre><code>
     CgSolution solution = EntityFactory.create(CgSolution.class);
     solution.setAssessBidMethod("1");
     solution.setAssessBidMode(0);
     solution.setBidMode(0);
 </code></pre>
+
+<h4>问题2：不能通过new创建服务，会导致@Resource、@@Autowired注入失效；</h4>
+<pre>
+    <code>
+        @Service
+        public class ProviderAppService extends AppService{
+            public UUID save(Provider data){
+                //这里不应该通过new创建ProviderDomainService
+                ProviderDomainService domainService = new ProviderDomainService();
+                domainService.save(data);
+            }
+        }
+
+        @Service
+        public class ProviderDomainService extends DomainService{
+            @Resource
+            private ProviderDao prividerDao;
+
+            public UUID save(Provider data){
+                //由于前面是new创建的ProviderDomainService，导致这里的prividerDao注入失效包空指针错误
+                prividerDao.saveChanges(data);
+            }
+        }
+    </code>
+</pre>
 </body>
 </html>

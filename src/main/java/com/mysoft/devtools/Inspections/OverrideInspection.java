@@ -24,5 +24,6 @@ public class OverrideInspection {
     private static void setErrorLevel(InspectionProfileImpl profile, Project project, String name) {
         profile.setToolEnabled(name, true);
         profile.setErrorLevel(HighlightDisplayKey.find(name), HighlightDisplayLevel.ERROR, project);
+        //profile.setDescription("");
     }
 }

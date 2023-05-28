@@ -5,6 +5,7 @@ import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
+import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.utils.psi.PsiExpressionExtension;
@@ -47,19 +48,19 @@ public class LambdaWrapperInspection extends AbstractBaseJavaLocalInspectionTool
                     return;
                 }
 
-                int startIndex = 0;
+                int columnIndex = 0;
                 //方法签名参数列表
                 PsiParameter[] signParameters = method.getParameterList().getParameters();
                 for (int index = 0; index < signParameters.length; index++) {
                     if (Objects.equals(COLUMN_NAME, signParameters[index].getName())) {
-                        startIndex = index;
+                        columnIndex = index;
                         break;
                     }
                 }
-                if (startIndex + 1 > signParameters.length) {
+                if (columnIndex + 1 >= signParameters.length) {
                     return;
                 }
-                PsiType type = signParameters[startIndex + 1].getType();
+                PsiType type = signParameters[columnIndex + 1].getType();
                 if (!VALUE_TYPES.contains(type.getPresentableText())) {
                     return;
                 }
@@ -69,9 +70,9 @@ public class LambdaWrapperInspection extends AbstractBaseJavaLocalInspectionTool
                  * Children gtSql(boolean condition, R column, String inValue)
                  * */
                 //参数1 一般是列名
-                PsiExpression columnPsiExpression = expressions[startIndex];
+                PsiExpression columnPsiExpression = expressions[columnIndex];
                 PsiType columnPsiType = columnPsiExpression.tryGetPsiType();
-                PsiExpression valuePsiExpression = expressions[startIndex + 1];
+                PsiExpression valuePsiExpression = expressions[columnIndex + 1];
                 PsiType valuePsiType;
                 String name = method.getName();
                 switch (name) {
@@ -81,6 +82,13 @@ public class LambdaWrapperInspection extends AbstractBaseJavaLocalInspectionTool
                         valuePsiType = valuePsiExpression.tryGetPsiType();
                         if (valuePsiType instanceof PsiClassReferenceType) {
                             PsiType[] parameters = ((PsiClassReferenceType) valuePsiType).getParameters();
+                            if (parameters.length > 0) {
+                                //UUID
+                                valuePsiType = parameters[0];
+                            }
+                        }
+                        if (valuePsiType instanceof PsiImmediateClassType) {
+                            PsiType[] parameters = ((PsiImmediateClassType) valuePsiType).getParameters();
                             if (parameters.length > 0) {
                                 //UUID
                                 valuePsiType = parameters[0];
