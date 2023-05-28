@@ -71,6 +71,12 @@ public class LombokCompletionContributor extends CompletionContributor {
             if (elementType == null) {
                 return;
             }
+
+            //值类型不可以用扩展方法
+            if (!PsiTypeExtension.isRefType(elementType)) {
+                return;
+            }
+
             PsiType finalElementType = elementType;
 
             List<PsiClassObjectAccessExpression> extensionClasses = Arrays.stream(attributeValue.getChildren()).filter(x -> x instanceof PsiClassObjectAccessExpression).map(x -> (PsiClassObjectAccessExpression) x).collect(Collectors.toList());
