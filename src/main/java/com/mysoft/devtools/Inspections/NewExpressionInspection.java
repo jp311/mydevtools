@@ -1,20 +1,26 @@
 package com.mysoft.devtools.Inspections;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.*;
+import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
+import com.mysoft.devtools.utils.InspectionWhiteUtil;
+import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
 import com.mysoft.devtools.utils.psi.IdeaSdkAdapter;
+import com.mysoft.devtools.utils.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
+import com.mysoft.devtools.views.users.InspectionWhiteDialog;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.lang.manifest.psi.ManifestTokenType;
 
+import javax.swing.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +30,10 @@ import java.util.List;
  *
  * @author hezd 2023/4/24
  */
-@ExtensionMethod(VirtualFileExtension.class)
-public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
+@ExtensionMethod({VirtualFileExtension.class, PsiClassExtension.class})
+public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool {
     private final ReplaceWithEntityFactoryQuickFix myQuickFix = new ReplaceWithEntityFactoryQuickFix();
+    private AddWhiteQuickFix addWhiteQuickFix;
 
     @NotNull
     @Override
@@ -34,33 +41,56 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitNewExpression(@NotNull PsiNewExpression expression) {
-                super.visitNewExpression(expression);
                 PsiType type = expression.getType();
-                if (type != null && isSubclassOfBaseEntity(type, expression.getProject())) {
-                    String message = InspectionBundle.message("inspection.platform.entity.create.problem.descriptor");
-                    holder.registerProblem(expression, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, myQuickFix);
+                if (type == null) {
+                    return;
                 }
+
+                PsiClass psiClass = PsiUtil.resolveClassInType(type);
+                if (psiClass == null || psiClass instanceof PsiTypeParameter) {
+                    return;
+                }
+                if (psiClass.isEnum() || psiClass.isInterface() || psiClass.isAnnotationType() || psiClass.isRecord()) {
+                    return;
+                }
+                Project project = psiClass.getProject();
+
+                if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+                    //白名单检查
+                    boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_ENTITY, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
+                    if (isWhite) {
+                        return;
+                    }
+                    addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_ENTITY);
+                    String message = InspectionBundle.message("inspection.platform.entity.create.problem.descriptor");
+                    holder.registerProblem(expression, message, ProblemHighlightType.ERROR, myQuickFix, addWhiteQuickFix);
+                }
+
+                List<PsiClass> superAnnotationOwners = new ArrayList<>(AnnotationUtil.getSuperAnnotationOwners(psiClass));
+                superAnnotationOwners.add(psiClass);
+                boolean isService = superAnnotationOwners.stream().anyMatch(x -> x.hasAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME)
+                        || x.hasAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME)
+                );
+
+                if (isService) {
+                    //白名单检查
+                    boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_SERVICE, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
+                    if (isWhite) {
+                        return;
+                    }
+                    addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_SERVICE);
+                    String message = InspectionBundle.message("inspection.platform.service.create.problem.descriptor");
+                    holder.registerProblem(expression, message, ProblemHighlightType.ERROR, addWhiteQuickFix);
+                }
+
             }
         };
     }
 
     /**
-     * 判断是否BaseEntity的子类
-     */
-    private boolean isSubclassOfBaseEntity(PsiType type, Project project) {
-        PsiClass psiClass = PsiUtil.resolveClassInType(type);
-        if (psiClass != null) {
-            PsiClass baseEntityClass = JavaPsiFacade.getInstance(project)
-                    .findClass(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, GlobalSearchScope.allScope(project));
-            return baseEntityClass != null && psiClass.isInheritor(baseEntityClass, true);
-        }
-        return false;
-    }
-
-    /**
      * EntityFactory.create 修复类
      */
-    private static class ReplaceWithEntityFactoryQuickFix implements LocalQuickFix {
+    private final static class ReplaceWithEntityFactoryQuickFix implements LocalQuickFix {
 
         @NotNull
         @Override
@@ -71,8 +101,13 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
             PsiElement psiElement = descriptor.getPsiElement();
-            PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
+            if (psiElement.getParent() == null || !(psiElement.getParent() instanceof PsiLocalVariable)) {
+                IdeaNotifyUtil.dialogError(InspectionBundle.message("inspection.platform.common.quickfix.fail"));
+                return;
+            }
+
             PsiLocalVariable localVariable = (PsiLocalVariable) psiElement.getParent();
+            PsiAnonymousClass anonymousClass = PsiTreeUtil.collectElementsOfType(psiElement, PsiAnonymousClass.class).stream().findFirst().orElse(null);
 
             String entityName = localVariable.getType().getPresentableText();
             String variableName = localVariable.getName();
@@ -92,7 +127,7 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
                             String setMethodName = methodCallExpression.getMethodExpression().getText();
                             String propertyValue = "";
                             PsiExpressionList childOfType = PsiTreeUtil.findChildOfType(methodCallExpression, PsiExpressionList.class);
-                            if (childOfType != null){
+                            if (childOfType != null) {
                                 propertyValue = childOfType.getText();
                             }
                             String newCode = MessageFormat.format("{0}.{1}{2};", variableName, setMethodName, propertyValue);
@@ -136,6 +171,46 @@ public class NewEntityInspection extends AbstractBaseJavaLocalInspectionTool {
         @Override
         public String getFamilyName() {
             return getName();
+        }
+    }
+
+    public final static class AddWhiteQuickFix implements LocalQuickFix {
+        private final String scope;
+
+        public AddWhiteQuickFix(String scope) {
+            this.scope = scope;
+        }
+
+        @Override
+        public @IntentionFamilyName @NotNull String getFamilyName() {
+            return InspectionBundle.message("inspection.platform.service.addwhite.quickfix");
+        }
+
+        @Override
+        public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor descriptor) {
+            PsiElement psiElement = descriptor.getPsiElement();
+            if (!(psiElement instanceof PsiNewExpression)) {
+                return;
+            }
+            PsiNewExpression newExpression = (PsiNewExpression) psiElement;
+
+            PsiType type = newExpression.getType();
+            if (type == null) {
+                return;
+            }
+
+
+            PsiClass aClass = PsiUtil.resolveClassInType(type);
+            if (aClass == null) {
+                return;
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                InspectionWhiteDialog dialog = new InspectionWhiteDialog(scope, aClass.getQualifiedName(), aClass.getPackageName());
+                if (dialog.showAndGet()) {
+                    aClass.refresh();
+                }
+            });
         }
     }
 }

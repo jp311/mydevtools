@@ -1,16 +1,17 @@
 package com.mysoft.devtools.intellisense;
 
 import com.intellij.codeInsight.completion.*;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.ui.IconManager;
+import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.ProcessingContext;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassObjectAccessExpressionExtension;
 import com.mysoft.devtools.utils.psi.PsiMethodExtension;
+import com.mysoft.devtools.utils.psi.PsiTypeExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +36,7 @@ public class LombokCompletionContributor extends CompletionContributor {
 
     private static class LombokCompletionProvider extends CompletionProvider<CompletionParameters> {
 
-        private final static Icon LOMBOK_METHOD_ICON = IconManager.getInstance().getIcon("/icons/lombokMethod", LombokCompletionContributor.class);
+        private final static Icon LOMBOK_METHOD_ICON = IconLoader.getIcon("/icons/lombokMethod", LombokCompletionContributor.class);
 
         @Override
         protected void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
@@ -71,34 +72,51 @@ public class LombokCompletionContributor extends CompletionContributor {
             if (elementType == null) {
                 return;
             }
+
+            //值类型不可以用扩展方法
+            if (!PsiTypeExtension.isRefType(elementType)) {
+                return;
+            }
+
             PsiType finalElementType = elementType;
 
-            List<PsiClassObjectAccessExpression> extensionClasses = Arrays.stream(attributeValue.getChildren()).filter(x -> x instanceof PsiClassObjectAccessExpression).map(x -> (PsiClassObjectAccessExpression) x).collect(Collectors.toList());
+            List<PsiClass> extensionClasses = Arrays.stream(attributeValue.getChildren())
+                    .filter(x -> x instanceof PsiClassObjectAccessExpression || x instanceof PsiTypeElement)
+                    .map(x -> {
+                        if (x instanceof PsiClassObjectAccessExpression) {
+                            return ((PsiClassObjectAccessExpression) x).getPsiClass();
+                        }
+                        return PsiTypesUtil.getPsiClass(((PsiTypeElement) x).getType());
+                    }).collect(Collectors.toList());
+
             List<PsiMethod> extensionMethods = extensionClasses.stream().flatMap(x ->
-                    Arrays.stream(x.getPsiClass().getAllMethods()).filter(m ->
+                    Arrays.stream(x.getAllMethods()).filter(m ->
                             m.isPublic() && m.isStatic()
                                     && m.getParameterList().getParameters().length > 0
-                                    && finalElementType.isConvertibleFrom(m.getParameterList().getParameters()[0].getType())
+                                    && PsiTypeExtension.compareTypes(finalElementType, m.getParameterList().getParameters()[0].getType())
                     )
             ).collect(Collectors.toList());
 
-            extensionMethods.forEach(m -> {
-                List<String> parameterTokenList = Arrays.stream(m.getParameterList().getParameters()).skip(1).map(p -> p.getType().getPresentableText() + " " + p.getName()).collect(Collectors.toList());
-                String paramterTokenString = "(" + String.join(", ", parameterTokenList) + ")";
 
-                String returnType = "void";
-                if (m.getReturnType() != null) {
-                    returnType = m.getReturnType().getPresentableText();
-                }
-                result.addElement(LookupElementBuilder.create(m)
-                        .withIcon(LOMBOK_METHOD_ICON)
-                        .withTypeText(returnType, true)
-                        .withTailText(paramterTokenString)
-                        .withInsertHandler((insertionContext, lookupElement) -> {
-                            insertionContext.getDocument().insertString(insertionContext.getSelectionEndOffset(), "()");
-                            insertionContext.getEditor().getCaretModel().moveToOffset(insertionContext.getSelectionEndOffset() - 1);
-                        })
-                );
+            extensionMethods.forEach(m -> {
+                JavaMethodCallElement javaMethodCallElement = new JavaMethodCallElement(m);
+                javaMethodCallElement.setIcon(LOMBOK_METHOD_ICON);
+                result.addElement(javaMethodCallElement);
+
+//                List<String> parameterTokenList = Arrays.stream(m.getParameterList().getParameters()).skip(1).map(p -> p.getType().getPresentableText() + " " + p.getName()).collect(Collectors.toList());
+//                String paramterTokenString = "(" + String.join(", ", parameterTokenList) + ")";
+//
+//                String returnType = "void";
+//                if (m.getReturnType() != null) {
+//                    returnType = m.getReturnType().getPresentableText();
+//                }
+//
+//                result.addElement(LookupElementBuilder.create(m)
+//                        .withIcon(LOMBOK_METHOD_ICON)
+//                        .withTypeText(returnType, true)
+//                        .withTailText(paramterTokenString)
+//                        .withInsertHandler(new MethodParenthesesHandler(m, true))
+//                );
             });
         }
     }

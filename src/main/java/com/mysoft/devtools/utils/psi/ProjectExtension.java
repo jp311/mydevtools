@@ -6,7 +6,6 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
-import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.utils.FileUtil;
 
 import java.io.File;
@@ -35,7 +34,7 @@ public class ProjectExtension {
             return path;
         }
 
-        throw new RuntimeException(LocalBundle.message("devtools.exception.notfoundpath.ci"));
+        return null;
     }
 
     /**

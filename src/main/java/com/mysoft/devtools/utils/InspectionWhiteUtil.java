@@ -1,5 +1,6 @@
 package com.mysoft.devtools.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.intellij.openapi.project.Project;
@@ -8,9 +9,7 @@ import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author hezd   2023/5/17
@@ -18,52 +17,94 @@ import java.util.Objects;
 @ExtensionMethod(ProjectExtension.class)
 public class InspectionWhiteUtil {
     private static String FILE_NAME;
-    private static WhiteSettingsDTO WHITE_CACHE;
+    private static Map<String, WhiteSettingsDTO> WHITE_CACHE;
 
-    private static List<String> INIT_PROJECTS = new ArrayList<>();
+    private static final List<String> INIT_PROJECTS = new ArrayList<>();
 
-    private static void loadSettings(Project project) {
+    public final static String NEW_SERVICE = "NewService";
+    public final static String NEW_ENTITY = "NewEntity";
+
+    public final static String ABSTRACT_ENTITY = "AbstractEntity";
+
+    private synchronized static void loadSettings(Project project) {
         if (INIT_PROJECTS.contains(project.getBasePath())) {
             return;
         }
-        FILE_NAME = FileUtil.combine(project.getCIDirectory(), "white_settings.xml");
+        String ciDirectory = project.getCIDirectory();
+        //可能是非明源项目
+        if (ciDirectory == null) {
+            return;
+        }
+        FILE_NAME = FileUtil.combine(ciDirectory, "white_settings.xml");
         try {
+            TypeReference<Map<String, WhiteSettingsDTO>> typeReference = new TypeReference<>() {
+            };
             if (FileUtil.isExist(FILE_NAME)) {
-                WHITE_CACHE = XmlUtil.fromFile(FILE_NAME, WhiteSettingsDTO.class);
-                INIT_PROJECTS.add(project.getBasePath());
+                WHITE_CACHE = XmlUtil.fromFile(FILE_NAME, typeReference);
             } else {
-                WHITE_CACHE = new WhiteSettingsDTO();
+                WHITE_CACHE = new HashMap<>();
             }
-            if (WHITE_CACHE.getPackages() == null) {
-                WHITE_CACHE.setPackages(new ArrayList<>());
-            }
-            if (WHITE_CACHE.getQualifiedNames() == null) {
-                WHITE_CACHE.setQualifiedNames(new ArrayList<>());
-            }
+            INIT_PROJECTS.add(project.getBasePath());
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static boolean isWhite(String qualifiedName, String packageName, Project project) {
+    public static boolean isWhite(String socpe, String qualifiedName, String packageName, Project project) {
         loadSettings(project);
-        return WHITE_CACHE.getQualifiedNames().stream().anyMatch(x -> Objects.equals(qualifiedName, x))
-                || WHITE_CACHE.getPackages().stream().anyMatch(x -> Objects.equals(packageName, x));
+        if (!WHITE_CACHE.containsKey(socpe)) {
+            return false;
+        }
+        WhiteSettingsDTO whiteSettingsDTO = WHITE_CACHE.get(socpe);
+        if (whiteSettingsDTO.getQualifiedNames() != null && whiteSettingsDTO.getQualifiedNames().stream().anyMatch(x -> Objects.equals(qualifiedName, x))) {
+            return true;
+        }
+        return whiteSettingsDTO.getPackages() != null && whiteSettingsDTO.getPackages().stream().anyMatch(x -> Objects.equals(packageName, x));
     }
 
-    public static void appendName(String qualifiedName) throws IOException {
-        WHITE_CACHE.getQualifiedNames().add(qualifiedName);
+    public static void appendName(String scope, String qualifiedName) throws IOException {
+        WhiteSettingsDTO whiteSettingsDTO;
+        if (!WHITE_CACHE.containsKey(scope)) {
+            whiteSettingsDTO = new WhiteSettingsDTO();
+            WHITE_CACHE.put(scope, whiteSettingsDTO);
+        } else {
+            whiteSettingsDTO = WHITE_CACHE.get(scope);
+        }
+
+        if (whiteSettingsDTO.getQualifiedNames().contains(qualifiedName)) {
+            return;
+        }
+
+        whiteSettingsDTO.getQualifiedNames().add(qualifiedName);
         XmlUtil.toFile(FILE_NAME, WHITE_CACHE);
     }
 
-    public static void appendPackage(String packageName) throws IOException {
-        WHITE_CACHE.getPackages().add(packageName);
+    public static void appendPackage(String scope, String packageName) throws IOException {
+        WhiteSettingsDTO whiteSettingsDTO;
+        if (!WHITE_CACHE.containsKey(scope)) {
+            whiteSettingsDTO = new WhiteSettingsDTO();
+            WHITE_CACHE.put(scope, whiteSettingsDTO);
+        } else {
+            whiteSettingsDTO = WHITE_CACHE.get(scope);
+        }
+
+        if (whiteSettingsDTO.getPackages().contains(packageName)) {
+            return;
+        }
+
+        whiteSettingsDTO.getPackages().add(packageName);
         XmlUtil.toFile(FILE_NAME, WHITE_CACHE);
     }
 
     @Data
     @JacksonXmlRootElement(localName = "WhiteSettings")
     private static final class WhiteSettingsDTO {
+        public WhiteSettingsDTO() {
+            qualifiedNames = new ArrayList<>();
+            packages = new ArrayList<>();
+        }
+
         @JacksonXmlProperty(localName = "QualifiedNames")
         private List<String> qualifiedNames;
         @JacksonXmlProperty(localName = "Packages")

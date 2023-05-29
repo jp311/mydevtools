@@ -1,6 +1,5 @@
 package com.mysoft.devtools.Inspections;
 
-import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.openapi.project.Project;
@@ -51,11 +50,6 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             public void visitClass(PsiClass aClass) {
                 if (!isController(aClass, aClass.getProject())) {
                     return;
-                }
-
-                //命名规范检查：以Controller结尾
-                if (aClass.getName() != null && !aClass.getName().endsWith("Controller")) {
-                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.name.descriptor"), ProblemHighlightType.WARNING);
                 }
 
                 if (aClass.isAbstract()) {
@@ -294,11 +288,12 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
         PsiAnnotation pubActionAnnotation = aMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (pubActionAnnotation == null) {
-            List<PsiMethod> superAnnotationOwners = AnnotationUtil.getSuperAnnotationOwners(aMethod);
-            boolean anyMatch = superAnnotationOwners.stream().anyMatch(x ->
+            PsiMethod[] superMethods = aMethod.findDeepestSuperMethods();
+            boolean anyMatch = Arrays.stream(superMethods).anyMatch(x ->
                     x.hasAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME)
                             || x.hasAnnotation(QualifiedNames.GET_MAPPING_QUALIFIED_NAME)
                             || x.hasAnnotation(QualifiedNames.POST_MAPPING_QUALIFIED_NAME)
+                            || x.hasAnnotation(QualifiedNames.REQUEST_MAPPING_QUALIFIED_NAME)
             );
             if (!anyMatch) {
                 holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.descriptor"), ProblemHighlightType.ERROR, addPubActionAnnotationQuickFix);
@@ -324,7 +319,7 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
      */
     private void checkerKeyword(PsiMethod aMethod, ProblemsHolder holder) {
         PsiParameterList parameterList = aMethod.getParameterList();
-        String[] keywords = new String[]{"buguid", "oid"};
+        String[] keywords = new String[]{"oid"};
         for (PsiParameter parameter : parameterList.getParameters()) {
             if (Arrays.stream(keywords).anyMatch(x -> Objects.equals(parameter.getName().toLowerCase(), x))) {
                 holder.registerProblem(parameter, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.keyword.descriptor", parameter.getName()), ProblemHighlightType.ERROR);
@@ -400,7 +395,8 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
             PsiAnnotation pubAnnotation = elementFactory.createAnnotationFromText(annString, null);
             method.addAnnotation(pubAnnotation);
 
-            ((PsiJavaFile) psiElement.getContainingFile().getVirtualFile()).addImportIfNotExist(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
+
+            psiElement.addImportIfNotExist(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         }
     }
 }

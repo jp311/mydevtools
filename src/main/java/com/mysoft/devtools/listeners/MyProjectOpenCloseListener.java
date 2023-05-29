@@ -15,7 +15,7 @@ public class MyProjectOpenCloseListener implements ProjectManagerListener {
 //     */
 //    @Override
 //    public void projectOpened(@NotNull Project project) {
-//        System.out.println("project opend!");
+//        OverrideInspection.doOverride(project);
 //    }
 
     /**

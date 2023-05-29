@@ -18,14 +18,17 @@ public class InspectionWhiteDialog extends BaseDialogComponent {
     private JRadioButton rbName;
     private JTextField txtPackage;
 
-    public InspectionWhiteDialog(String qualifiedName, String packageName) {
+    private final String scope;
 
+    public InspectionWhiteDialog(String scope, String qualifiedName, String packageName) {
         setTitle(LocalBundle.message("devtools.userview.white.dialogtitle"));
         init();
 
         txtName.setText(qualifiedName);
         txtPackage.setText(packageName);
         contentPanel.setPreferredSize(new Dimension(600, 200));
+
+        this.scope = scope;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class InspectionWhiteDialog extends BaseDialogComponent {
     protected void doOKAction() {
         if (rbPackage.isSelected()) {
             try {
-                InspectionWhiteUtil.appendPackage(txtPackage.getText());
+                InspectionWhiteUtil.appendPackage(scope, txtPackage.getText());
                 close(0, true);
                 return;
             } catch (IOException e) {
@@ -46,9 +49,8 @@ public class InspectionWhiteDialog extends BaseDialogComponent {
         }
         if (rbName.isSelected()) {
             try {
-                InspectionWhiteUtil.appendName(txtName.getText());
+                InspectionWhiteUtil.appendName(scope, txtName.getText());
                 close(0, true);
-                return;
             } catch (IOException e) {
                 IdeaNotifyUtil.dialogError(e.getMessage());
             }

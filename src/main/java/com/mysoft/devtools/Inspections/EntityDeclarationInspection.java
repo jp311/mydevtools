@@ -45,6 +45,9 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
                     return;
                 }
 
+                if (aClass instanceof PsiTypeParameter) {
+                    return;
+                }
                 //非BaseEntity子类不检查
                 if (!aClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
                     return;
@@ -122,7 +125,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
         }
 
         //白名单检查
-        boolean isWhite = InspectionWhiteUtil.isWhite(aClass.getQualifiedName(), aClass.getPackageName(), aClass.getProject());
+        boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.ABSTRACT_ENTITY, aClass.getQualifiedName(), aClass.getPackageName(), aClass.getProject());
         if (isWhite) {
             return;
         }
@@ -165,7 +168,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
     private final static class AddWhiteQuickFix implements LocalQuickFix {
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {
-            return InspectionBundle.message("inspection.platform.service.entity.addwhite.quickfix");
+            return InspectionBundle.message("inspection.platform.service.addwhite.quickfix");
         }
 
         @Override
@@ -174,7 +177,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
             PsiClass aClass = (PsiClass) psiElement.getParent();
 
 
-            InspectionWhiteDialog dialog = new InspectionWhiteDialog(aClass.getQualifiedName(), aClass.getPackageName());
+            InspectionWhiteDialog dialog = new InspectionWhiteDialog(InspectionWhiteUtil.ABSTRACT_ENTITY, aClass.getQualifiedName(), aClass.getPackageName());
             if (dialog.showAndGet()) {
                 aClass.refresh();
             }

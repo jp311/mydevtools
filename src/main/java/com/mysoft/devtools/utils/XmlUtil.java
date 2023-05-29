@@ -2,6 +2,7 @@ package com.mysoft.devtools.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -15,11 +16,11 @@ import java.util.List;
  * @author hezd 2023/5/3
  */
 public class XmlUtil {
-    private static final XmlMapper xmlMapper;
+    private static final XmlMapper XML_MAPPER;
 
     static {
         SimpleModule module = new SimpleModule();
-        xmlMapper = XmlMapper
+        XML_MAPPER = XmlMapper
                 .xmlBuilder()
                 .addModule(module)
                 //字段为null，自动忽略，不再序列化
@@ -28,7 +29,7 @@ public class XmlUtil {
                 //转化成加下划线和大写
                 .propertyNamingStrategy(new UpperCaseSnackNamingStrategy())
                 //是否在反序列化时忽略未知属性。
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 //是否在反序列化时忽略缺少的外部类型标识属性。
                 .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY,false)
                 //是否在反序列化时忽略空的创建者属性。
@@ -39,20 +40,29 @@ public class XmlUtil {
     }
 
     public static String toXml(Object obj) throws JsonProcessingException {
-        return xmlMapper.writeValueAsString(obj);
+        return XML_MAPPER.writeValueAsString(obj);
     }
 
     public static <T> T fromXml(String xml, Class<T> clazz) throws JsonProcessingException {
-        return xmlMapper.readValue(xml, clazz);
+        return XML_MAPPER.readValue(xml, clazz);
+    }
+
+    public static <T> T fromXml(String xml, TypeReference<T> valueTypeRef) throws JsonProcessingException {
+        return XML_MAPPER.readValue(xml, valueTypeRef);
     }
 
     public static <T> List<T> fromXmlList(String xml, Class<T> clazz) throws JsonProcessingException {
-        return xmlMapper.readValue(xml, xmlMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        return XML_MAPPER.readValue(xml, XML_MAPPER.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 
     public static <T> T fromFile(String fileName, Class<T> clazz) throws IOException {
         String xml = FileUtil.readAllText(fileName);
         return fromXml(xml, clazz);
+    }
+
+    public static <T> T fromFile(String fileName, TypeReference<T> valueTypeRef) throws IOException {
+        String xml = FileUtil.readAllText(fileName);
+        return fromXml(xml, valueTypeRef);
     }
 
     public static void toFile(String fileName, Object xmlObj) throws IOException {

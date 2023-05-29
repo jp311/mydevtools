@@ -42,7 +42,9 @@
               <forms/>
             </constraints>
             <properties>
+              <enabled value="false"/>
               <text value="文件监听器"/>
+              <visible value="false"/>
             </properties>
           </component>
           <component id="f0c8d" class="com.intellij.ui.components.JBCheckBox">
@@ -51,7 +53,9 @@
               <forms/>
             </constraints>
             <properties>
+              <enabled value="false"/>
               <text value="元数据变化后自动刷新实体类"/>
+              <visible value="false"/>
             </properties>
           </component>
         </children>
