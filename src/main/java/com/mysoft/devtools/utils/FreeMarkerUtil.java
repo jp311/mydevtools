@@ -39,7 +39,7 @@ public class FreeMarkerUtil {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
         cfg.setDefaultEncoding("UTF-8");
 // 加载模板文件
-        InputStream inputStream = FreeMarkerUtil.class.getClassLoader().getResourceAsStream("templates/problem_email.ftl");
+        InputStream inputStream = FreeMarkerUtil.class.getClassLoader().getResourceAsStream("templates/freemarker/problem_email.ftl");
         InputStreamReader reader = null;
         if (inputStream != null) {
             reader = new InputStreamReader(inputStream);

@@ -10,9 +10,9 @@ public class MysoftSettingsDTO {
         metadataPath = FileUtil.combine("data", "_metadata");
         author = System.getProperty("user.name");
 
-        entityTemplate = FileUtil.readResourceContent("templates/entity.ftl");
-        jsProxyTemplate = FileUtil.readResourceContent("templates/jsproxy.ftl");
-        entityDtoTemplate = FileUtil.readResourceContent("templates/entitydto.ftl");
+        entityTemplate = FileUtil.readResourceContent("templates/freemarker/entity.ftl");
+        jsProxyTemplate = FileUtil.readResourceContent("templates/freemarker/jsproxy.ftl");
+        entityDtoTemplate = FileUtil.readResourceContent("templates/freemarker/entitydto.ftl");
     }
 
     /**

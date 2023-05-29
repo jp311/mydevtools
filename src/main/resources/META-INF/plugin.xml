@@ -10,6 +10,10 @@
     psi：https://www.ideaplugin.com/idea-docs/Part%20IV%20%E2%80%94%20PSI/PSI%20Cookbook.html#%E5%A6%82%E4%BD%95%E9%87%8D%E5%91%BD%E5%90%8Dpsi%E5%85%83%E7%B4%A0
     C:\Users\h5989\.gradle\caches\modules-2\files-2.1\com.jetbrains.intellij.idea\ideaIU\2022.3.1\39ac473da83edaa9b87b08e3fe0c752766155864\ideaIU-2022.3.1
 
+    plugin.xml文档：https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html#idea-plugin__vendor
+    单元测试：https://www.jetbrains.com/help/idea/testing-frameworks.html
+    依赖分析：https://www.jetbrains.com/help/idea/dependencies-analysis.html#validate-dependencies
+    宏：https://www.jetbrains.com/help/idea/built-in-macros.html#custom-macros
     com.intellij.psi.PsiFileFactory：
     文件相关操作，e.g.创建文件等。
     com.intellij.psi.PsiElementFactory:
