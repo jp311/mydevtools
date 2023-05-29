@@ -6,6 +6,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.ProcessingContext;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassObjectAccessExpressionExtension;
@@ -79,14 +80,23 @@ public class LombokCompletionContributor extends CompletionContributor {
 
             PsiType finalElementType = elementType;
 
-            List<PsiClassObjectAccessExpression> extensionClasses = Arrays.stream(attributeValue.getChildren()).filter(x -> x instanceof PsiClassObjectAccessExpression).map(x -> (PsiClassObjectAccessExpression) x).collect(Collectors.toList());
+            List<PsiClass> extensionClasses = Arrays.stream(attributeValue.getChildren())
+                    .filter(x -> x instanceof PsiClassObjectAccessExpression || x instanceof PsiTypeElement)
+                    .map(x -> {
+                        if (x instanceof PsiClassObjectAccessExpression) {
+                            return ((PsiClassObjectAccessExpression) x).getPsiClass();
+                        }
+                        return PsiTypesUtil.getPsiClass(((PsiTypeElement) x).getType());
+                    }).collect(Collectors.toList());
+
             List<PsiMethod> extensionMethods = extensionClasses.stream().flatMap(x ->
-                    Arrays.stream(x.getPsiClass().getAllMethods()).filter(m ->
+                    Arrays.stream(x.getAllMethods()).filter(m ->
                             m.isPublic() && m.isStatic()
                                     && m.getParameterList().getParameters().length > 0
                                     && PsiTypeExtension.compareTypes(finalElementType, m.getParameterList().getParameters()[0].getType())
                     )
             ).collect(Collectors.toList());
+
 
             extensionMethods.forEach(m -> {
                 JavaMethodCallElement javaMethodCallElement = new JavaMethodCallElement(m);
