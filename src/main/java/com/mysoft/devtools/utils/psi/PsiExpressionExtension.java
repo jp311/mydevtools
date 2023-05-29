@@ -2,8 +2,7 @@ package com.mysoft.devtools.utils.psi;
 
 import com.intellij.psi.*;
 import com.intellij.psi.impl.light.LightMethodBuilder;
-import com.intellij.psi.impl.source.PsiParameterImpl;
-import com.intellij.psi.impl.source.tree.java.PsiReferenceExpressionImpl;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
 
 /**
  * @author hezd   2023/5/27
@@ -19,11 +18,11 @@ public class PsiExpressionExtension {
             }
         }
 
-        //cgPlanName
-        if (expression instanceof PsiReferenceExpressionImpl) {
-            PsiElement referenceExpression = ((PsiReferenceExpressionImpl) expression).resolve();
-            if (referenceExpression instanceof PsiParameterImpl) {
-                return ((PsiParameterImpl) referenceExpression).getType();
+        //String cgPlanName、SFunction<T, R> keyFunc
+        if (expression instanceof PsiReferenceExpression) {
+            PsiElement referenceExpression = ((PsiReferenceExpression) expression).resolve();
+            if (referenceExpression instanceof PsiParameter) {
+                return ((PsiParameter) referenceExpression).getType();
             }
         }
 
@@ -31,7 +30,15 @@ public class PsiExpressionExtension {
         if (expression instanceof PsiMethodCallExpression) {
             PsiMethod method = ((PsiMethodCallExpression) expression).resolveMethod();
             if (method != null) {
-                return method.getReturnType();
+                PsiType returnType = method.getReturnType();
+                if (returnType instanceof PsiClassReferenceType) {
+                    PsiClassReferenceType type = (PsiClassReferenceType) returnType;
+                    if (!type.isRaw()) {
+                        return expression.getType();
+                    }
+                }
+
+                return returnType;
             }
         }
 

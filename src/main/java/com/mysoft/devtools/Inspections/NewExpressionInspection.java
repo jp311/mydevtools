@@ -24,6 +24,7 @@ import javax.swing.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * new entity检查，只能通过EntityFactory.create创建entity实例
@@ -54,37 +55,47 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
                     return;
                 }
                 Project project = psiClass.getProject();
+                newEntityChecker(expression, psiClass, project, holder);
 
-                if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
-                    //白名单检查
-                    boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_ENTITY, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
-                    if (isWhite) {
-                        return;
-                    }
-                    addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_ENTITY);
-                    String message = InspectionBundle.message("inspection.platform.entity.create.problem.descriptor");
-                    holder.registerProblem(expression, message, ProblemHighlightType.ERROR, myQuickFix, addWhiteQuickFix);
-                }
-
-                List<PsiClass> superAnnotationOwners = new ArrayList<>(AnnotationUtil.getSuperAnnotationOwners(psiClass));
-                superAnnotationOwners.add(psiClass);
-                boolean isService = superAnnotationOwners.stream().anyMatch(x -> x.hasAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME)
-                        || x.hasAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME)
-                );
-
-                if (isService) {
-                    //白名单检查
-                    boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_SERVICE, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
-                    if (isWhite) {
-                        return;
-                    }
-                    addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_SERVICE);
-                    String message = InspectionBundle.message("inspection.platform.service.create.problem.descriptor");
-                    holder.registerProblem(expression, message, ProblemHighlightType.ERROR, addWhiteQuickFix);
-                }
+                newServiceChecker(expression, psiClass, project, holder);
 
             }
         };
+    }
+
+    private void newServiceChecker(@NotNull PsiNewExpression expression, PsiClass psiClass, Project project, @NotNull ProblemsHolder holder) {
+        List<PsiClass> superAnnotationOwners = new ArrayList<>(AnnotationUtil.getSuperAnnotationOwners(psiClass));
+        superAnnotationOwners.add(psiClass);
+        boolean isService = superAnnotationOwners.stream().anyMatch(x -> x.hasAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME)
+                || x.hasAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME)
+        );
+
+        if (isService) {
+            //白名单检查
+            boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_SERVICE, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
+            if (isWhite) {
+                return;
+            }
+            addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_SERVICE);
+            String message = InspectionBundle.message("inspection.platform.service.create.problem.descriptor");
+            holder.registerProblem(expression, message, ProblemHighlightType.ERROR, addWhiteQuickFix);
+        }
+    }
+
+    private void newEntityChecker(@NotNull PsiNewExpression expression, PsiClass psiClass, Project project, @NotNull ProblemsHolder holder) {
+        if (psiClass.isInheritors(QualifiedNames.BASE_ENTITY_QUALIFIED_NAME, project)) {
+            if (Objects.equals(psiClass.getQualifiedName(), QualifiedNames.CUSTOM_BASE_ENTITY_QUALIFIED_NAME)) {
+                return;
+            }
+            //白名单检查
+            boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.NEW_ENTITY, psiClass.getQualifiedName(), psiClass.getPackageName(), project);
+            if (isWhite) {
+                return;
+            }
+            addWhiteQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.NEW_ENTITY);
+            String message = InspectionBundle.message("inspection.platform.entity.create.problem.descriptor");
+            holder.registerProblem(expression, message, ProblemHighlightType.ERROR, myQuickFix, addWhiteQuickFix);
+        }
     }
 
     /**
@@ -158,7 +169,7 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
                 return;
             }
 
-            ((PsiJavaFile) containingFile).addImportIfNotExist("com.mysoft.framework.mybatis.EntityFactory");
+            ((PsiJavaFile) containingFile).addImportIfNotExist(QualifiedNames.ENTITY_FACTORY_QUALIFIED_NAME);
 
             PsiMethod method = PsiTreeUtil.getParentOfType(localVariable, PsiMethod.class);
             if (method != null) {

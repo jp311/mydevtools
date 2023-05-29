@@ -24,7 +24,7 @@ public class InspectionWhiteUtil {
     public final static String NEW_SERVICE = "NewService";
     public final static String NEW_ENTITY = "NewEntity";
 
-    public final static String ABSTRACT_ENTITY = "AbstractEntity";
+    public final static String ENTITY_DECLARE = "EntityDeclare";
 
     private synchronized static void loadSettings(Project project) {
         if (INIT_PROJECTS.contains(project.getBasePath())) {

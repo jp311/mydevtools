@@ -49,9 +49,9 @@ public class AppServiceInspection extends AbstractBaseJavaLocalInspectionTool {
                     }
                 }
 
-                if (!aClass.getName().endsWith("AppService")) {
-                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.appservice.problem.name.descriptor"), ProblemHighlightType.WARNING);
-                }
+//                if (!aClass.getName().endsWith("AppService")) {
+//                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.appservice.problem.name.descriptor"), ProblemHighlightType.WARNING);
+//                }
             }
         };
     }
