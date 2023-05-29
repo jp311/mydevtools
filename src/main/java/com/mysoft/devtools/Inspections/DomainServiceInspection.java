@@ -47,9 +47,9 @@ public class DomainServiceInspection extends AbstractBaseJavaLocalInspectionTool
                     }
                 }
 
-                if (!aClass.getName().endsWith("DomainService")) {
-                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.domainservice.problem.name.descriptor"), ProblemHighlightType.WARNING);
-                }
+//                if (!aClass.getName().endsWith("DomainService")) {
+//                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.domainservice.problem.name.descriptor"), ProblemHighlightType.WARNING);
+//                }
             }
         };
     }

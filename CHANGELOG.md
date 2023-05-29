@@ -3,7 +3,9 @@
 # mydevtools Changelog
 
 ## [Unreleased]
-
+- [1.0.0]
+- bug fix
+- 修改版本号规则：第1为是大版本更新，第二位是小版本更新，第三位是bug修复
 
 ## [0.0.3]
 

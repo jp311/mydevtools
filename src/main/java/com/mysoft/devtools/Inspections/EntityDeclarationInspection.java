@@ -16,6 +16,7 @@ import com.mysoft.devtools.views.users.InspectionWhiteDialog;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.Arrays;
 
 /**
@@ -32,7 +33,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
     private final AddTableNameQuickFix addTableNameQuickFix = new AddTableNameQuickFix();
     private final RemoveAbstractQuickFix removeAbstractQuickFix = new RemoveAbstractQuickFix();
 
-    private final AddWhiteQuickFix addWhiteQuickFix = new AddWhiteQuickFix();
+    private final AddWhiteQuickFix addWhiteDeclareQuickFix = new AddWhiteQuickFix(InspectionWhiteUtil.ENTITY_DECLARE);
 
     @NotNull
     @Override
@@ -53,6 +54,11 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
                     return;
                 }
 
+                //白名单检查
+                boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.ENTITY_DECLARE, aClass.getQualifiedName(), aClass.getPackageName(), project);
+                if (isWhite) {
+                    return;
+                }
                 //1、字段列表中只能存在一个@TableId（继承父类存在TableId也不行）
                 checkerTableId(aClass, holder);
 
@@ -80,11 +86,11 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
 
         long count = Arrays.stream(allFields).filter(x -> x.hasAnnotation(QualifiedNames.TABLE_ID_QUALIFIED_NAME)).count();
         if (count == 0) {
-            holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.notableid.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.notableid.descriptor"), ProblemHighlightType.ERROR, addWhiteDeclareQuickFix);
         }
 
         if (count > 1) {
-            holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.moretableid.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.moretableid.descriptor"), ProblemHighlightType.ERROR, addWhiteDeclareQuickFix);
         }
     }
 
@@ -102,13 +108,13 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
 
         PsiAnnotation annotation = aClass.getAnnotation(QualifiedNames.TABLE_NAME_QUALIFIED_NAME);
         if (annotation == null) {
-            holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.lacktablename.descriptor"), ProblemHighlightType.ERROR, addTableNameQuickFix);
+            holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.lacktablename.descriptor"), ProblemHighlightType.ERROR, addTableNameQuickFix, addWhiteDeclareQuickFix);
             return;
         }
 
         PsiAnnotationMemberValue valueAttr = annotation.findAttributeValue("value");
         if (valueAttr == null || valueAttr.getValue().isNullOrEmpty()) {
-            holder.registerProblem(annotation, InspectionBundle.message("inspection.platform.service.entity.problem.lacktablevalue.descriptor"), ProblemHighlightType.ERROR);
+            holder.registerProblem(annotation, InspectionBundle.message("inspection.platform.service.entity.problem.lacktablevalue.descriptor"), ProblemHighlightType.ERROR, addWhiteDeclareQuickFix);
         }
     }
 
@@ -124,12 +130,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
             return;
         }
 
-        //白名单检查
-        boolean isWhite = InspectionWhiteUtil.isWhite(InspectionWhiteUtil.ABSTRACT_ENTITY, aClass.getQualifiedName(), aClass.getPackageName(), aClass.getProject());
-        if (isWhite) {
-            return;
-        }
-        holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.abstract.descriptor"), ProblemHighlightType.ERROR, removeAbstractQuickFix, addWhiteQuickFix);
+        holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.entity.problem.abstract.descriptor"), ProblemHighlightType.ERROR, removeAbstractQuickFix, addWhiteDeclareQuickFix);
     }
 
     private final static class AddTableNameQuickFix implements LocalQuickFix {
@@ -166,9 +167,15 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
     }
 
     private final static class AddWhiteQuickFix implements LocalQuickFix {
+        private String scope;
+
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {
             return InspectionBundle.message("inspection.platform.service.addwhite.quickfix");
+        }
+
+        public AddWhiteQuickFix(String scope) {
+            this.scope = scope;
         }
 
         @Override
@@ -177,10 +184,12 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
             PsiClass aClass = (PsiClass) psiElement.getParent();
 
 
-            InspectionWhiteDialog dialog = new InspectionWhiteDialog(InspectionWhiteUtil.ABSTRACT_ENTITY, aClass.getQualifiedName(), aClass.getPackageName());
-            if (dialog.showAndGet()) {
-                aClass.refresh();
-            }
+            InspectionWhiteDialog dialog = new InspectionWhiteDialog(scope, aClass.getQualifiedName(), aClass.getPackageName());
+            SwingUtilities.invokeLater(() -> {
+                if (dialog.showAndGet()) {
+                    aClass.refresh();
+                }
+            });
         }
     }
 }

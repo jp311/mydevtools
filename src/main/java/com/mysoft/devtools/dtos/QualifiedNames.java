@@ -11,6 +11,8 @@ public class QualifiedNames {
 
     public static final String ENTITY_FACTORY_QUALIFIED_NAME = "com.mysoft.framework.mybatis.EntityFactory";
 
+    public static final String CUSTOM_BASE_ENTITY_QUALIFIED_NAME = "com.mysoft.framework.mybatis.CustomBaseEntity";
+
     public static final String PUB_SERVICE_QUALIFIED_NAME = "com.mysoft.framework.rpc.annotation.PubService";
 
     public static final String PUB_ACTION_QUALIFIED_NAME = "com.mysoft.framework.rpc.annotation.PubAction";
@@ -52,4 +54,6 @@ public class QualifiedNames {
     public static final String ENUM_FIELD_INTERFACE_QUALIFIED_NAME = "com.mysoft.framework.core.function.enumfield.interfaces.EnumFieldInterface";
 
     public static final String EXTENSION_METHOD_QUALIFIED_NAME = "lombok.experimental.ExtensionMethod";
+
+    public static final String S_FUNCTION_QUALIFIED_NAME = "com.baomidou.mybatisplus.core.toolkit.support.SFunction";
 }
