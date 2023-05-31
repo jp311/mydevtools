@@ -70,6 +70,10 @@
                           key="devtools.settings.generatecodetemplate.name"
                           instance="com.mysoft.devtools.settings.GenerateCodeTemplateConfigurable"/>
 
+            <configurable id="setting-metadata" bundle="messages.LocalBundle"
+                          key="devtools.settings.datasource.name"
+                          instance="com.mysoft.devtools.settings.DataSourceConfigurable"/>
+
         </projectConfigurable>
 
         <!-- lombok扩展方法代码提示 -->
@@ -163,22 +167,29 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
+
     </extensions>
 
     <applicationListeners>
-<!--        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"-->
-<!--                  topic="com.intellij.ide.FrameStateListener"/>-->
+        <!--        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"-->
+        <!--                  topic="com.intellij.ide.FrameStateListener"/>-->
 
         <listener class="com.mysoft.devtools.listeners.MyProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
     </applicationListeners>
 
 
-    <!-- 定义菜单组 -->
+    <!-- 定义菜单组 https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html#idea-plugin__actions-->
     <actions resource-bundle="messages.mysoft">
-        <!--        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">-->
-        <!--            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>-->
-        <!--        </group>-->
+        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">
+            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
+        </group>
+
+        <group id="mysoft-tool-menus-database" text="数据库" popup="true" description="明源云-开发工具箱"
+               searchable="false">
+            <add-to-group group-id="mysoft-tool-menus"/>
+        </group>
+
         <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </group>
@@ -203,20 +214,21 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
-<!--        <action id="GenerateDtoAction"-->
-<!--                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"-->
-<!--                description="根据Json、Sql生成Dto">-->
-<!--            <add-to-group group-id="mysoft-explorer-menus"/>-->
-<!--        </action>-->
-
-        <!--        <action id="com.mysoft.devtools.actions.toolactions.TestAction"-->
-        <!--                class="com.mysoft.devtools.actions.toolactions.TestAction" text="测试" >-->
-        <!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
+        <!--        <action id="GenerateDtoAction"-->
+        <!--                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"-->
+        <!--                description="根据Json、Sql生成Dto">-->
+        <!--            <add-to-group group-id="mysoft-explorer-menus"/>-->
         <!--        </action>-->
 
-        <!--        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"-->
-        <!--                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">-->
-        <!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
-        <!--        </action>-->
+
+        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"
+                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">
+            <add-to-group group-id="mysoft-tool-menus-database"/>
+        </action>
+
+        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
+                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
+            <add-to-group group-id="mysoft-tool-menus-database"/>
+        </action>
     </actions>
 </idea-plugin>

@@ -1,21 +1,14 @@
 package com.mysoft.devtools.settings;
 
-import com.intellij.openapi.options.Configurable;
 import com.mysoft.devtools.views.settings.HomeComponent;
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
 
 /**
  * <a href="https://plugins.jetbrains.com/docs/intellij/settings.html">...</a>
+ *
  * @author hezd 2023/4/22
  */
-public class HomeConfigurable implements Configurable {
-    private HomeComponent homeComponent;
-
-    // A default constructor with no arguments is required because this implementation
-    // is registered as an applicationConfigurable EP
+public class HomeConfigurable extends BaseConfigurable<HomeComponent> {
 
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
@@ -24,36 +17,7 @@ public class HomeConfigurable implements Configurable {
     }
 
     @Override
-    public JComponent getPreferredFocusedComponent() {
-        return homeComponent.getContentPanel();
-    }
-
-    @Nullable
-    @Override
-    public JComponent createComponent() {
-        homeComponent = new HomeComponent();
-        return homeComponent.getContentPanel();
-    }
-
-    @Override
-    public boolean isModified() {
-
-        return false;
-    }
-
-    @Override
-    public void apply() {
-
-    }
-
-    @Override
-    public void reset() {
-
-        Configurable.super.reset();
-    }
-
-    @Override
-    public void disposeUIResources() {
-        homeComponent = null;
+    public HomeComponent getSettingsComponent() {
+        return new HomeComponent();
     }
 }
