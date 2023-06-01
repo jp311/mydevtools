@@ -58,9 +58,6 @@
                              bundle="messages.LocalBundle"
                              key="devtools.settings.home.name"
                              instance="com.mysoft.devtools.settings.HomeConfigurable">
-            <!--            <configurable id="setting-environment" bundle="messages.CommonBundle"-->
-            <!--                          key="devtools.settings.environment.name"-->
-            <!--                          instance="com.mysoft.devtools.settings.EnvironmentConfigurable"/>-->
 
             <configurable id="setting-metadata" bundle="messages.LocalBundle"
                           key="devtools.settings.metadata.name"

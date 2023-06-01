@@ -37,7 +37,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
 
     public MyVector<MyVector<Object>> getSelected() {
         MyVector<MyVector<Object>> myVector = new MyVector<>();
-        CheckTableModle model = (CheckTableModle) table.getModel();
+        CheckTableModel model = (CheckTableModel) table.getModel();
         model.getDataVector().forEach(x->{
             if (x.get(0).equals(true)){
                 myVector.add((MyVector<Object>) x);
@@ -49,7 +49,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     private void createUIComponents() {
 
         table = new JBTable();
-        CheckTableModle tableModel = new CheckTableModle(generateDialogDTO.getDataSource(), generateDialogDTO.getHeaders());
+        CheckTableModel tableModel = new CheckTableModel(generateDialogDTO.getDataSource(), generateDialogDTO.getHeaders());
         table.setModel(tableModel);
 
         JTableHeader tableHeader = table.getTableHeader();
@@ -124,12 +124,12 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     }
 
     private static final class CheckHeaderCellRenderer implements TableCellRenderer {
-        CheckTableModle tableModel;
+        CheckTableModel tableModel;
         JTableHeader tableHeader;
         final JCheckBox selectBox;
 
         public CheckHeaderCellRenderer(JBTable table) {
-            this.tableModel = (CheckTableModle) table.getModel();
+            this.tableModel = (CheckTableModel) table.getModel();
             this.tableHeader = table.getTableHeader();
             selectBox = new JCheckBox(tableModel.getColumnName(0));
             selectBox.setSelected(false);
@@ -192,8 +192,8 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         }
     }
 
-    private static final class CheckTableModle extends DefaultTableModel {
-        public CheckTableModle(MyVector data, MyVector columnNames) {
+    private static final class CheckTableModel extends DefaultTableModel {
+        public CheckTableModel(MyVector data, MyVector columnNames) {
             super(data, columnNames);
         }
 

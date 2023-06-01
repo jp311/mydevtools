@@ -1,6 +1,6 @@
 package com.mysoft.devtools.settings;
 
-import com.mysoft.devtools.views.settings.HomeComponent;
+import com.mysoft.devtools.views.settings.MetadataComponent;
 import org.jetbrains.annotations.Nls;
 
 import java.util.ResourceBundle;
@@ -10,16 +10,16 @@ import java.util.ResourceBundle;
  *
  * @author hezd   2023/5/6
  */
-public class MetadataConfigurable extends BaseConfigurable<HomeComponent> {
+public class MetadataConfigurable extends BaseConfigurable<MetadataComponent> {
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
         ResourceBundle bundle = ResourceBundle.getBundle("CommonBundle");
-        return bundle.getString("devtools.settings.environment.name");
+        return bundle.getString("devtools.settings.metadata.name");
     }
 
     @Override
-    public HomeComponent getSettingsComponent() {
-        return new HomeComponent();
+    public MetadataComponent getSettingsComponent() {
+        return new MetadataComponent();
     }
 }

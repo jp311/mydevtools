@@ -1,7 +1,6 @@
 package com.mysoft.devtools.settings;
 
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.mysoft.devtools.views.settings.BaseSettingsComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +30,7 @@ public abstract class BaseConfigurable<T extends BaseSettingsComponent> implemen
 
     @Override
     public JComponent getPreferredFocusedComponent() {
-        return settingsComponent.getContentPanel();
+        return settingsComponent.getPreferredFocusedComponent();
     }
 
     @Override
@@ -40,7 +39,7 @@ public abstract class BaseConfigurable<T extends BaseSettingsComponent> implemen
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         settingsComponent.apply();
     }
 
