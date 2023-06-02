@@ -2,6 +2,8 @@ package com.mysoft.devtools.dtos;
 
 import com.mysoft.devtools.utils.FileUtil;
 
+import java.util.List;
+
 /**
  * @author hezd 2023/4/30
  */
@@ -27,5 +29,5 @@ public class MysoftSettingsDTO {
     public String entityTemplate;
     public String entityDtoTemplate;
     public String jsProxyTemplate;
-
+    public List<DbLinkDTO> dataSources;
 }
