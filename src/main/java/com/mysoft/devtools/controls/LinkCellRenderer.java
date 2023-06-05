@@ -1,16 +1,21 @@
 package com.mysoft.devtools.controls;
 
-/**
+/*
+ * 超链接
+ *
  * @author hezd   2023/6/2
  */
 
 import com.intellij.ui.JBColor;
+import com.intellij.util.Consumer;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.Vector;
 
 /**
  * 显示超链接的JTable单元格渲染器
@@ -25,6 +30,12 @@ public class LinkCellRenderer extends DefaultTableCellRenderer implements MouseI
     private int col = -1;
     //当前监听的Table
     private JTable table = null;
+
+    private final Consumer<Vector<String>> onClick;
+
+    public LinkCellRenderer(Consumer<Vector<String>> onClick) {
+        this.onClick = onClick;
+    }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -131,7 +142,12 @@ public class LinkCellRenderer extends DefaultTableCellRenderer implements MouseI
         int r = table.rowAtPoint(p);
         try {
             //取得目标单元格的值,即链接信息
-            Object valueAt = table.getValueAt(r, c);
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            Vector<String> row = new Vector<>();
+            for (Object item : model.getDataVector().get(r)) {
+                row.add(String.valueOf(item));
+            }
+            onClick.consume(row);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

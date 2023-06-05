@@ -5,6 +5,8 @@ import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.table.JBTable;
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.DbLinkDTO;
+import com.mysoft.devtools.utils.JdbcUtil;
+import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -54,7 +56,7 @@ public class DataSourceTable extends JBTable {
         DefaultCellEditor passwordEditor = new DefaultCellEditor(password);
         columnModel.getColumn(PASSWORD_COLUMN_INDEX).setCellEditor(passwordEditor);
 
-        LinkCellRenderer actionLinkCellRenderer = new LinkCellRenderer();
+        LinkCellRenderer actionLinkCellRenderer = new LinkCellRenderer(this::testConnect);
         columnModel.getColumn(OPERATION_COLUMN_INDEX).setCellRenderer(actionLinkCellRenderer);
         addMouseListener(actionLinkCellRenderer);
 
@@ -64,8 +66,22 @@ public class DataSourceTable extends JBTable {
 
         setCellAlignment(SwingConstants.CENTER);
         this.setRowHeight(ROW_HEIGHT);
+    }
 
+    private void testConnect(Vector<String> row) {
+        String dbType = row.get(PROVIDER_COLUMN_INDEX);
+        String ip = row.get(IP_COLUMNS_INDEX);
+        String port = row.get(PORT_COLUMN_INDEX);
+        String userName = row.get(USERNAME_COLUMNS_INDEX);
+        String password = row.get(PASSWORD_COLUMN_INDEX);
+        String dbName = row.get(DBNAME_COLUMN_INDEX);
 
+        boolean isOk = JdbcUtil.test(dbType, ip, port, dbName, userName, password);
+        if (isOk) {
+            IdeaNotifyUtil.dialogInfo(LocalBundle.message("devtools.settings.datasource.test.success"));
+        } else {
+            IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.settings.datasource.test.fail"));
+        }
     }
 
     public void setCellAlignment(int alignment) {
@@ -150,6 +166,7 @@ public class DataSourceTable extends JBTable {
             item.setUserName(String.valueOf(getValueAt(rowIndex, USERNAME_COLUMNS_INDEX)));
             datas.add(item);
         }
+
         return datas;
     }
 
