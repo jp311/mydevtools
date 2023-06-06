@@ -43,9 +43,9 @@ public class IdeaNotifyUtil {
         Messages.showMessageDialog(message, title, Messages.getInformationIcon());
     }
 
-    public static void dialogQuestion(String message) {
+    public static int dialogQuestion(String message) {
         String[] buttons = new String[]{Messages.getOkButton(), Messages.getCancelButton()};
-        Messages.showDialog(message, title, buttons, 0, Messages.getQuestionIcon());
+        return Messages.showDialog(message, title, buttons, 0, Messages.getQuestionIcon());
     }
 
     public static void dialogInfo(String message) {

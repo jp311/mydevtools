@@ -217,15 +217,19 @@
         <!--            <add-to-group group-id="mysoft-explorer-menus"/>-->
         <!--        </action>-->
 
+        <!--        <action id="com.mysoft.devtools.actions.toolactions.CreateDatabaseAction"-->
+        <!--                class="com.mysoft.devtools.actions.toolactions.CreateDatabaseAction" text="制作空库">-->
+        <!--            <add-to-group group-id="mysoft-tool-menus-database"/>-->
+        <!--        </action>-->
 
         <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"
                 class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">
             <add-to-group group-id="mysoft-tool-menus-database"/>
         </action>
 
-        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
-                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
-            <add-to-group group-id="mysoft-tool-menus-database"/>
-        </action>
+        <!--        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"-->
+        <!--                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">-->
+        <!--            <add-to-group group-id="mysoft-tool-menus-database"/>-->
+        <!--        </action>-->
     </actions>
 </idea-plugin>

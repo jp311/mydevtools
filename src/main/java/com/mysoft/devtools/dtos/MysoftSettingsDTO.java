@@ -21,6 +21,7 @@ public class MysoftSettingsDTO {
      * 元数据路径
      */
     public String metadataPath;
+    public String metadataSyncClientPath;
     /**
      * 作者姓名（用于代码生成器），默认当前系统登录账号
      */
