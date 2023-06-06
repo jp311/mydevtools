@@ -37,6 +37,7 @@ public class LinkCellRenderer extends DefaultTableCellRenderer implements MouseI
         this.onClick = onClick;
     }
 
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         //恢复默认状态
@@ -147,6 +148,7 @@ public class LinkCellRenderer extends DefaultTableCellRenderer implements MouseI
             for (Object item : model.getDataVector().get(r)) {
                 row.add(String.valueOf(item));
             }
+
             onClick.consume(row);
         } catch (Exception ex) {
             ex.printStackTrace();

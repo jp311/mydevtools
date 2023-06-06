@@ -130,6 +130,8 @@ public class DataSourceTable extends JBTable {
         stopCellEditing();
         int selectedRow = getSelectedRow();
         if (selectedRow > -1) {
+            MyDefaultTableCellRenderer cellRenderer = (MyDefaultTableCellRenderer) this.getCellRenderer(selectedRow, 1);
+            cellRenderer.removeErrorRow(selectedRow);
             model.removeRow(selectedRow);
         }
     }
@@ -140,10 +142,12 @@ public class DataSourceTable extends JBTable {
         int rowCount = getRowCount();
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
             for (int colIndex = 0; colIndex < TOTAL_COLUMN; colIndex++) {
+                MyDefaultTableCellRenderer cellRenderer = (MyDefaultTableCellRenderer) getCellRenderer(rowIndex, colIndex);
+                cellRenderer.removeErrorCell(rowIndex, colIndex);
                 String value = String.valueOf(getValueAt(rowIndex, colIndex));
                 if (value.isBlank()) {
-                    //MyDefaultTableCellRenderer cellRenderer = (MyDefaultTableCellRenderer) getCellRenderer(rowIndex, colIndex);
-                    //cellRenderer.setHasError(true);
+                    cellRenderer.addErrorCell(rowIndex, colIndex);
+                    repaint();
                     hasError = true;
                 }
             }

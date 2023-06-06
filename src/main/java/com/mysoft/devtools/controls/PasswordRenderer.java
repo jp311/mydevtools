@@ -25,7 +25,7 @@ public class PasswordRenderer extends MyDefaultTableCellRenderer {
         passwordField.setText(String.valueOf(value));
         passwordField.setOpaque(true);
 
-        if (super.isHasError()) {
+        if (super.isErrorCell(row, column)) {
             passwordField.setBorder(ERROR_BORDER);
         } else {
             passwordField.setBorder(null);
