@@ -20,6 +20,11 @@ public class JdbcUtil {
     public static boolean test(String dbType, String ip, String port, String dbName, String userName, String password) {
         try {
             String url = getUrl(dbType, ip, port, dbName);
+            if (Objects.equals(dbType, MYSQL)) {
+                Class.forName(MYSQL_JDBC_DRIVER);
+            } else {
+                Class.forName(DM_JDBC_DRIVER);
+            }
             Connection conn = DriverManager.getConnection(url, userName, password);
 
             Statement statement = conn.createStatement();
@@ -33,10 +38,9 @@ public class JdbcUtil {
         }
     }
 
-    private static String getUrl(String dbType, String ip, String port, String dbName) throws ClassNotFoundException {
+    public static String getUrl(String dbType, String ip, String port, String dbName) {
         String url;
         if (Objects.equals(dbType, MYSQL)) {
-            Class.forName(MYSQL_JDBC_DRIVER);
             if (dbName == null || dbName.isBlank()) {
                 url = MessageFormat.format("jdbc:mysql://{0}:{1}", ip, port);
             } else {
@@ -48,7 +52,6 @@ public class JdbcUtil {
             } else {
                 url = MessageFormat.format("jdbc:dm://{0}:{1}?schema={2}", ip, port, dbName);
             }
-            Class.forName(DM_JDBC_DRIVER);
         }
         return url;
     }

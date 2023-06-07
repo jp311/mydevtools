@@ -11,6 +11,9 @@ import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author hezd 2023/5/31
@@ -19,7 +22,7 @@ public class DataSourceComponent extends BaseSettingsComponent {
     private JPanel contentPanel;
     private DataSourceTable table;
 
-    private final MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
+    private MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
 
     @Override
     public JComponent getContentPanel() {
@@ -61,7 +64,15 @@ public class DataSourceComponent extends BaseSettingsComponent {
             return;
         }
         if (settings == null) {
-            return;
+            settings = new MysoftSettingsDTO();
+        }
+
+        Map<String, List<DbLinkDTO>> collect = table.getData().stream().collect(Collectors.groupingBy(DbLinkDTO::getAlias));
+        for (String name : collect.keySet()) {
+            if (collect.get(name).size() > 1) {
+                IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.settings.datasource.name.repeat", name));
+                return;
+            }
         }
         settings.dataSources = table.getData();
         AppSettingsStateService.getInstance().loadState(settings);
