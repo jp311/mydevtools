@@ -36,6 +36,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
 
     <resource-bundle>messages.mysoft</resource-bundle>
 
@@ -92,9 +93,9 @@
                          groupKey="group.names.mysoft"
                          enabledByDefault="true"
                          level="ERROR"
-                         implementationClass="com.mysoft.devtools.Inspections.NewExpressionInspection"/>
+                         implementationClass="com.mysoft.devtools.inspections.NewExpressionInspection"/>
 
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.AppServiceInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.AppServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.appservice.display.name"
                          groupPath="Java"
@@ -104,7 +105,7 @@
                          enabledByDefault="true"
         />
 
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.DomainServiceInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.DomainServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.domainservice.display.name"
                          groupPath="Java"
@@ -112,7 +113,7 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.ControllerInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.ControllerInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.controller.display.name"
                          groupPath="Java"
@@ -120,7 +121,7 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.EntityDeclarationInspection"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.EntityDeclarationInspection"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.entity.display.name"
                          groupPath="Java"
@@ -129,7 +130,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.EnumInspection"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.EnumInspection"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.enum.display.name"
                          groupPath="Java"
@@ -138,7 +139,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.ResourceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.resource.display.name"
                          groupPath="Java"
@@ -148,7 +149,7 @@
                          enabledByDefault="true"/>
 
 
-        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->
+        <!--        <localInspection implementationClass="com.mysoft.devtools.inspections.MybatisMapperInspection" language="XML"-->
         <!--                         bundle="messages.InspectionsBundle"-->
         <!--                         key="inspection.mybatis.mapper.display.name"-->
         <!--                         groupPath="XML"-->
@@ -156,7 +157,7 @@
         <!--                         groupKey="group.names.mysoft"-->
         <!--                         level="ERROR"-->
         <!--        />-->
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.LambdaWrapperInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.LambdaWrapperInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.lambdawrapper.display.name"
                          groupPath="Java"

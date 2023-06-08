@@ -3,22 +3,22 @@ package com.mysoft.devtools.views.users;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.terminal.JBTerminalWidget;
 import com.intellij.ui.ContextHelpLabel;
-import com.intellij.ui.content.ContentManager;
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.DbLinkDTO;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.settings.DataSourceConfigurable;
+import com.mysoft.devtools.utils.JdbcUtil;
+import com.mysoft.devtools.utils.MetadataUtil;
 import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.psi.IdeaTerminalUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Objects;
 
 import static com.mysoft.devtools.bundles.LocalBundle.message;
@@ -63,47 +63,22 @@ public class MetadataSyncDialog extends BaseDialogComponent {
             return;
         }
 
-        ToolWindowManager instance = ToolWindowManager.getInstance(project);
-        ToolWindow toolWindow = instance.getToolWindow("Terminal");
-        ContentManager contentManager = toolWindow.getContentManager();
-        JBTerminalWidget terminal = (JBTerminalWidget) contentManager.getSelectedContent().getPreferredFocusableComponent();
-        Process process = terminal.getProcessTtyConnector().getProcess();
-        OutputStream outputStream = process.getOutputStream();
+        var args = MessageFormat.format(" --url={0} --dbUserName={1} --dbPassword={2} --siteAddr={3} --basicAddr={4} --moqlServiceUrl={5} --dbType={6}"
+                , JdbcUtil.getUrl(dbLinkDTO.getProvider(), dbLinkDTO.getServerIp(), dbLinkDTO.getServerPort(), dbLinkDTO.getDbName())
+                , dbLinkDTO.getUserName()
+                , dbLinkDTO.getPassword()
+                , ""
+                , MetadataUtil.getProductMetadataRootPath()
+                , ""
+                , dbLinkDTO.getProvider()
+        );
+        String cmd = MessageFormat.format("java -jar {0} {1}", settings.metadataSyncClientPath, args);
         try {
-            outputStream.write("dir".getBytes());
-            terminal.start();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            IdeaTerminalUtil.execute(project,new File(settings.metadataSyncClientPath).getParent(), cmd);
+            close(0);
+        } catch (IOException ex) {
+            IdeaNotifyUtil.dialogError(ex.getMessage());
         }
-        toolWindow.show();
-
-//        var metadataClientDir = settings.metadataSyncClientPath;
-//        var workspaceDir = MetadataUtil.getProductMetadataRootPath();
-//
-//        var args = MessageFormat.format(" --url={0} --dbUserName={1} --dbPassword={2} --siteAddr={3} --basicAddr={4} --moqlServiceUrl{5}"
-//                , JdbcUtil.getUrl(dbLinkDTO.getProvider(), dbLinkDTO.getServerIp(), dbLinkDTO.getServerPort(), dbLinkDTO.getDbName())
-//                , dbLinkDTO.getUserName()
-//                , dbLinkDTO.getPassword()
-//                , ""
-//                , MetadataUtil.getProductMetadataRootPath()
-//                , ""
-//        );
-//        String[] cmd = {"java", "-jar", metadataClientDir, args};
-//        ConsoleView consoleView = TextConsoleBuilderFactory.getInstance().createBuilder(project).getConsole();
-//
-//        GeneralCommandLine commandLine = new GeneralCommandLine(cmd);
-//        OSProcessHandler processHandler = null;
-//        try {
-//            processHandler = new OSProcessHandler(commandLine);
-//            commandLine.setCharset(StandardCharsets.UTF_8);
-//            commandLine.setWorkDirectory(workspaceDir);
-//        } catch (ExecutionException e) {
-//            throw new RuntimeException(e);
-//        }
-//        consoleView.attachToProcess(processHandler);
-//        processHandler.startNotify();
-
-
     }
 
     private void createUIComponents() {

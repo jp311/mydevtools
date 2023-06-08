@@ -2,7 +2,7 @@ package com.mysoft.devtools.listeners;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
-import com.mysoft.devtools.Inspections.OverrideInspection;
+import com.mysoft.devtools.inspections.OverrideInspection;
 import org.jetbrains.annotations.NotNull;
 
 /**

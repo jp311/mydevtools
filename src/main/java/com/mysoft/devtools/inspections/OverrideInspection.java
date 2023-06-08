@@ -1,4 +1,4 @@
-package com.mysoft.devtools.Inspections;
+package com.mysoft.devtools.inspections;
 
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
 import com.intellij.codeInsight.daemon.HighlightDisplayKey;
