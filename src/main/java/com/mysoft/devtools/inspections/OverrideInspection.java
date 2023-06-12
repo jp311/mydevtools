@@ -13,12 +13,20 @@ import java.util.List;
  * @author hezd   2023/5/23
  */
 public class OverrideInspection {
+    private static boolean IS_OVERRIDE = false;
     public static void doOverride(Project project) {
+        if (project == null) {
+            return;
+        }
+        if (IS_OVERRIDE) {
+            return;
+        }
         InspectionProfileManager manager = InspectionProfileManager.getInstance(project);
         InspectionProfileImpl profile = manager.getCurrentProfile();
 
         List<String> names = Arrays.asList("EqualsBetweenInconvertibleTypes", "ArrayEquality", "ArrayObjectsEquals", "NewObjectEquality", "NumberEquality", "ObjectEquality", "StringEquality");
         names.forEach(x -> setErrorLevel(profile, project, x));
+        IS_OVERRIDE = true;
     }
 
     private static void setErrorLevel(InspectionProfileImpl profile, Project project, String name) {

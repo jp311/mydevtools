@@ -14,6 +14,7 @@
     单元测试：https://www.jetbrains.com/help/idea/testing-frameworks.html
     依赖分析：https://www.jetbrains.com/help/idea/dependencies-analysis.html#validate-dependencies
     宏：https://www.jetbrains.com/help/idea/built-in-macros.html#custom-macros
+    创建文件模板：https://plugins.jetbrains.com/docs/intellij/using-file-templates.html#improving-save-file-as-template-action
     com.intellij.psi.PsiFileFactory：
     文件相关操作，e.g.创建文件等。
     com.intellij.psi.PsiElementFactory:
@@ -31,6 +32,7 @@
     <vendor email="hezd@mingyuanyun.com" url="https://github.com/h598937749/mydevtools/wiki">
         hezd
     </vendor>
+
 
     <!-- 参考文档：https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html#modules-specific-to-functionality -->
     <depends>com.intellij.modules.platform</depends>
@@ -50,8 +52,6 @@
 
         <!--插件设置持久化服务-->
         <applicationService serviceImplementation="com.mysoft.devtools.services.AppSettingsStateService"/>
-        <!--项目启动活动-->
-        <postStartupActivity implementation="com.mysoft.devtools.listeners.MyStartupActivity"/>
         <!--项目结构-->
         <!--        <treeStructureProvider implementation="com.mysoft.devtools.projectview.controller.MysoftTreeStructureProvider"/>-->
         <!--设置窗口-->
@@ -80,6 +80,7 @@
         <!--错误上报接口-->
         <errorHandler implementation="com.mysoft.devtools.listeners.MyErrorReportSubmitter"/>
 
+        <!-- 消息通知分组 -->
         <notificationGroup displayType="BALLOON" id="mysoft-balloon" key="description"/>
         <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
         <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>
@@ -174,6 +175,9 @@
 
         <listener class="com.mysoft.devtools.listeners.MyProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
+
+        <listener class="com.mysoft.devtools.listeners.MyDynamicPluginListener"
+                  topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
 

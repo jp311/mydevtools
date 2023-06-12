@@ -2,7 +2,6 @@ package com.mysoft.devtools.utils.psi;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.plugins.terminal.ShellTerminalWidget;
-import org.jetbrains.plugins.terminal.TerminalView;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,15 +26,14 @@ public class IdeaTerminalUtil {
 
         String key = project.getBasePath() + title;
         if (!TERMINAL_TOOLWINDOW_TAB_CACHES.containsKey(key)) {
-            ShellTerminalWidget terminal = TerminalView.getInstance(project)
-                    .createLocalShellWidget(workspacePath, title);
+            ShellTerminalWidget terminal = IdeaSdkAdapter.createLocalShellWidget(project, workspacePath, title);
             TERMINAL_TOOLWINDOW_TAB_CACHES.put(key, terminal);
             return terminal;
         }
+
         ShellTerminalWidget shellTerminalWidget = TERMINAL_TOOLWINDOW_TAB_CACHES.get(key);
         if (!shellTerminalWidget.isValid()) {
-            ShellTerminalWidget terminal = TerminalView.getInstance(project)
-                    .createLocalShellWidget(workspacePath, title);
+            ShellTerminalWidget terminal = IdeaSdkAdapter.createLocalShellWidget(project, workspacePath, title);
             TERMINAL_TOOLWINDOW_TAB_CACHES.replace(key, terminal);
             return terminal;
         }

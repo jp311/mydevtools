@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
+import com.mysoft.devtools.utils.psi.IdeaSdkAdapter;
 import com.mysoft.devtools.views.toolwindows.MiddlewareToolWindow;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +19,7 @@ public class MyToolWindowFactory implements ToolWindowFactory, DumbAware {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         MiddlewareToolWindow window = new MiddlewareToolWindow();
-        Content content = ContentFactory.SERVICE.getInstance().createContent(window.getContentPanel(), window.getDisplayName(), window.isLockable());
+        Content content = IdeaSdkAdapter.getContentFactory(project).createContent(window.getContentPanel(), window.getDisplayName(), window.isLockable());
         toolWindow.getContentManager().addContent(content);
     }
 }
