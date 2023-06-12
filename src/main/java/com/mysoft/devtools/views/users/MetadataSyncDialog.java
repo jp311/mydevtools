@@ -68,13 +68,13 @@ public class MetadataSyncDialog extends BaseDialogComponent {
                 , dbLinkDTO.getUserName()
                 , dbLinkDTO.getPassword()
                 , ""
-                , MetadataUtil.getProductMetadataRootPath()
+                , new File(MetadataUtil.getProductMetadataRootPath()).getParent()
                 , ""
                 , dbLinkDTO.getProvider()
         );
         String cmd = MessageFormat.format("java -jar {0} {1}", settings.metadataSyncClientPath, args);
         try {
-            IdeaTerminalUtil.execute(project,new File(settings.metadataSyncClientPath).getParent(), cmd);
+            IdeaTerminalUtil.execute(project, new File(settings.metadataSyncClientPath).getParent(), cmd, LocalBundle.message("devtools.menutools.syncmetadata.title"));
             close(0);
         } catch (IOException ex) {
             IdeaNotifyUtil.dialogError(ex.getMessage());
@@ -84,8 +84,6 @@ public class MetadataSyncDialog extends BaseDialogComponent {
     private void createUIComponents() {
         contextHelpLabel1 = ContextHelpLabel.createWithLink(message("devtools.menutools.syncmetadata.title")
                 , message("devtools.menutools.syncmetadata.description")
-                , message("devtools.menutools.syncmetadata.createdatasource"), () -> {
-                    ShowSettingsUtil.getInstance().showSettingsDialog(project, DataSourceConfigurable.class);
-                });
+                , message("devtools.menutools.syncmetadata.createdatasource"), () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, DataSourceConfigurable.class));
     }
 }

@@ -1,9 +1,12 @@
 package com.mysoft.devtools.utils.psi;
 
 import com.intellij.openapi.project.Project;
+import org.jetbrains.plugins.terminal.ShellTerminalWidget;
 import org.jetbrains.plugins.terminal.TerminalView;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <a href="https://www.jianshu.com/p/964f0e9d870c">...</a>
@@ -11,15 +14,31 @@ import java.io.IOException;
  * @author hezd 2023/6/8
  */
 public class IdeaTerminalUtil {
-    public static void execute(Project project, String cmd) throws IOException {
-        TerminalView.getInstance(project)
-                    .createLocalShellWidget(project.getBasePath(), "Terminal")
-                    .executeCommand(cmd);
+    private final static Map<String, ShellTerminalWidget> TERMINAL_TOOLWINDOW_TAB_CACHES = new HashMap<>();
+
+    public static void execute(Project project, String workspacePath, String cmd, String title) throws IOException {
+        getWidget(project, workspacePath, title).executeCommand(cmd);
     }
 
-    public static void execute(Project project,String workspacePath, String cmd) throws IOException {
-        TerminalView.getInstance(project)
-                    .createLocalShellWidget(workspacePath, "Terminal")
-                    .executeCommand(cmd);
+    private static ShellTerminalWidget getWidget(Project project, String workspacePath, String title) {
+        if (title == null || title.isBlank()) {
+            title = "Terminal";
+        }
+
+        String key = project.getBasePath() + title;
+        if (!TERMINAL_TOOLWINDOW_TAB_CACHES.containsKey(key)) {
+            ShellTerminalWidget terminal = TerminalView.getInstance(project)
+                    .createLocalShellWidget(workspacePath, title);
+            TERMINAL_TOOLWINDOW_TAB_CACHES.put(key, terminal);
+            return terminal;
+        }
+        ShellTerminalWidget shellTerminalWidget = TERMINAL_TOOLWINDOW_TAB_CACHES.get(key);
+        if (!shellTerminalWidget.isValid()) {
+            ShellTerminalWidget terminal = TerminalView.getInstance(project)
+                    .createLocalShellWidget(workspacePath, title);
+            TERMINAL_TOOLWINDOW_TAB_CACHES.replace(key, terminal);
+            return terminal;
+        }
+        return shellTerminalWidget;
     }
 }
