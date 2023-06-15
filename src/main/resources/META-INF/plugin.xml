@@ -85,6 +85,9 @@
         <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
         <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>
 
+        <defaultLiveTemplates file="templates/liveTemplates/mapper/native.xml"/>
+
+
         <!--代码检查  https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/comparing_string_references_inspection-->
         <localInspection language="JAVA"
                          bundle="messages.InspectionsBundle"
