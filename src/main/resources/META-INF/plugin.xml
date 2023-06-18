@@ -39,6 +39,8 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>com.intellij.spring</depends>
+    <depends>JavaScript</depends>
 
     <resource-bundle>messages.mysoft</resource-bundle>
 
@@ -218,11 +220,6 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
-        <!--        <action id="GenerateDtoAction"-->
-        <!--                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"-->
-        <!--                description="根据Json、Sql生成Dto">-->
-        <!--            <add-to-group group-id="mysoft-explorer-menus"/>-->
-        <!--        </action>-->
 
         <!--        <action id="com.mysoft.devtools.actions.toolactions.CreateDatabaseAction"-->
         <!--                class="com.mysoft.devtools.actions.toolactions.CreateDatabaseAction" text="制作空库">-->
@@ -234,9 +231,9 @@
             <add-to-group group-id="mysoft-tool-menus-database"/>
         </action>
 
-        <!--        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"-->
-        <!--                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">-->
-        <!--            <add-to-group group-id="mysoft-tool-menus-database"/>-->
-        <!--        </action>-->
+        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
+                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
+            <add-to-group group-id="mysoft-tool-menus-database"/>
+        </action>
     </actions>
 </idea-plugin>
