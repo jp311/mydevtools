@@ -65,7 +65,7 @@ public class MetadataUtil {
         if (!FileUtil.isExist(path)) {
             throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
         }
-        return path;
+        return new File(path).getPath();
     }
 
     public static <T> String getMetadataPath(Class<T> clazz) {
@@ -78,7 +78,6 @@ public class MetadataUtil {
         }
 
         String productMetadataRootPath = getProductMetadataRootPath();
-        var path = FileUtil.combine(productMetadataRootPath, metadataType);
-        return path;
+        return FileUtil.combine(productMetadataRootPath, metadataType);
     }
 }

@@ -4,7 +4,9 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ContextHelpLabel;
+import com.intellij.ui.components.fields.ExtendableTextField;
 import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.controls.ChooseFileUtil;
 import com.mysoft.devtools.dtos.DbLinkDTO;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
@@ -30,9 +32,12 @@ public class MetadataSyncDialog extends BaseDialogComponent {
     private JPanel contentPanel;
     private ContextHelpLabel contextHelpLabel1;
     private ComboBox<String> cmDataSource;
+    private ExtendableTextField txtMedataPath;
     private final Project project;
 
     private final MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
+
+    private final String metadataPath = MetadataUtil.getProductMetadataRootPath();
 
     public MetadataSyncDialog(Project project) {
         setTitle(LocalBundle.message("devtools.menutools.syncmetadata.title"));
@@ -44,9 +49,18 @@ public class MetadataSyncDialog extends BaseDialogComponent {
     @Override
     protected JComponent createCenterPanel() {
         MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
-        if (settings != null && settings.dataSources != null) {
-            settings.dataSources.forEach(x -> cmDataSource.addItem(x.getAlias()));
+        txtMedataPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.settings.metadata.tooltip"), path -> {
+            txtMedataPath.setText(path);
+        }));
+        txtMedataPath.setEditable(true);
+        txtMedataPath.setText(metadataPath);
+
+        if (settings != null) {
+            if (settings.dataSources != null) {
+                settings.dataSources.forEach(x -> cmDataSource.addItem(x.getAlias()));
+            }
         }
+
         return contentPanel;
     }
 
@@ -68,7 +82,7 @@ public class MetadataSyncDialog extends BaseDialogComponent {
                 , dbLinkDTO.getUserName()
                 , dbLinkDTO.getPassword()
                 , ""
-                , new File(MetadataUtil.getProductMetadataRootPath()).getParent()
+                , new File(metadataPath).getParent()
                 , ""
                 , dbLinkDTO.getProvider()
         );

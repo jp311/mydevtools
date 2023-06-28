@@ -163,9 +163,9 @@
         <!--                         groupKey="group.names.mysoft"-->
         <!--                         level="ERROR"-->
         <!--        />-->
-        <localInspection implementationClass="com.mysoft.devtools.inspections.LambdaWrapperInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.DaoInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
-                         key="inspection.platform.service.lambdawrapper.display.name"
+                         key="inspection.platform.service.dao.display.name"
                          groupPath="Java"
                          groupBundle="messages.InspectionsBundle"
                          groupKey="group.names.mysoft"
@@ -231,9 +231,9 @@
             <add-to-group group-id="mysoft-tool-menus-database"/>
         </action>
 
-        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
-                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
-            <add-to-group group-id="mysoft-tool-menus-database"/>
-        </action>
+        <!--        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"-->
+        <!--                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">-->
+        <!--            <add-to-group group-id="mysoft-tool-menus-database"/>-->
+        <!--        </action>-->
     </actions>
 </idea-plugin>
