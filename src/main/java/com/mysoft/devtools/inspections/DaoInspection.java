@@ -163,7 +163,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         if (Objects.equals(valuePsiExpression.getText(), "null")) {
             holder.registerProblem(expression, InspectionBundle.message("inspection.platform.service.dao.problem.null.descriptor"), ProblemHighlightType.ERROR);
         }
-        if (columnPsiType != null && valuePsiType != null && !PsiTypeExtension.compareTypes(columnPsiType, valuePsiType)) {
+        if (columnPsiType != null && valuePsiType != null && !PsiTypeExtension.compareTypes(columnPsiType, valuePsiType) && !"?".equals(valuePsiType.getPresentableText())) {
             holder.registerProblem(expression, InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
                     , columnPsiType.getPresentableText(), valuePsiType.getPresentableText()), ProblemHighlightType.ERROR);
         }

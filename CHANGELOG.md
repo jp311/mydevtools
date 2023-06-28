@@ -8,6 +8,7 @@
 
 - bug fix
 - 增加文件模板、实时模板
+- LambdaWrapper检查更名为Dao检查，增加列名不能用Lambda表达式检查及一键修复
 
 ## [1.1.0]
 

@@ -2,7 +2,6 @@ package com.mysoft.devtools.utils.psi;
 
 import com.intellij.psi.*;
 import com.intellij.psi.impl.light.LightMethodBuilder;
-import com.intellij.psi.impl.source.PsiClassReferenceType;
 
 /**
  * @author hezd   2023/5/27
@@ -31,12 +30,14 @@ public class PsiExpressionExtension {
             PsiMethod method = ((PsiMethodCallExpression) expression).resolveMethod();
             if (method != null) {
                 PsiType returnType = method.getReturnType();
-                if (returnType instanceof PsiClassReferenceType) {
-                    PsiClassReferenceType type = (PsiClassReferenceType) returnType;
-                    if (!type.isRaw()) {
-                        return expression.getType();
-                    }
-                }
+                //注释原因：BaseDao.findLikeRight 不对
+
+//                if (returnType instanceof PsiClassReferenceType) {
+//                    PsiClassReferenceType type = (PsiClassReferenceType) returnType;
+//                    if (!type.isRaw()) {
+//                        return expression.getType();
+//                    }
+//                }
 
                 return returnType;
             }
