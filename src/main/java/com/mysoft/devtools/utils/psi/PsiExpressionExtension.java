@@ -2,6 +2,7 @@ package com.mysoft.devtools.utils.psi;
 
 import com.intellij.psi.*;
 import com.intellij.psi.impl.light.LightMethodBuilder;
+import com.intellij.psi.util.PsiTypesUtil;
 
 /**
  * @author hezd   2023/5/27
@@ -25,20 +26,18 @@ public class PsiExpressionExtension {
             }
         }
 
-        //Long.valueOf(1)
+        //Long.valueOf(1)、Arrays.asList(BidStatusEnum.Returned.valueOf())、Map<K,V>.getKey()
         if (expression instanceof PsiMethodCallExpression) {
             PsiMethod method = ((PsiMethodCallExpression) expression).resolveMethod();
             if (method != null) {
                 PsiType returnType = method.getReturnType();
-                //注释原因：BaseDao.findLikeRight 不对
 
-//                if (returnType instanceof PsiClassReferenceType) {
-//                    PsiClassReferenceType type = (PsiClassReferenceType) returnType;
-//                    if (!type.isRaw()) {
-//                        return expression.getType();
-//                    }
-//                }
-
+                PsiClass psiClass = PsiTypesUtil.getPsiClass(returnType);
+                if (psiClass != null && psiClass.getQualifiedName() != null) {
+                    //adjustInquiryEndTime_CzWeb
+                    return expression.getType();
+                }
+                //BaseDao.findIn
                 return returnType;
             }
         }
