@@ -199,6 +199,7 @@
         <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </group>
+
     </actions>
 
     <actions>
@@ -220,12 +221,6 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
-
-        <action id="com.mysoft.devtools.actions.toolactions.CreateDatabaseAction"
-                class="com.mysoft.devtools.actions.toolactions.CreateDatabaseAction" text="制作空库">
-            <add-to-group group-id="mysoft-tool-menus-database"/>
-        </action>
-
         <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"
                 class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">
             <add-to-group group-id="mysoft-tool-menus-database"/>
@@ -234,6 +229,11 @@
         <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
                 class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
             <add-to-group group-id="mysoft-tool-menus-database"/>
+        </action>
+
+        <action id="com.mysoft.devtools.actions.toolactions.DocumentAction"
+                class="com.mysoft.devtools.actions.toolactions.DocumentAction" text="帮助文档">
+            <add-to-group group-id="mysoft-tool-menus" anchor="last"/>
         </action>
     </actions>
 </idea-plugin>
