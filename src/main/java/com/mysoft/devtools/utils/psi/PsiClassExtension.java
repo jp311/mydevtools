@@ -41,9 +41,13 @@ public class PsiClassExtension {
         return PsiUtil.getPackageName(psiClass);
     }
 
-    public static boolean isInheritors(PsiClass subClass, String baseName, Project project) {
+    public static PsiClass getPsiClass(Project project, String fullName) {
         GlobalSearchScope scope = ProjectScope.getAllScope(project);
-        PsiClass baseClass = JavaPsiFacade.getInstance(project).findClass(baseName, scope);
+        return JavaPsiFacade.getInstance(project).findClass(fullName, scope);
+    }
+
+    public static boolean isInheritors(PsiClass subClass, String baseName, Project project) {
+        PsiClass baseClass = getPsiClass(project, baseName);
         if (baseClass == null) {
             return false;
         }

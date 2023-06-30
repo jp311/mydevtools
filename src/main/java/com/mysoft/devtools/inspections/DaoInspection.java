@@ -12,6 +12,8 @@ import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.psi.PsiExpressionExtension;
 import com.mysoft.devtools.utils.psi.PsiTypeExtension;
+import lombok.Builder;
+import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,69 +30,63 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
     private final List<String> VALUE_TYPES = Arrays.asList("Object", "Collection<?>");
 
     private final LambdaLocalQuickFix lambdaLocalQuickFix = new LambdaLocalQuickFix();
+    private static PsiClass SFUNCTION_PSICLASS;
+    private static PsiClass BASE_MAPPER_PSICLASS;
+
+    private static PsiClass getSFunctionPsiClass(Project project) {
+        if (SFUNCTION_PSICLASS == null) {
+            SFUNCTION_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.S_FUNCTION_QUALIFIED_NAME);
+        }
+        return SFUNCTION_PSICLASS;
+    }
+
+    private static PsiClass getBaseMapperPsiClass(Project project) {
+        if (BASE_MAPPER_PSICLASS == null) {
+            BASE_MAPPER_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.BASE_MAPPER_QUALIFIED_NAME);
+        }
+        return BASE_MAPPER_PSICLASS;
+    }
 
     /**
      * 检查 BaseMapper 的方法调用规范
      */
-    private void checkerBaseMapper(ProblemsHolder holder, boolean isOnTheFly, PsiMethodCallExpression expression) {
-        PsiExpression qualifierExpression = expression.getMethodExpression().getQualifierExpression();
+    private void checkerBaseMapper(CheckerDTO checkerDTO) {
+        PsiExpression qualifierExpression = checkerDTO.getExpression().getMethodExpression().getQualifierExpression();
         if (qualifierExpression == null) {
             return;
         }
 
-        PsiMethod method = expression.resolveMethod();
-        if (method == null) {
-            return;
-        }
 
-        PsiExpression[] expressions = expression.getArgumentList().getExpressions();
-        if (expressions.length < 2) {
-            return;
-        }
         PsiType psiType = qualifierExpression.getType();
         PsiClass psiClass = PsiTypesUtil.getPsiClass(psiType);
 
-        Project project = expression.getProject();
-        if (!psiClass.isInheritors(QualifiedNames.BASE_MAPPER_QUALIFIED_NAME, project)) {
+        if (!psiClass.isInheritors(getBaseMapperPsiClass(checkerDTO.getProject()))) {
             return;
         }
 
-        int columnIndex = -1;
-        //方法签名参数列表
-        PsiParameter[] signParameters = method.getParameterList().getParameters();
-        for (int index = 0; index < signParameters.length; index++) {
-            if (Objects.equals(COLUMN_NAME, signParameters[index].getName())) {
-                columnIndex = index;
-                break;
-            }
-        }
-        if (columnIndex == -1 || columnIndex + 1 >= signParameters.length) {
-            return;
-        }
-
-        PsiType columnPsiType = method.getParameterList().getParameters()[columnIndex].getType();
+        PsiType columnPsiType = checkerDTO.getSignParameters()[checkerDTO.getColumnIndex()].getType();
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
 
         //兼容这种写法SFunction<T, R> keyFunc
-        if (columnTypeClass == null || !columnTypeClass.isInheritors(QualifiedNames.S_FUNCTION_QUALIFIED_NAME, project)) {
+        if (columnTypeClass == null || !columnTypeClass.isInheritors(getSFunctionPsiClass(checkerDTO.getProject()))) {
             return;
         }
 
-        PsiExpression columnPsiExpression = expressions[columnIndex];
+        PsiExpression columnPsiExpression = checkerDTO.getPsiExpressions()[checkerDTO.getColumnIndex()];
         if (columnPsiExpression instanceof PsiLambdaExpression) {
-            holder.registerProblem(expressions[columnIndex], InspectionBundle.message("inspection.platform.service.dao.problem.lambda.descriptor"), ProblemHighlightType.ERROR, lambdaLocalQuickFix);
+            checkerDTO.getHolder().registerProblem(columnPsiExpression, InspectionBundle.message("inspection.platform.service.dao.problem.lambda.descriptor"), ProblemHighlightType.ERROR, lambdaLocalQuickFix);
         }
     }
 
     /**
      * 检查 LambdaQueryWrapper 的方法调用规范
      */
-    private void checkerLambdaQueryWrapper(ProblemsHolder holder, boolean isOnTheFly, PsiMethodCallExpression expression) {
-        PsiMethod method = expression.resolveMethod();
-        if (method == null || expression.getType() == null) {
+    private void checkerLambdaQueryWrapper(CheckerDTO checkerDTO) {
+        PsiType type = checkerDTO.getExpression().getType();
+        if (type == null) {
             return;
         }
-        PsiClass psiClass = PsiTypesUtil.getPsiClass(expression.getType());
+        PsiClass psiClass = PsiTypesUtil.getPsiClass(type);
         if (psiClass == null) {
             return;
         }
@@ -98,24 +94,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
             return;
         }
 
-        PsiExpression[] expressions = expression.getArgumentList().getExpressions();
-        if (expressions.length < 2) {
-            return;
-        }
-
-        int columnIndex = -1;
-        //方法签名参数列表
-        PsiParameter[] signParameters = method.getParameterList().getParameters();
-        for (int index = 0; index < signParameters.length; index++) {
-            if (Objects.equals(COLUMN_NAME, signParameters[index].getName())) {
-                columnIndex = index;
-                break;
-            }
-        }
-        if (columnIndex == -1 || columnIndex + 1 >= signParameters.length) {
-            return;
-        }
-        PsiType valueType = signParameters[columnIndex + 1].getType();
+        PsiType valueType = checkerDTO.getSignParameters()[checkerDTO.getColumnIndex() + 1].getType();
         if (!VALUE_TYPES.contains(valueType.getPresentableText())) {
             return;
         }
@@ -125,12 +104,12 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
          * Children gtSql(boolean condition, R column, String inValue)
          * */
         //参数1 一般是列名
-        PsiExpression columnPsiExpression = expressions[columnIndex];
+        PsiExpression columnPsiExpression = checkerDTO.getPsiExpressions()[checkerDTO.getColumnIndex()];
         PsiType columnPsiType = columnPsiExpression.tryGetPsiType();
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
 
         //兼容这种写法SFunction<T, R> keyFunc
-        if (columnTypeClass != null && columnTypeClass.isInheritors(QualifiedNames.S_FUNCTION_QUALIFIED_NAME, columnTypeClass.getProject())) {
+        if (columnTypeClass != null && columnTypeClass.isInheritors(getSFunctionPsiClass(checkerDTO.getProject()))) {
             if (columnPsiType instanceof PsiClassReferenceType) {
                 PsiType[] parameters = ((PsiClassReferenceType) columnPsiType).getParameters();
                 if (parameters.length == 2) {
@@ -139,9 +118,9 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
             }
         }
 
-        PsiExpression valuePsiExpression = expressions[columnIndex + 1];
+        PsiExpression valuePsiExpression = checkerDTO.getPsiExpressions()[checkerDTO.getColumnIndex() + 1];
         PsiType valuePsiType;
-        String name = method.getName();
+        String name = checkerDTO.getMethod().getName();
         switch (name) {
             case "in":
             case "notIn":
@@ -161,10 +140,10 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         }
 
         if (Objects.equals(valuePsiExpression.getText(), "null")) {
-            holder.registerProblem(expression, InspectionBundle.message("inspection.platform.service.dao.problem.null.descriptor"), ProblemHighlightType.ERROR);
+            checkerDTO.getHolder().registerProblem(checkerDTO.getExpression(), InspectionBundle.message("inspection.platform.service.dao.problem.null.descriptor"), ProblemHighlightType.ERROR);
         }
         if (columnPsiType != null && valuePsiType != null && !PsiTypeExtension.compareTypes(columnPsiType, valuePsiType) && !"?".equals(valuePsiType.getPresentableText())) {
-            holder.registerProblem(expression, InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
+            checkerDTO.getHolder().registerProblem(checkerDTO.getExpression(), InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
                     , columnPsiType.getPresentableText(), valuePsiType.getPresentableText()), ProblemHighlightType.ERROR);
         }
     }
@@ -175,10 +154,56 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-                checkerLambdaQueryWrapper(holder, isOnTheFly, expression);
-                checkerBaseMapper(holder, isOnTheFly, expression);
+                PsiMethod method = expression.resolveMethod();
+                if (method == null) {
+                    return;
+                }
+                PsiExpression[] expressions = expression.getArgumentList().getExpressions();
+                if (expressions.length < 2) {
+                    return;
+                }
+
+                int columnIndex = -1;
+                //方法签名参数列表
+                PsiParameter[] signParameters = method.getParameterList().getParameters();
+                for (int index = 0; index < signParameters.length; index++) {
+                    if (Objects.equals(COLUMN_NAME, signParameters[index].getName())) {
+                        columnIndex = index;
+                        break;
+                    }
+                }
+                if (columnIndex == -1 || columnIndex + 1 >= signParameters.length) {
+                    return;
+                }
+
+                CheckerDTO checkerDTO = CheckerDTO.builder()
+                        .project(holder.getProject())
+                        .columnIndex(columnIndex)
+                        .method(method)
+                        .signParameters(signParameters)
+                        .psiExpressions(expressions)
+                        .holder(holder)
+                        .isOnTheFly(isOnTheFly)
+                        .expression(expression)
+                        .build();
+
+                checkerLambdaQueryWrapper(checkerDTO);
+                checkerBaseMapper(checkerDTO);
             }
         };
+    }
+
+    @Data
+    @Builder
+    private static final class CheckerDTO {
+        private Project project;
+        private PsiMethod method;
+        private PsiParameter[] signParameters;
+        private PsiExpression[] psiExpressions;
+        private int columnIndex;
+        private ProblemsHolder holder;
+        private boolean isOnTheFly;
+        private PsiMethodCallExpression expression;
     }
 
     private static final class LambdaLocalQuickFix implements LocalQuickFix {
