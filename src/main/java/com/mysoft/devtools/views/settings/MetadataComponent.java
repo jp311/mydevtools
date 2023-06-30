@@ -25,6 +25,9 @@ public class MetadataComponent extends BaseSettingsComponent {
     private JPanel contentPanel;
     private ContextHelpLabel contextHelpLabel1;
     private ExtendableTextField txtMetadataSyncClient;
+    private ContextHelpLabel contextHelpLabel2;
+    private ExtendableTextField txtSqlPath;
+    private ExtendableTextField txtSqlToolPath;
 
     private MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
 
@@ -32,15 +35,18 @@ public class MetadataComponent extends BaseSettingsComponent {
     public JComponent getContentPanel() {
         contentPanel.setBorder(null);
 
-        txtMedataPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.settings.metadata.tooltip"), path -> {
-            txtMedataPath.setText(path);
-        }));
+        txtMedataPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.settings.metadata.tooltip"), path -> txtMedataPath.setText(path)));
         txtMedataPath.setEditable(false);
         txtMedataPath.setText(settings.metadataPath);
 
-        txtMetadataSyncClient.addExtension(ChooseFileUtil.getChooseSingeFileExtension(LocalBundle.message("devtools.settings.metadata.sync.client.tooltip"), fileName -> {
-            txtMetadataSyncClient.setText(fileName);
-        }));
+        txtMetadataSyncClient.addExtension(ChooseFileUtil.getChooseSingeFileExtension(LocalBundle.message("devtools.settings.metadata.sync.client.tooltip"), fileName -> txtMetadataSyncClient.setText(fileName)));
+
+
+        txtSqlPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.menutools.executesql.choose.sqlpath.tooltip"), path -> txtSqlPath.setText(path)));
+        txtSqlPath.setEditable(false);
+        txtSqlPath.setText(settings.sqlPath);
+
+        txtSqlToolPath.addExtension(ChooseFileUtil.getChooseSingeFileExtension(LocalBundle.message("devtools.settings.metadata.sqltool.tooltip"), fileName -> txtSqlToolPath.setText(fileName)));
         return contentPanel;
     }
 
@@ -52,13 +58,18 @@ public class MetadataComponent extends BaseSettingsComponent {
     @Override
     public boolean isModified() {
         return !Objects.equals(settings.metadataPath, txtMedataPath.getText())
-                || !Objects.equals(settings.metadataSyncClientPath, txtMetadataSyncClient.getText());
+                || !Objects.equals(settings.metadataSyncClientPath, txtMetadataSyncClient.getText())
+                || !Objects.equals(settings.sqlPath, txtSqlPath.getText())
+                || !Objects.equals(settings.sqlToolPath, txtSqlToolPath.getText())
+                ;
     }
 
     @Override
     public void apply() {
         settings.metadataPath = txtMedataPath.getText();
         settings.metadataSyncClientPath = txtMetadataSyncClient.getText();
+        settings.sqlToolPath = txtSqlToolPath.getText();
+        settings.sqlPath = txtSqlPath.getText();
         AppSettingsStateService.getInstance().loadState(settings);
     }
 
@@ -66,6 +77,8 @@ public class MetadataComponent extends BaseSettingsComponent {
     public void reset() {
         txtMedataPath.setText(settings.metadataPath);
         txtMetadataSyncClient.setText(settings.metadataSyncClientPath);
+        txtSqlPath.setText(settings.sqlPath);
+        txtSqlToolPath.setText(settings.sqlToolPath);
     }
 
     @Override
@@ -84,6 +97,21 @@ public class MetadataComponent extends BaseSettingsComponent {
                     }
                     try {
                         URI uri = new URI("https://docs.mingyuanyun.com/pages/viewpage.action?pageId=148959495");
+                        Desktop.getDesktop().browse(uri);
+                    } catch (IOException | URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                });
+
+        contextHelpLabel2 = ContextHelpLabel.createWithLink(message("devtools.settings.metadata.sync.client.title")
+                , message("devtools.settings.metadata.sqltool.description")
+                , message("devtools.settings.metadata.sqltool.download"), () -> {
+                    if (!Desktop.isDesktopSupported()) {
+                        IdeaNotifyUtil.dialogError("Desktop is not supported");
+                        return;
+                    }
+                    try {
+                        URI uri = new URI("https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151229359");
                         Desktop.getDesktop().browse(uri);
                     } catch (IOException | URISyntaxException e) {
                         e.printStackTrace();

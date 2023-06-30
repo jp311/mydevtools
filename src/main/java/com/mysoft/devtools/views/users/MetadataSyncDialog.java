@@ -48,10 +48,7 @@ public class MetadataSyncDialog extends BaseDialogComponent {
 
     @Override
     protected JComponent createCenterPanel() {
-        MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
-        txtMedataPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.settings.metadata.tooltip"), path -> {
-            txtMedataPath.setText(path);
-        }));
+        txtMedataPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.settings.metadata.tooltip"), path -> txtMedataPath.setText(path)));
         txtMedataPath.setEditable(true);
         txtMedataPath.setText(metadataPath);
 

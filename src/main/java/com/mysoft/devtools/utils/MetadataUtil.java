@@ -43,6 +43,18 @@ public class MetadataUtil {
         return result;
     }
 
+    public static String getRootPath() {
+        Project project = IdeaContext.getActiveProject();
+        String basePath = project.getBasePath();
+        if (basePath == null || basePath.isEmpty()) {
+            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
+        }
+        if (basePath.toLowerCase().endsWith("src")) {
+            basePath = FileUtil.getParent(basePath);
+        }
+        return basePath;
+    }
+
     public static String getProductMetadataRootPath() {
         MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
         if (settings == null) {
@@ -53,20 +65,15 @@ public class MetadataUtil {
             return settings.metadataPath;
         }
 
-        Project project = IdeaContext.getActiveProject();
-        String basePath = project.getBasePath();
-        if (basePath == null || basePath.isEmpty()) {
-            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
-        }
-        if (basePath.toLowerCase().endsWith("src")) {
-            basePath = FileUtil.getParent(basePath);
-        }
+        String basePath = getRootPath();
+
         var path = FileUtil.combine(basePath, settings.metadataPath);
         if (!FileUtil.isExist(path)) {
             throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
         }
         return new File(path).getPath();
     }
+
 
     public static <T> String getMetadataPath(Class<T> clazz) {
 
