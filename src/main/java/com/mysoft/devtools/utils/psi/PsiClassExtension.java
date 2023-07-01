@@ -20,6 +20,11 @@ import java.util.stream.Collectors;
  */
 @ExtensionMethod({VirtualFileExtension.class})
 public class PsiClassExtension {
+    public static PsiClass createClassFromText(Project project, String qualifiedName) {
+        JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
+        return javaPsiFacade.getElementFactory().createClass(qualifiedName);
+    }
+
     public static boolean isAbstract(PsiClass psiClass) {
         PsiModifierList modifierList = psiClass.getModifierList();
         if (modifierList == null) {

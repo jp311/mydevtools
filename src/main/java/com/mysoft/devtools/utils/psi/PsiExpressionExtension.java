@@ -2,6 +2,7 @@ package com.mysoft.devtools.utils.psi;
 
 import com.intellij.psi.*;
 import com.intellij.psi.impl.light.LightMethodBuilder;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 
 /**
@@ -15,6 +16,9 @@ public class PsiExpressionExtension {
             PsiElement methodRefExpression = ((PsiMethodReferenceExpression) expression).resolve();
             if (methodRefExpression instanceof LightMethodBuilder) {
                 return ((LightMethodBuilder) methodRefExpression).getReturnType();
+            }
+            if (methodRefExpression instanceof PsiMethod) {
+                return ((PsiMethod) methodRefExpression).getReturnType();
             }
         }
 
@@ -42,6 +46,15 @@ public class PsiExpressionExtension {
             }
         }
 
-        return null;
+        if (expression instanceof PsiLambdaExpression) {
+            PsiReferenceExpression childOfType = PsiTreeUtil.findChildOfType(expression, PsiReferenceExpression.class);
+            if (childOfType != null) {
+                return childOfType.getType();
+            } else {
+                return LambdaUtil.getFunctionalInterfaceReturnType((PsiFunctionalExpression) expression);
+            }
+        }
+
+        return expression.getType();
     }
 }

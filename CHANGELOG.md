@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [1.1.0]
+
+- bug fix
+- 增加元数据同步功能
+
 ## [1.2.0]
 
 - bug fix
@@ -11,18 +16,12 @@
 - LambdaWrapper检查更名为Dao检查，增加列名不能用Lambda表达式检查及一键修复
 - 集成SqlTool工具执行初始化sql功能（支持达梦、mysql）
 
-## [1.1.0]
-
-- bug fix
-- 增加元数据同步功能
-
 ## [1.0.0]
 
 - bug fix
 - 修改版本号规则：第1为是大版本更新，第二位是小版本更新，第三位是bug修复
 
 ## [0.0.3]
-
 - bug fix
 - 增加插件错误上报入口
 - 增加检查：LambdaWrapper、new Service、Resource注解字段名称规范检查
@@ -82,6 +81,20 @@
 [Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.1.0...HEAD
 
 [1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.1.0...HEAD
+
+[1.2.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.2.0
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.2.0...v1.1.0
 
 [1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
 

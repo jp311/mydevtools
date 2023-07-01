@@ -24,20 +24,30 @@ import java.util.Objects;
 /**
  * @author hezd   2023/5/27
  */
-@ExtensionMethod({PsiExpressionExtension.class, PsiClassExtension.class})
+@ExtensionMethod({PsiExpressionExtension.class, PsiClassExtension.class, PsiTypeExtension.class})
 public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
-    private final static String COLUMN_NAME = "column";
     private final List<String> VALUE_TYPES = Arrays.asList("Object", "Collection<?>");
 
     private final LambdaLocalQuickFix lambdaLocalQuickFix = new LambdaLocalQuickFix();
     private static PsiClass SFUNCTION_PSICLASS;
+
+    private static PsiType SFUNCTION_PSITYPE;
     private static PsiClass BASE_MAPPER_PSICLASS;
+
+    private static PsiClass LAMBDA_QUERY_WRAPPER_PSICLASS;
 
     private static PsiClass getSFunctionPsiClass(Project project) {
         if (SFUNCTION_PSICLASS == null) {
             SFUNCTION_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.S_FUNCTION_QUALIFIED_NAME);
         }
         return SFUNCTION_PSICLASS;
+    }
+
+    private static PsiType getSFunctionPsiType(Project project) {
+        if (SFUNCTION_PSITYPE == null) {
+            SFUNCTION_PSITYPE = PsiTypeExtension.createTypeFromText(project, QualifiedNames.S_FUNCTION_QUALIFIED_NAME);
+        }
+        return SFUNCTION_PSITYPE;
     }
 
     private static PsiClass getBaseMapperPsiClass(Project project) {
@@ -47,20 +57,20 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         return BASE_MAPPER_PSICLASS;
     }
 
+    private static PsiClass getLambdaQueryWrapperPsiClass(Project project) {
+        if (LAMBDA_QUERY_WRAPPER_PSICLASS == null) {
+            LAMBDA_QUERY_WRAPPER_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.LAMBDA_QUERY_WRAPPER_QUALIFIED_NAME);
+        }
+        return LAMBDA_QUERY_WRAPPER_PSICLASS;
+    }
+
     /**
      * 检查 BaseMapper 的方法调用规范
      */
     private void checkerBaseMapper(CheckerDTO checkerDTO) {
-        PsiExpression qualifierExpression = checkerDTO.getExpression().getMethodExpression().getQualifierExpression();
-        if (qualifierExpression == null) {
-            return;
-        }
+        PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
 
-
-        PsiType psiType = qualifierExpression.getType();
-        PsiClass psiClass = PsiTypesUtil.getPsiClass(psiType);
-
-        if (!psiClass.isInheritors(getBaseMapperPsiClass(checkerDTO.getProject()))) {
+        if (psiClass == null || !psiClass.isInheritors(getBaseMapperPsiClass(checkerDTO.getProject()))) {
             return;
         }
 
@@ -82,15 +92,15 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查 LambdaQueryWrapper 的方法调用规范
      */
     private void checkerLambdaQueryWrapper(CheckerDTO checkerDTO) {
-        PsiType type = checkerDTO.getExpression().getType();
-        if (type == null) {
+        if (checkerDTO.getColumnIndex() == -1 || checkerDTO.getColumnIndex() + 1 >= checkerDTO.getSignParameters().length) {
             return;
         }
-        PsiClass psiClass = PsiTypesUtil.getPsiClass(type);
-        if (psiClass == null) {
-            return;
-        }
-        if (!Objects.equals(psiClass.getName(), "LambdaQueryWrapper")) {
+        PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
+//        if (psiClass == null || !psiClass.isInheritors(getLambdaQueryWrapperPsiClass(checkerDTO.getProject()))) {
+//            return;
+//        }
+
+        if (!Objects.equals(psiClass.getPackageName(), "com.baomidou.mybatisplus.core.conditions.interfaces")) {
             return;
         }
 
@@ -105,6 +115,9 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
          * */
         //参数1 一般是列名
         PsiExpression columnPsiExpression = checkerDTO.getPsiExpressions()[checkerDTO.getColumnIndex()];
+        if (columnPsiExpression instanceof PsiLambdaExpression) {
+            checkerDTO.getHolder().registerProblem(columnPsiExpression, InspectionBundle.message("inspection.platform.service.dao.problem.lambda.descriptor"), ProblemHighlightType.ERROR, lambdaLocalQuickFix);
+        }
         PsiType columnPsiType = columnPsiExpression.tryGetPsiType();
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
 
@@ -143,7 +156,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
             checkerDTO.getHolder().registerProblem(checkerDTO.getExpression(), InspectionBundle.message("inspection.platform.service.dao.problem.null.descriptor"), ProblemHighlightType.ERROR);
         }
         if (columnPsiType != null && valuePsiType != null && !PsiTypeExtension.compareTypes(columnPsiType, valuePsiType) && !"?".equals(valuePsiType.getPresentableText())) {
-            checkerDTO.getHolder().registerProblem(checkerDTO.getExpression(), InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
+            checkerDTO.getHolder().registerProblem(valuePsiExpression, InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
                     , columnPsiType.getPresentableText(), valuePsiType.getPresentableText()), ProblemHighlightType.ERROR);
         }
     }
@@ -167,13 +180,12 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                 //方法签名参数列表
                 PsiParameter[] signParameters = method.getParameterList().getParameters();
                 for (int index = 0; index < signParameters.length; index++) {
-                    if (Objects.equals(COLUMN_NAME, signParameters[index].getName())) {
+                    PsiType sFunctionPsiType = getSFunctionPsiType(holder.getProject());
+
+                    if (sFunctionPsiType.compareTypes(signParameters[index].getType())) {
                         columnIndex = index;
                         break;
                     }
-                }
-                if (columnIndex == -1 || columnIndex + 1 >= signParameters.length) {
-                    return;
                 }
 
                 CheckerDTO checkerDTO = CheckerDTO.builder()
