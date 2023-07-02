@@ -2,7 +2,6 @@ package com.mysoft.devtools.listeners;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
-import com.mysoft.devtools.inspections.OverrideInspection;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,15 +13,5 @@ public class MyStartupActivity implements StartupActivity {
     @Override
     public void runActivity(@NotNull Project project) {
 
-        OverrideInspection.doOverride(project);
-
-//        Application application = ApplicationManager.getApplication();
-//        MessageBusConnection connect = application.getMessageBus().connect();
-//        connect.subscribe(ProjectManager.TOPIC, new ProjectManagerListener() {
-//            @Override
-//            public void projectOpened(@NotNull Project project) {
-//                OverrideInspection.doOverride(project);
-//            }
-//        });
     }
 }
