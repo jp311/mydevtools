@@ -22,6 +22,9 @@ public class MetadataUtil {
 
         if (clazz == EntityDTO.class) {
             String path = getMetadataPath(clazz);
+            if (!new File(path).exists()) {
+                throw new RuntimeException(LocalBundle.message("devtools.userview.generate.path.notfound.exception"));
+            }
             List<File> allEntity = FileUtil.getAllFiles(path);
 
             //处理.metadata.design.config的情况

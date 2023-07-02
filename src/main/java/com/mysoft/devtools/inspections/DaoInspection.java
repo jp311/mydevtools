@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 1、列名列参数不能使用Lambda表达式
+ * 2、不能使用eq null，ne null，应该使用isNull或 isNotNull
+ * 3、检查列名和参数值类型是否一致
+ *
  * @author hezd   2023/5/27
  */
 @ExtensionMethod({PsiExpressionExtension.class, PsiClassExtension.class, PsiTypeExtension.class})

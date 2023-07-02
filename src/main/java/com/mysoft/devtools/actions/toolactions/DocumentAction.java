@@ -21,7 +21,7 @@ public class DocumentAction extends AnAction {
                 IdeaNotifyUtil.dialogError("Desktop is not supported");
                 return;
             }
-            Desktop.getDesktop().browse(new URI("https://docs.mingyuanyun.com/pages/viewpage.action?pageId=151236868"));
+            Desktop.getDesktop().browse(new URI("https://gitee.com/he-zhangdi/mysoft-devtools/wikis/pages?sort_id=8233727&doc_id=4149338"));
         } catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
