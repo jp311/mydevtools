@@ -27,6 +27,9 @@ public class InspectionWhiteUtil {
     public final static String ENTITY_DECLARE = "EntityDeclare";
 
     private synchronized static void loadSettings(Project project) {
+        if (project == null) {
+            return;
+        }
         if (INIT_PROJECTS.contains(project.getBasePath())) {
             return;
         }
@@ -52,8 +55,11 @@ public class InspectionWhiteUtil {
     }
 
     public static boolean isWhite(String socpe, String qualifiedName, String packageName, Project project) {
+        if (project == null) {
+            return false;
+        }
         loadSettings(project);
-        if (!WHITE_CACHE.containsKey(socpe)) {
+        if (WHITE_CACHE == null || !WHITE_CACHE.containsKey(socpe)) {
             return false;
         }
         WhiteSettingsDTO whiteSettingsDTO = WHITE_CACHE.get(socpe);

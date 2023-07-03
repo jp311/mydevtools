@@ -17,7 +17,9 @@ public class QualifiedNames {
 
     public static final String PUB_ACTION_QUALIFIED_NAME = "com.mysoft.framework.rpc.annotation.PubAction";
 
-    public static final String BASE_DAO_QUALIFIED_NAME = "com.mysoft.czxt.utility.abstracts.BaseDao";
+    public static final String BASE_MAPPER_QUALIFIED_NAME = "com.baomidou.mybatisplus.core.mapper.BaseMapper";
+
+    public static final String LAMBDA_QUERY_WRAPPER_QUALIFIED_NAME = "com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper";
 
     public static final String APP_SERVICE_QUALIFIED_NAME = "com.mysoft.framework.service.AppService";
 

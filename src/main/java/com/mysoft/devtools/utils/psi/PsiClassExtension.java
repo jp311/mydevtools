@@ -20,6 +20,11 @@ import java.util.stream.Collectors;
  */
 @ExtensionMethod({VirtualFileExtension.class})
 public class PsiClassExtension {
+    public static PsiClass createClassFromText(Project project, String qualifiedName) {
+        JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
+        return javaPsiFacade.getElementFactory().createClass(qualifiedName);
+    }
+
     public static boolean isAbstract(PsiClass psiClass) {
         PsiModifierList modifierList = psiClass.getModifierList();
         if (modifierList == null) {
@@ -41,9 +46,13 @@ public class PsiClassExtension {
         return PsiUtil.getPackageName(psiClass);
     }
 
-    public static boolean isInheritors(PsiClass subClass, String baseName, Project project) {
+    public static PsiClass getPsiClass(Project project, String fullName) {
         GlobalSearchScope scope = ProjectScope.getAllScope(project);
-        PsiClass baseClass = JavaPsiFacade.getInstance(project).findClass(baseName, scope);
+        return JavaPsiFacade.getInstance(project).findClass(fullName, scope);
+    }
+
+    public static boolean isInheritors(PsiClass subClass, String baseName, Project project) {
+        PsiClass baseClass = getPsiClass(project, baseName);
         if (baseClass == null) {
             return false;
         }

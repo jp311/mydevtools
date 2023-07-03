@@ -2,6 +2,14 @@ package com.mysoft.devtools.actions.toolactions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.options.ShowSettingsUtil;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
+import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.dtos.MysoftSettingsDTO;
+import com.mysoft.devtools.services.AppSettingsStateService;
+import com.mysoft.devtools.settings.MetadataConfigurable;
+import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
 import com.mysoft.devtools.views.users.MetadataSyncDialog;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +21,18 @@ import org.jetbrains.annotations.NotNull;
 public class MetadataSyncAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        MetadataSyncDialog dialog = new MetadataSyncDialog();
+        Project project = e.getProject();
+        MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
+        if (settings == null || settings.metadataSyncClientPath == null || settings.metadataSyncClientPath.isBlank()) {
+            int res = IdeaNotifyUtil.dialogQuestion(LocalBundle.message("devtools.menutools.syncmetadata.settings.fail"));
+            if (Messages.NO == res) {
+                return;
+            }
+            ShowSettingsUtil.getInstance().showSettingsDialog(project, MetadataConfigurable.class);
+            return;
+        }
+
+        MetadataSyncDialog dialog = new MetadataSyncDialog(project);
         dialog.show();
     }
 }

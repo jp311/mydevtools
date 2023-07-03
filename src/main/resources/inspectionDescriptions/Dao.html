@@ -32,8 +32,20 @@
     }
 </code></pre>
 
+<p>反例3：列名不支持Lambda表达式</p>
+<pre><code>
+    LambdaQueryWrapper&lt;BidValue&gt; queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(x -> getReturnBidProviderGUID(), UUIDExtension.Empty);
+    return delete(queryWrapper);
+</code></pre>
+<p>正例：将列名Lambda表达式改成方法引用</p>
+<pre><code>
+    LambdaQueryWrapper&lt;BidValue&gt; queryWrapper = new LambdaQueryWrapper<>();
+    queryWrapper.eq(BidValue::getReturnBidProviderGUID, UUIDExtension.Empty);
+    return delete(queryWrapper);
+</code></pre>
 
-<a href="https://github.com/h598937749/mydevtools/wiki/%E4%BB%A3%E7%A0%81%E6%A3%80%E6%9F%A5%E5%99%A8"
+<a href="https://gitee.com/he-zhangdi/mysoft-devtools/wikis/pages?sort_id=8233756&doc_id=4149338"
    target="_blank">详情</a>
 </body>
 </html>

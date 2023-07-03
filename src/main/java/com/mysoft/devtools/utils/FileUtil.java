@@ -22,8 +22,9 @@ public class FileUtil {
         reader.close();
         return stringBuilder.toString();
     }
+
     public static void writeAllText(String fileName, String content) throws IOException {
-        FileWriter fileWriter = new FileWriter(fileName);
+        FileWriter fileWriter = new FileWriter(fileName, StandardCharsets.UTF_8);
         fileWriter.write(content);
         fileWriter.close();
     }
@@ -38,11 +39,13 @@ public class FileUtil {
             fileList.add(file);
         } else {
             File[] files = file.listFiles();
-            for (File subFile : files) {
-                if (subFile.isDirectory()) {
-                    fileList.addAll(getAllFiles(subFile.getAbsolutePath()));
-                } else {
-                    fileList.add(subFile);
+            if (files != null) {
+                for (File subFile : files) {
+                    if (subFile.isDirectory()) {
+                        fileList.addAll(getAllFiles(subFile.getAbsolutePath()));
+                    } else {
+                        fileList.add(subFile);
+                    }
                 }
             }
         }
@@ -61,10 +64,13 @@ public class FileUtil {
         return new File(path).getParent();
     }
 
-    public static String readResourceContent(String relationPath){
+    public static String readResourceContent(String relationPath) {
         ClassLoader classLoader = FileUtil.class.getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(relationPath);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+        if (inputStream == null) {
+            return null;
+        }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             StringBuilder stringBuilder = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {

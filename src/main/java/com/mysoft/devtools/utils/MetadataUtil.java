@@ -22,6 +22,9 @@ public class MetadataUtil {
 
         if (clazz == EntityDTO.class) {
             String path = getMetadataPath(clazz);
+            if (!new File(path).exists()) {
+                throw new RuntimeException(LocalBundle.message("devtools.userview.generate.path.notfound.exception"));
+            }
             List<File> allEntity = FileUtil.getAllFiles(path);
 
             //处理.metadata.design.config的情况
@@ -43,12 +46,40 @@ public class MetadataUtil {
         return result;
     }
 
+    public static String getRootPath() {
+        Project project = IdeaContext.getActiveProject();
+        String basePath = project.getBasePath();
+        if (basePath == null || basePath.isEmpty()) {
+            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
+        }
+        if (basePath.toLowerCase().endsWith("src")) {
+            basePath = FileUtil.getParent(basePath);
+        }
+        return basePath;
+    }
 
-    public static <T> String getMetadataPath(Class<T> clazz) {
+    public static String getProductMetadataRootPath() {
         MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
-        if (settings == null){
+        if (settings == null) {
             throw new RuntimeException(LocalBundle.message("devtools.generate.settings.notfound"));
         }
+
+        if (FileUtil.isExist(settings.metadataPath)) {
+            return settings.metadataPath;
+        }
+
+        String basePath = getRootPath();
+
+        var path = FileUtil.combine(basePath, settings.metadataPath);
+        if (!FileUtil.isExist(path)) {
+            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
+        }
+        return new File(path).getPath();
+    }
+
+
+    public static <T> String getMetadataPath(Class<T> clazz) {
+
         String metadataType;
         if (clazz == EntityDTO.class) {
             metadataType = "Entity";
@@ -56,24 +87,7 @@ public class MetadataUtil {
             throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notsupport"));
         }
 
-        String path = FileUtil.combine(settings.metadataPath, metadataType);
-
-        if (FileUtil.isExist(path)) {
-            return path;
-        }
-
-        Project project = IdeaContext.getActiveProject();
-        String basePath = project.getBasePath();
-        if(basePath == null || basePath.isEmpty()){
-            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
-        }
-        if (basePath.toLowerCase().endsWith("src")) {
-            basePath = FileUtil.getParent(basePath);
-        }
-        path = FileUtil.combine(basePath, settings.metadataPath, metadataType);
-        if (!FileUtil.isExist(path)) {
-            throw new RuntimeException(LocalBundle.message("devtools.generate.metadata.notfound"));
-        }
-        return path;
+        String productMetadataRootPath = getProductMetadataRootPath();
+        return FileUtil.combine(productMetadataRootPath, metadataType);
     }
 }

@@ -24,7 +24,6 @@ public class EntityDTO implements Serializable {
     private String entityId;
     @JacksonXmlProperty(localName = "Name", isAttribute = true)
     private String name;
-    private String simpleName;
     @JacksonXmlProperty(localName = "DisplayName", isAttribute = true)
     private String displayName;
     @JacksonXmlProperty(localName = "Application", isAttribute = true)
@@ -60,5 +59,8 @@ public class EntityDTO implements Serializable {
     @JacksonXmlElementWrapper(localName = "Attributes")
     public List<EntityAttributeDTO> attributes;
 
+    public String getSimpleName() {
+        return name.split("_").lastOrDefault();
+    }
 
 }

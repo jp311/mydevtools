@@ -1,9 +1,7 @@
 package com.mysoft.devtools.utils.psi;
 
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiType;
-import com.intellij.psi.PsiTypeParameter;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.util.PsiTypesUtil;
 
@@ -14,6 +12,12 @@ import java.util.Objects;
  * @author hezd   2023/5/27
  */
 public class PsiTypeExtension {
+
+    public static PsiType createTypeFromText(Project project, String qualifiedName) {
+        JavaPsiFacade javaPsiFacade = JavaPsiFacade.getInstance(project);
+        return javaPsiFacade.getElementFactory().createTypeFromText(qualifiedName, null);
+    }
+
     public static boolean compareTypes(PsiType leftType, PsiType rightType) {
         if (leftType == null || rightType == null) {
             return false;

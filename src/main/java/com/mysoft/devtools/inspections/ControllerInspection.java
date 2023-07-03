@@ -1,4 +1,4 @@
-package com.mysoft.devtools.Inspections;
+package com.mysoft.devtools.inspections;
 
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.util.IntentionFamilyName;
@@ -147,14 +147,14 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
         }
 
         PsiMethod[] methods = aClass.getMethods();
-        List<PsiMethod> repeatUsages = Arrays.stream(methods).filter(x -> !Objects.equals(x, method) && comprePubActionAnnotation(valueAttr.getValue(), x)).collect(Collectors.toList());
+        List<PsiMethod> repeatUsages = Arrays.stream(methods).filter(x -> !Objects.equals(x, method) && comparePubActionAnnotation(valueAttr.getValue(), x)).collect(Collectors.toList());
         if (repeatUsages.size() > 0) {
             holder.registerProblem(valueAttr, InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.unique.descriptor"), ProblemHighlightType.ERROR);
         }
 
     }
 
-    private boolean comprePubActionAnnotation(String value, PsiMethod psiMethod) {
+    private boolean comparePubActionAnnotation(String value, PsiMethod psiMethod) {
         PsiAnnotation annotation = psiMethod.getAnnotation(QualifiedNames.PUB_ACTION_QUALIFIED_NAME);
         if (annotation == null) {
             return false;

@@ -10,6 +10,11 @@
     psi：https://www.ideaplugin.com/idea-docs/Part%20IV%20%E2%80%94%20PSI/PSI%20Cookbook.html#%E5%A6%82%E4%BD%95%E9%87%8D%E5%91%BD%E5%90%8Dpsi%E5%85%83%E7%B4%A0
     C:\Users\h5989\.gradle\caches\modules-2\files-2.1\com.jetbrains.intellij.idea\ideaIU\2022.3.1\39ac473da83edaa9b87b08e3fe0c752766155864\ideaIU-2022.3.1
 
+    plugin.xml文档：https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html#idea-plugin__vendor
+    单元测试：https://www.jetbrains.com/help/idea/testing-frameworks.html
+    依赖分析：https://www.jetbrains.com/help/idea/dependencies-analysis.html#validate-dependencies
+    宏：https://www.jetbrains.com/help/idea/built-in-macros.html#custom-macros
+    创建文件模板：https://plugins.jetbrains.com/docs/intellij/using-file-templates.html#improving-save-file-as-template-action
     com.intellij.psi.PsiFileFactory：
     文件相关操作，e.g.创建文件等。
     com.intellij.psi.PsiElementFactory:
@@ -28,10 +33,14 @@
         hezd
     </vendor>
 
+
     <!-- 参考文档：https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html#modules-specific-to-functionality -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>com.intellij.spring</depends>
+    <depends>JavaScript</depends>
 
     <resource-bundle>messages.mysoft</resource-bundle>
 
@@ -45,8 +54,6 @@
 
         <!--插件设置持久化服务-->
         <applicationService serviceImplementation="com.mysoft.devtools.services.AppSettingsStateService"/>
-        <!--项目启动活动-->
-        <postStartupActivity implementation="com.mysoft.devtools.listeners.MyStartupActivity"/>
         <!--项目结构-->
         <!--        <treeStructureProvider implementation="com.mysoft.devtools.projectview.controller.MysoftTreeStructureProvider"/>-->
         <!--设置窗口-->
@@ -54,9 +61,6 @@
                              bundle="messages.LocalBundle"
                              key="devtools.settings.home.name"
                              instance="com.mysoft.devtools.settings.HomeConfigurable">
-            <!--            <configurable id="setting-environment" bundle="messages.CommonBundle"-->
-            <!--                          key="devtools.settings.environment.name"-->
-            <!--                          instance="com.mysoft.devtools.settings.EnvironmentConfigurable"/>-->
 
             <configurable id="setting-metadata" bundle="messages.LocalBundle"
                           key="devtools.settings.metadata.name"
@@ -66,6 +70,10 @@
                           key="devtools.settings.generatecodetemplate.name"
                           instance="com.mysoft.devtools.settings.GenerateCodeTemplateConfigurable"/>
 
+            <configurable id="setting-metadata" bundle="messages.LocalBundle"
+                          key="devtools.settings.datasource.name"
+                          instance="com.mysoft.devtools.settings.DataSourceConfigurable"/>
+
         </projectConfigurable>
 
         <!-- lombok扩展方法代码提示 -->
@@ -74,9 +82,13 @@
         <!--错误上报接口-->
         <errorHandler implementation="com.mysoft.devtools.listeners.MyErrorReportSubmitter"/>
 
+        <!-- 消息通知分组 -->
         <notificationGroup displayType="BALLOON" id="mysoft-balloon" key="description"/>
         <notificationGroup displayType="TOOL_WINDOW" id="mysoft-toolwindow" key="description"/>
         <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>
+
+        <!-- 实时模板（代码片段） -->
+        <defaultLiveTemplates file="liveTemplates/mapper/native.xml"/>
 
         <!--代码检查  https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/comparing_string_references_inspection-->
         <localInspection language="JAVA"
@@ -87,9 +99,9 @@
                          groupKey="group.names.mysoft"
                          enabledByDefault="true"
                          level="ERROR"
-                         implementationClass="com.mysoft.devtools.Inspections.NewExpressionInspection"/>
+                         implementationClass="com.mysoft.devtools.inspections.NewExpressionInspection"/>
 
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.AppServiceInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.AppServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.appservice.display.name"
                          groupPath="Java"
@@ -99,7 +111,7 @@
                          enabledByDefault="true"
         />
 
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.DomainServiceInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.DomainServiceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.domainservice.display.name"
                          groupPath="Java"
@@ -107,7 +119,7 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.ControllerInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.ControllerInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.controller.display.name"
                          groupPath="Java"
@@ -115,7 +127,7 @@
                          groupKey="group.names.mysoft"
                          level="ERROR"
                          enabledByDefault="true"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.EntityDeclarationInspection"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.EntityDeclarationInspection"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.entity.display.name"
                          groupPath="Java"
@@ -124,7 +136,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.EnumInspection"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.EnumInspection"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.enum.display.name"
                          groupPath="Java"
@@ -133,7 +145,7 @@
                          enabledByDefault="true"
                          level="ERROR"
                          language="JAVA"/>
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.ResourceInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.ResourceInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
                          key="inspection.platform.service.resource.display.name"
                          groupPath="Java"
@@ -143,7 +155,7 @@
                          enabledByDefault="true"/>
 
 
-        <!--        <localInspection implementationClass="com.mysoft.devtools.Inspections.MybatisMapperInspection" language="XML"-->
+        <!--        <localInspection implementationClass="com.mysoft.devtools.inspections.MybatisMapperInspection" language="XML"-->
         <!--                         bundle="messages.InspectionsBundle"-->
         <!--                         key="inspection.mybatis.mapper.display.name"-->
         <!--                         groupPath="XML"-->
@@ -151,9 +163,9 @@
         <!--                         groupKey="group.names.mysoft"-->
         <!--                         level="ERROR"-->
         <!--        />-->
-        <localInspection implementationClass="com.mysoft.devtools.Inspections.LambdaWrapperInspection" language="JAVA"
+        <localInspection implementationClass="com.mysoft.devtools.inspections.DaoInspection" language="JAVA"
                          bundle="messages.InspectionsBundle"
-                         key="inspection.platform.service.lambdawrapper.display.name"
+                         key="inspection.platform.service.dao.display.name"
                          groupPath="Java"
                          groupBundle="messages.InspectionsBundle"
                          groupKey="group.names.mysoft"
@@ -162,22 +174,32 @@
     </extensions>
 
     <applicationListeners>
-<!--        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"-->
-<!--                  topic="com.intellij.ide.FrameStateListener"/>-->
+        <!--        <listener class="com.mysoft.devtools.listeners.MyFrameStateListener"-->
+        <!--                  topic="com.intellij.ide.FrameStateListener"/>-->
 
         <listener class="com.mysoft.devtools.listeners.MyProjectOpenCloseListener"
                   topic="com.intellij.openapi.project.ProjectManagerListener"/>
+
+        <listener class="com.mysoft.devtools.listeners.MyDynamicPluginListener"
+                  topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
 
-    <!-- 定义菜单组 -->
+    <!-- 定义菜单组 https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html#idea-plugin__actions-->
     <actions resource-bundle="messages.mysoft">
-        <!--        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">-->
-        <!--            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>-->
-        <!--        </group>-->
+        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">
+            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
+        </group>
+
+        <group id="mysoft-tool-menus-database" text="数据库" popup="true" description="明源云-开发工具箱"
+               searchable="false">
+            <add-to-group group-id="mysoft-tool-menus"/>
+        </group>
+
         <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </group>
+
     </actions>
 
     <actions>
@@ -199,20 +221,19 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
-<!--        <action id="GenerateDtoAction"-->
-<!--                class="com.mysoft.devtools.actions.exploreractions.GenerateDtoAction" text="生成Dto"-->
-<!--                description="根据Json、Sql生成Dto">-->
-<!--            <add-to-group group-id="mysoft-explorer-menus"/>-->
-<!--        </action>-->
+        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"
+                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">
+            <add-to-group group-id="mysoft-tool-menus-database"/>
+        </action>
 
-        <!--        <action id="com.mysoft.devtools.actions.toolactions.TestAction"-->
-        <!--                class="com.mysoft.devtools.actions.toolactions.TestAction" text="测试" >-->
-        <!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
-        <!--        </action>-->
+        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
+                class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
+            <add-to-group group-id="mysoft-tool-menus-database"/>
+        </action>
 
-        <!--        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"-->
-        <!--                class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">-->
-        <!--            <add-to-group group-id="mysoft-tool-menus" anchor="first"/>-->
-        <!--        </action>-->
+        <action id="com.mysoft.devtools.actions.toolactions.DocumentAction"
+                class="com.mysoft.devtools.actions.toolactions.DocumentAction" text="帮助文档">
+            <add-to-group group-id="mysoft-tool-menus" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

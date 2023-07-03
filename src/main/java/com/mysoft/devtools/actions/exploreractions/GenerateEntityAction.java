@@ -58,4 +58,6 @@ public class GenerateEntityAction extends BaseGenerateAction {
     protected String getCodeTemplate() {
         return Objects.requireNonNull(AppSettingsStateService.getInstance().getState()).entityTemplate;
     }
+
+
 }

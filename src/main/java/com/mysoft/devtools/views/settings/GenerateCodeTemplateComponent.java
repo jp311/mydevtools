@@ -9,6 +9,7 @@ import com.mysoft.devtools.controls.FreeMarkerEditor;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.utils.psi.IdeaContext;
+import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,16 +47,15 @@ public class GenerateCodeTemplateComponent extends BaseSettingsComponent {
 
         JPanel entityDtoPanel = new JPanel();
         entityDtoPanel.setLayout(new BorderLayout());
-        etEntityDto = new FreeMarkerEditor(project,settings.entityDtoTemplate);
+        etEntityDto = new FreeMarkerEditor(project, settings.entityDtoTemplate);
         entityDtoPanel.add(etEntityDto);
         tabPanel.addTab("EntityDto模板", null, entityDtoPanel, "该模板控制EntityDto生成格式");
 
         JPanel jsProxyPanel = new JPanel();
         jsProxyPanel.setLayout(new BorderLayout());
-        etJsProxy = new FreeMarkerEditor(project,settings.jsProxyTemplate);
+        etJsProxy = new FreeMarkerEditor(project, settings.jsProxyTemplate);
         jsProxyPanel.add(etJsProxy);
         tabPanel.addTab("JSProxy模板", null, jsProxyPanel, "该模板控制JS代理类生成格式");
-
 
 
         contentPanel.setBorder(null);
@@ -104,12 +104,16 @@ public class GenerateCodeTemplateComponent extends BaseSettingsComponent {
         help = ContextHelpLabel.createWithLink(LocalBundle.message("devtools.settings.generatecodetemplate.title")
                 , LocalBundle.message("devtools.settings.generatecodetemplate.description")
                 , LocalBundle.message("devtools.settings.generatecodetemplate.help"), () -> {
-            try {
-                Desktop.getDesktop().browse(new URI("http://freemarker.foofun.cn/pgui_config_sharedvariables.html"));
-            } catch (IOException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
+                    try {
+                        if (!Desktop.isDesktopSupported()) {
+                            IdeaNotifyUtil.dialogError("Desktop is not supported");
+                            return;
+                        }
+                        Desktop.getDesktop().browse(new URI("http://freemarker.foofun.cn/pgui_config_sharedvariables.html"));
+                    } catch (IOException | URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
     }
 }
