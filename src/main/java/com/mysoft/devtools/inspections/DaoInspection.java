@@ -9,14 +9,13 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.PsiExpressionExtension;
-import com.mysoft.devtools.utils.psi.PsiTypeExtension;
+import com.mysoft.devtools.utils.psi.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +27,7 @@ import java.util.Objects;
  *
  * @author hezd   2023/5/27
  */
-@ExtensionMethod({PsiExpressionExtension.class, PsiClassExtension.class, PsiTypeExtension.class})
+@ExtensionMethod({PsiExpressionExtension.class, PsiClassExtension.class, PsiTypeExtension.class, PsiElementExtension.class})
 public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
     private final List<String> VALUE_TYPES = Arrays.asList("Object", "Collection<?>");
 
@@ -72,11 +71,15 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查 BaseMapper 的方法调用规范
      */
     private void checkerBaseMapper(CheckerDTO checkerDTO) {
+        if (checkerDTO.getColumnIndex() == -1) {
+            return;
+        }
         PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
 
         if (psiClass == null || !psiClass.isInheritors(getBaseMapperPsiClass(checkerDTO.getProject()))) {
             return;
         }
+
 
         PsiType columnPsiType = checkerDTO.getSignParameters()[checkerDTO.getColumnIndex()].getType();
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
@@ -171,6 +174,11 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
+
+                PsiClass psiClass = PsiTreeUtil.getParentOfType(expression, PsiClass.class);
+                if (psiClass == null) {
+                    return;
+                }
                 PsiMethod method = expression.resolveMethod();
                 if (method == null) {
                     return;
@@ -203,8 +211,22 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                         .expression(expression)
                         .build();
 
-                checkerLambdaQueryWrapper(checkerDTO);
-                checkerBaseMapper(checkerDTO);
+                long begin = System.currentTimeMillis();
+                try {
+                    checkerLambdaQueryWrapper(checkerDTO);
+                    checkerBaseMapper(checkerDTO);
+                } catch (Exception ex) {
+                    IdeaLoggerUtil.error(MessageFormat.format("【{0}】检查出错：", method.getName()));
+                    ex.printStackTrace();
+                } finally {
+                    long end = System.currentTimeMillis();
+                    if (end - begin > 50) {
+                        long lineNumber = expression.getOriginalElement().getLineNumber();
+                        String psiKeygen = psiClass.getName() + "." + method.getName() + ":" + lineNumber;
+                        IdeaLoggerUtil.error(MessageFormat.format("Dao检查器完成【{0}】，耗时：{1}....", psiKeygen, end - begin));
+                    }
+                }
+
             }
         };
     }

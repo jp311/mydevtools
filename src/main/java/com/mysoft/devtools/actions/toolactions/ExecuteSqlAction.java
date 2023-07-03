@@ -48,6 +48,9 @@ public class ExecuteSqlAction extends AnAction {
 //        GlobalSearchScope scope = ProjectScope.getAllScope(project);
 //        PsiClass baseClass = JavaPsiFacade.getInstance(project).findClass("com.mysoft.czxt.cgplanmng.service.appservice.BudgetsAppService", scope);
 //        CommonSpringModel psiClassSpringModel = SpringModelUtils.getInstance().getPsiClassSpringModel(baseClass);
+
+        //检查是否存在具有给定名称/类型的 Bean
+        //SpringModelSearchers.doesBeanExist(null,null);
     }
 
 

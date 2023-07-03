@@ -44,13 +44,7 @@ public class CgPlanController extends Controller {
 }
 </code></pre>
 
-<p>反例5：命名不是以Controller结尾</p>
-<pre><code>
-public class CgPlanAppService extends Controller {
-
-}
-</code></pre>
-<p>问题6：@PubService注解中的value + businessCode 非全局唯一</p>
+<p>反例45：@PubService注解中的value + businessCode 非全局唯一</p>
 <pre><code>
 @PubService(value = "/CgPlan", prefix = RequestPrefix.API, businessCode = "02200301")
 public class CgPlanController extends Controller {
@@ -61,7 +55,7 @@ public class CgSolutionController extends Controller {
 
 }
 </code></pre>
-<p>问题7：缺少@Tag注解</p>
+<p>反例46：缺少@Tag注解</p>
 <pre><code>
 public class CgPlanController extends Controller {
 ...
