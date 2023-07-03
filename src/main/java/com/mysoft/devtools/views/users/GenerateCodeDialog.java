@@ -14,10 +14,14 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <a href="https://plugins.jetbrains.com/docs/intellij/popups.html">Dialog</a>
+ *
  * @author hezd 2023/4/27
  */
 public class GenerateCodeDialog extends BaseDialogComponent {
@@ -33,13 +37,13 @@ public class GenerateCodeDialog extends BaseDialogComponent {
 
         contentPanel.setPreferredSize(new Dimension(960, 600));
     }
-    
+
 
     public MyVector<MyVector<Object>> getSelected() {
         MyVector<MyVector<Object>> myVector = new MyVector<>();
         CheckTableModel model = (CheckTableModel) table.getModel();
-        model.getDataVector().forEach(x->{
-            if (x.get(0).equals(true)){
+        model.getDataVector().forEach(x -> {
+            if (x.get(0).equals(true)) {
                 myVector.add((MyVector<Object>) x);
             }
         });
@@ -47,13 +51,15 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     }
 
     private void createUIComponents() {
+        txtFilter = new JBTextField();
 
         table = new JBTable();
-        CheckTableModel tableModel = new CheckTableModel(generateDialogDTO.getDataSource(), generateDialogDTO.getHeaders());
+        CheckTableModel tableModel = new CheckTableModel(txtFilter, generateDialogDTO.getDataSource(), generateDialogDTO.getHeaders());
         table.setModel(tableModel);
 
         JTableHeader tableHeader = table.getTableHeader();
-        tableHeader.setDefaultRenderer(new CheckHeaderCellRenderer(table));
+        CheckHeaderCellRenderer checkHeaderCellRenderer = new CheckHeaderCellRenderer(table);
+        tableHeader.setDefaultRenderer(checkHeaderCellRenderer);
         tableHeader.setPreferredSize(new Dimension(50, 40));
 
         TableColumnModel columnModel = table.getColumnModel();
@@ -65,19 +71,21 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(table.getModel());
         table.setRowSorter(sorter);
 
-        txtFilter = new JBTextField();
         // 为文本框添加监听器，每当文本框内容发生变化时，过滤行
         txtFilter.setTextToTriggerEmptyTextStatus("输入关键字可对数据过滤");
         txtFilter.getDocument().addDocumentListener(new DocumentListener() {
             private final Timer timer = new Timer(500, evt -> newFilter());
+
             @Override
             public void changedUpdate(DocumentEvent e) {
                 restartTimer();
             }
+
             @Override
             public void insertUpdate(DocumentEvent e) {
                 restartTimer();
             }
+
             @Override
             public void removeUpdate(DocumentEvent e) {
                 restartTimer();
@@ -88,6 +96,10 @@ public class GenerateCodeDialog extends BaseDialogComponent {
                     timer.stop();
                 }
                 timer.start();
+
+                if (table.getSelectedRows().length != table.getRowCount()) {
+                    checkHeaderCellRenderer.selectBox.setSelected(false);
+                }
             }
 
             private void newFilter() {
@@ -108,7 +120,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     protected JComponent createCenterPanel() {
         return contentPanel;
     }
-    
+
     @Override
     protected void doOKAction() {
         Function<MyVector<MyVector<Object>>, Boolean> doOkAction = generateDialogDTO.getDoOKAction();
@@ -116,7 +128,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
             return;
         }
         MyVector<MyVector<Object>> selected = getSelected();
-        if (selected.size() == 0){
+        if (selected.size() == 0) {
             IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.userview.generate.noselected.message"));
             return;
         }
@@ -193,8 +205,11 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     }
 
     private static final class CheckTableModel extends DefaultTableModel {
-        public CheckTableModel(MyVector data, MyVector columnNames) {
+        private JBTextField txtFilter;
+
+        public CheckTableModel(JBTextField txtFilter, MyVector data, MyVector columnNames) {
             super(data, columnNames);
+            this.txtFilter = txtFilter;
         }
 
         @Override
@@ -203,8 +218,19 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         }
 
         public void selectAllOrNull(boolean value) {
+            String filterText = txtFilter.getText() == null || "".equals(txtFilter.getText()) ? "" : txtFilter.getText();
+
             for (int i = 0; i < getRowCount(); i++) {
-                this.setValueAt(value, i, 0);
+                if (Objects.equals(filterText, "")) {
+                    this.setValueAt(value, i, 0);
+                } else {
+                    String text = String.valueOf(this.getValueAt(i, 1)) + String.valueOf(this.getValueAt(i, 2));
+                    Pattern regex = Pattern.compile("(?i)" + filterText);
+                    Matcher matcher = regex.matcher(text);
+                    if (matcher.find()) {
+                        this.setValueAt(value, i, 0);
+                    }
+                }
             }
         }
 
