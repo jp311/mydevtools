@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 /**
  * DomainService 检查（前置条件：继承自DomainService的子类）：
  * 1、非abstract类必须增加@Service注解
- * 2、命名应以DomainService结尾
  * @author hezd 2023/4/27
  */
 @ExtensionMethod({PsiClassExtension.class, PsiElementExtension.class})

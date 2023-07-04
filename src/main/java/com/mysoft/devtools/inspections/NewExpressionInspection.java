@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * new entity检查，只能通过EntityFactory.create创建entity实例
+ * 1、new Entity检查，只能通过EntityFactory.create创建entity实例
+ * 2、new Service检查，标记了@Service注解的类通过new创建实例
  *
  * @author hezd 2023/4/24
  */

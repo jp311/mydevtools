@@ -146,13 +146,37 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
             case "notIn":
                 //List<UUID>
                 valuePsiType = valuePsiExpression.tryGetPsiType();
+                //valuePsiType instanceof PsiImmediateClassType
                 if (valuePsiType instanceof PsiClassType) {
+
+
+                    if (valuePsiExpression instanceof PsiNewExpression) {
+                        /*
+                        兼容这种写法
+                         new ArrayList<Integer>() {
+                            {
+                                add(AdjustStateEnum.Processing.valueOf());
+                                add(AdjustStateEnum.UnProcess.valueOf());
+                            }
+                          }
+                        */
+                        PsiJavaCodeReferenceElement childOfType = PsiTreeUtil.findChildOfType(valuePsiExpression, PsiJavaCodeReferenceElement.class);
+                        if (childOfType != null) {
+                            PsiType[] typeParameters = childOfType.getTypeParameters();
+                            if (typeParameters.length > 0) {
+                                valuePsiType = typeParameters[0];
+                            }
+                        }
+                    }
+
                     PsiType[] parameters = ((PsiClassType) valuePsiType).getParameters();
                     if (parameters.length > 0) {
                         //UUID
                         valuePsiType = parameters[0];
                     }
                 }
+
+
                 break;
             default:
                 valuePsiType = valuePsiExpression.tryGetPsiType();
