@@ -2,22 +2,27 @@ package com.mysoft.devtools.listeners;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManagerListener;
-import com.mysoft.devtools.inspections.OverrideInspection;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author hezd 2023/4/24
  */
 public class MyProjectOpenCloseListener implements ProjectManagerListener {
-    /**
-     * 打开项目事件（已过时，后期版本可能会删除）
-     *
-     * @param project
-     */
-    @Override
-    public void projectOpened(@NotNull Project project) {
-        OverrideInspection.doOverride(project);
-    }
+//    /**
+//     * 打开项目事件（已过时，后期版本可能会删除）
+//     *
+//     * @param project
+//     */
+//    @Override
+//    public void projectOpened(@NotNull Project project) {
+//        StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
+//            OverrideInspection.doOverride(project);
+//
+//            //ActionManager.getInstance().registerAction("UnitTestAction", new UnitTestAction());
+//
+////            IntentionManager.getInstance().addAction(new UnitTestIntention());
+//        });
+//    }
 
     /**
      * 关闭项目事件

@@ -88,7 +88,21 @@
         <notificationGroup displayType="STICKY_BALLOON" id="mysoft-sticky_balloon" key="description"/>
 
         <!-- 实时模板（代码片段） -->
+        <!--实时模板：https://plugins.jetbrains.com/docs/intellij/live-templates.html-->
+        <!--文件模板：https://plugins.jetbrains.com/docs/intellij/file-and-code-templates.html-->
         <defaultLiveTemplates file="liveTemplates/mapper/native.xml"/>
+
+        <!--灯泡建议（意图）https://plugins.jetbrains.com/docs/intellij/code-inspections-and-intentions.html-->
+        <intentionAction>
+            <className>com.mysoft.devtools.actions.intentions.UnitTestIntention</className>
+        </intentionAction>
+
+        <intentionAction>
+            <className>com.mysoft.devtools.actions.intentions.NewMapperIntention</className>
+        </intentionAction>
+
+        <!--启动活动-->
+        <postStartupActivity implementation="com.mysoft.devtools.listeners.MyStartupActivity"/>
 
         <!--代码检查  https://github.com/JetBrains/intellij-sdk-code-samples/tree/main/comparing_string_references_inspection-->
         <localInspection language="JAVA"
@@ -187,6 +201,7 @@
 
     <!-- 定义菜单组 https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html#idea-plugin__actions-->
     <actions resource-bundle="messages.mysoft">
+        <!--工具菜单-->
         <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
         </group>
@@ -196,14 +211,20 @@
             <add-to-group group-id="mysoft-tool-menus"/>
         </group>
 
+        <!--资源管理器-->
         <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </group>
+
+        <!--代码编辑器-->
+        <group id="mysoft-editor-menus" popup="true" text="明源云" description="明源云-开发工具箱">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </group>
 
     </actions>
 
     <actions>
-
+        <!--资源管理器-->
         <action id="GenerateEntity" class="com.mysoft.devtools.actions.exploreractions.GenerateEntityAction"
                 text="生成Entity"
                 description="生成Entity">
@@ -221,6 +242,7 @@
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
+        <!--工具菜单-->
         <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"
                 class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">
             <add-to-group group-id="mysoft-tool-menus-database"/>
@@ -235,5 +257,7 @@
                 class="com.mysoft.devtools.actions.toolactions.DocumentAction" text="帮助文档">
             <add-to-group group-id="mysoft-tool-menus" anchor="last"/>
         </action>
+
+        <!--代码编辑器-->
     </actions>
 </idea-plugin>

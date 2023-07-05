@@ -2,6 +2,8 @@ package com.mysoft.devtools.listeners;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
+import com.intellij.openapi.startup.StartupManager;
+import com.mysoft.devtools.inspections.OverrideInspection;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,6 +14,12 @@ import org.jetbrains.annotations.NotNull;
 public class MyStartupActivity implements StartupActivity {
     @Override
     public void runActivity(@NotNull Project project) {
+        StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
+            OverrideInspection.doOverride(project);
 
+            //ActionManager.getInstance().registerAction("UnitTestAction", new UnitTestAction());
+
+//            IntentionManager.getInstance().addAction(new UnitTestIntention());
+        });
     }
 }
