@@ -199,6 +199,11 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
 
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
+
                 PsiClass psiClass = PsiTreeUtil.getParentOfType(expression, PsiClass.class);
                 if (psiClass == null) {
                     return;
@@ -216,7 +221,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                 //方法签名参数列表
                 PsiParameter[] signParameters = method.getParameterList().getParameters();
                 for (int index = 0; index < signParameters.length; index++) {
-                    PsiType sFunctionPsiType = getSFunctionPsiType(holder.getProject());
+                    PsiType sFunctionPsiType = getSFunctionPsiType(project);
 
                     if (sFunctionPsiType.compareTypes(signParameters[index].getType())) {
                         columnIndex = index;
@@ -225,7 +230,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                 }
 
                 CheckerDTO checkerDTO = CheckerDTO.builder()
-                        .project(holder.getProject())
+                        .project(project)
                         .columnIndex(columnIndex)
                         .method(method)
                         .signParameters(signParameters)
