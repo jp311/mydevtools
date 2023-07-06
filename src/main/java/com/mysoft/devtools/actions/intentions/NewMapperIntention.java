@@ -1,19 +1,15 @@
 package com.mysoft.devtools.actions.intentions;
 
-import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
-import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.FileUtil;
@@ -33,7 +29,7 @@ import java.util.Properties;
  * @author hezd   2023/7/5
  */
 @ExtensionMethod({PsiClassExtension.class, VirtualFileExtension.class, ProjectExtension.class})
-public class NewMapperIntention implements IntentionAction {
+public class NewMapperIntention extends BaseIntention {
 
     private static PsiClass mapperPsiClass;
 
@@ -97,13 +93,6 @@ public class NewMapperIntention implements IntentionAction {
     @Override
     public boolean startInWriteAction() {
         return true;
-    }
-
-    private PsiClass getPsiClass(@NotNull Project project, Editor editor, PsiFile file) {
-        CaretModel caretModel = editor.getCaretModel();
-        int offset = caretModel.getOffset();
-        PsiElement elementAt = file.findElementAt(offset);
-        return PsiTreeUtil.getParentOfType(elementAt, PsiClass.class);
     }
 
     private static void getMapperPsiClass(Project project) {
