@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author hezd   2023/7/5
  */
-public class UnitTestIntention extends BaseIntention {
+public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
     @Override
     public @IntentionName @NotNull String getText() {
         return "AI生成测试";

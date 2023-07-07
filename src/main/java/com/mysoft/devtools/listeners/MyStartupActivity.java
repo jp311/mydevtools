@@ -19,7 +19,7 @@ public class MyStartupActivity implements StartupActivity {
 
             //ActionManager.getInstance().registerAction("UnitTestAction", new UnitTestAction());
 
-//            IntentionManager.getInstance().addAction(new UnitTestIntention());
+//            IntentionManager.getInstance().addAction(new UnitTestIntentionJavaFile());
         });
     }
 }

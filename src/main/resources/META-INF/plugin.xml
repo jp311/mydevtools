@@ -94,11 +94,11 @@
 
         <!--灯泡建议（意图）https://plugins.jetbrains.com/docs/intellij/code-inspections-and-intentions.html-->
         <intentionAction>
-            <className>com.mysoft.devtools.actions.intentions.UnitTestIntention</className>
+            <className>com.mysoft.devtools.actions.intentions.UnitTestIntentionJavaFile</className>
         </intentionAction>
 
         <intentionAction>
-            <className>com.mysoft.devtools.actions.intentions.NewMapperIntention</className>
+            <className>com.mysoft.devtools.actions.intentions.NewMapperIntentionJavaFile</className>
         </intentionAction>
 
         <!--启动活动-->

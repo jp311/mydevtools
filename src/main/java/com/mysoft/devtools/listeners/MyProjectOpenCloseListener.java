@@ -20,7 +20,7 @@ public class MyProjectOpenCloseListener implements ProjectManagerListener {
 //
 //            //ActionManager.getInstance().registerAction("UnitTestAction", new UnitTestAction());
 //
-////            IntentionManager.getInstance().addAction(new UnitTestIntention());
+////            IntentionManager.getInstance().addAction(new UnitTestIntentionJavaFile());
 //        });
 //    }
 

@@ -9,17 +9,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.util.IncorrectOperationException;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.FileUtil;
+import com.mysoft.devtools.utils.psi.MapperUtil;
 import com.mysoft.devtools.utils.psi.ProjectExtension;
 import com.mysoft.devtools.utils.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -29,7 +28,7 @@ import java.util.Properties;
  * @author hezd   2023/7/5
  */
 @ExtensionMethod({PsiClassExtension.class, VirtualFileExtension.class, ProjectExtension.class})
-public class NewMapperIntention extends BaseIntention {
+public class NewMapperIntentionJavaFile extends JavaFileBaseIntention {
 
     private static PsiClass mapperPsiClass;
 
@@ -45,7 +44,7 @@ public class NewMapperIntention extends BaseIntention {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
-        if (!(file instanceof PsiJavaFile)) {
+        if (!super.isAvailable(project, editor, file)) {
             return false;
         }
 
@@ -57,14 +56,8 @@ public class NewMapperIntention extends BaseIntention {
 
         PsiClass psiClass = getPsiClass(project, editor, file);
 
-        if (!psiClass.isInheritors(mapperPsiClass)) {
-            return false;
-        }
 
-        VirtualFile resources = project.getResourcePath(file);
-        String fileName = FileUtil.combine(resources.getPath(), "mapper", psiClass.getName() + "Mapper.xml");
-
-        return !new File(fileName).exists();
+        return !MapperUtil.findMappers(project, psiClass).isEmpty();
     }
 
     @Override
@@ -95,7 +88,7 @@ public class NewMapperIntention extends BaseIntention {
         return true;
     }
 
-    private static void getMapperPsiClass(Project project) {
+    private void getMapperPsiClass(Project project) {
         if (mapperPsiClass != null) {
             return;
         }
