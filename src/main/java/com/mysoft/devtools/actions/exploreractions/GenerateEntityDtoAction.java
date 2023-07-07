@@ -11,7 +11,7 @@ import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.NameConventValidateUtil;
-import com.mysoft.devtools.utils.psi.*;
+import com.mysoft.devtools.utils.idea.psi.*;
 import lombok.experimental.ExtensionMethod;
 
 import java.util.ArrayList;

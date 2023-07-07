@@ -7,7 +7,7 @@ import com.mysoft.devtools.controls.DataSourceTable;
 import com.mysoft.devtools.dtos.DbLinkDTO;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
 
 import javax.swing.*;
 import java.awt.*;

@@ -9,9 +9,9 @@ import com.intellij.psi.util.PsiUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.StringExtension;
-import com.mysoft.devtools.utils.psi.ProjectExtension;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.PsiCommonExtension;
+import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiCommonExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 

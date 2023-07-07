@@ -1,7 +1,7 @@
 package com.mysoft.devtools.utils;
 
 import com.intellij.psi.PsiClass;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
 import lombok.experimental.ExtensionMethod;
 
 import java.util.Objects;

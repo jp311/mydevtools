@@ -3,6 +3,7 @@ package com.mysoft.devtools.aimodeling;
 import com.google.gson.annotations.SerializedName;
 import com.mysoft.devtools.bundles.LocalBundle;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.message.BasicHeader;
@@ -70,6 +71,7 @@ public class AIAccessTokenClientAIModeling extends AIModelingBaseClient<List<? e
     }
 
     @Data
+    @EqualsAndHashCode
     public static final class AccessTokenResponse extends BaseResponse implements Serializable {
         @SerializedName("access_token")
         private String accessToken;

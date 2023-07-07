@@ -6,7 +6,7 @@ import com.intellij.ui.table.JBTable;
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.DbLinkDTO;
 import com.mysoft.devtools.utils.JdbcUtil;
-import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

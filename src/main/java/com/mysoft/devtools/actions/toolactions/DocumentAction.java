@@ -2,7 +2,7 @@ package com.mysoft.devtools.actions.toolactions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.PsiElementExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiElementExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 

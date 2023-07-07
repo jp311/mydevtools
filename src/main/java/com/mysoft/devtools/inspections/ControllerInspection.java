@@ -10,7 +10,7 @@ import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.StringExtension;
-import com.mysoft.devtools.utils.psi.*;
+import com.mysoft.devtools.utils.idea.psi.*;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 

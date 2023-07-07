@@ -13,8 +13,8 @@ import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.settings.DataSourceConfigurable;
 import com.mysoft.devtools.utils.JdbcUtil;
 import com.mysoft.devtools.utils.MetadataUtil;
-import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
-import com.mysoft.devtools.utils.psi.IdeaTerminalUtil;
+import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.IdeaTerminalUtil;
 
 import javax.swing.*;
 import java.awt.*;

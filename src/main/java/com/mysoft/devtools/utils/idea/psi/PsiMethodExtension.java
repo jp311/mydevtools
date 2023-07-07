@@ -1,4 +1,4 @@
-package com.mysoft.devtools.utils.psi;
+package com.mysoft.devtools.utils.idea.psi;
 
 import com.intellij.psi.*;
 import com.intellij.psi.javadoc.PsiDocComment;
@@ -53,5 +53,10 @@ public class PsiMethodExtension {
             className = method.getContainingClass().getQualifiedName();
         }
         return className + "." + method.getName();
+    }
+
+    public static String getSimpleName(PsiMethod method) {
+        PsiClass aClass = method.getContainingClass();
+        return aClass == null ? "" : aClass.getName() + "." + method.getName();
     }
 }

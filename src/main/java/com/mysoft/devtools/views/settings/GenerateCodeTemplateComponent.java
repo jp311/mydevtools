@@ -8,8 +8,8 @@ import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.controls.FreeMarkerEditor;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.psi.IdeaContext;
-import com.mysoft.devtools.utils.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.IdeaContext;
+import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
 
 import javax.swing.*;
 import java.awt.*;

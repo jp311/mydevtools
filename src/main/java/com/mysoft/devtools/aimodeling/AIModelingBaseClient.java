@@ -36,6 +36,8 @@ public abstract class AIModelingBaseClient<TRequest, TResponse> {
     protected static final String HOST = "http://10.20.180.85:9020";
     private static final Gson GSON = new Gson();
 
+    private static final Integer CONNECTION_TIMEOUT = 3000;
+
     private static final Integer TIMEOUT = 300000;
 
     protected abstract String getUrl();
@@ -121,7 +123,7 @@ public abstract class AIModelingBaseClient<TRequest, TResponse> {
 
         //设置超时
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(TIMEOUT)
+                .setConnectTimeout(CONNECTION_TIMEOUT)
                 .setConnectionRequestTimeout(TIMEOUT)
                 .setSocketTimeout(TIMEOUT)
                 .build();

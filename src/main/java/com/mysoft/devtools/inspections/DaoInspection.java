@@ -9,7 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.mysoft.devtools.bundles.InspectionBundle;
 import com.mysoft.devtools.dtos.QualifiedNames;
-import com.mysoft.devtools.utils.psi.*;
+import com.mysoft.devtools.utils.idea.psi.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;

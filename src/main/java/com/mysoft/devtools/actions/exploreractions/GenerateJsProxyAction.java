@@ -8,10 +8,10 @@ import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.NameConventValidateUtil;
-import com.mysoft.devtools.utils.psi.ProjectExtension;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.PsiMethodExtension;
-import com.mysoft.devtools.utils.psi.PsiParameterExtension;
+import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiParameterExtension;
 import lombok.experimental.ExtensionMethod;
 
 import java.util.ArrayList;

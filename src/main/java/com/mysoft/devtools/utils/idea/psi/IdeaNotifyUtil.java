@@ -1,4 +1,4 @@
-package com.mysoft.devtools.utils.psi;
+package com.mysoft.devtools.utils.idea.psi;
 
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
@@ -60,16 +60,16 @@ public class IdeaNotifyUtil {
         Messages.showMessageDialog(message, title, Messages.getWarningIcon());
     }
 
-    public static void notifyError(String message,Project project) {
+    public static void notifyError(String title, String message, Project project) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("mysoft-balloon")
-                .createNotification(message, NotificationType.ERROR)
+                .createNotification(title, message, NotificationType.ERROR)
                 .notify(project);
 
         //Notifications.Bus.notify(notify,project)
     }
 
-    public static void notifyWarn(String message,Project project) {
+    public static void notifyWarn(String message, Project project) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("mysoft-balloon")
                 .createNotification(message, NotificationType.WARNING)
@@ -78,10 +78,10 @@ public class IdeaNotifyUtil {
         //Notifications.Bus.notify(notify,project)
     }
 
-    public static void notifyInfo(String message,Project project) {
+    public static void notifyInfo(String title, String message, Project project) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("mysoft-balloon")
-                .createNotification(message, NotificationType.INFORMATION)
+                .createNotification(title, message, NotificationType.INFORMATION)
                 .notify(project);
 
         //Notifications.Bus.notify(notify,project)
@@ -90,9 +90,10 @@ public class IdeaNotifyUtil {
     /**
      * <a href="https://jetbrains.design/intellij/controls/balloon/">官方文档</a>
      * 用完后请手动释放： balloon.dispose()
+     *
      * @param component 组件
-     * @param message 消息
-     * @param listener x
+     * @param message   消息
+     * @param listener  x
      * @return x
      */
     public static Balloon balloonMessage(JComponent component, String message, HyperlinkListener listener) {

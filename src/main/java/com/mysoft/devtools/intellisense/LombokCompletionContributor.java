@@ -9,9 +9,9 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.util.ProcessingContext;
 import com.mysoft.devtools.dtos.QualifiedNames;
-import com.mysoft.devtools.utils.psi.PsiClassObjectAccessExpressionExtension;
-import com.mysoft.devtools.utils.psi.PsiMethodExtension;
-import com.mysoft.devtools.utils.psi.PsiTypeExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassObjectAccessExpressionExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiTypeExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 

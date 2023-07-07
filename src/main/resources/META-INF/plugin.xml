@@ -217,9 +217,9 @@
         </group>
 
         <!--代码编辑器-->
-        <group id="mysoft-editor-menus" popup="true" text="明源云" description="明源云-开发工具箱">
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-        </group>
+        <!--        <group id="mysoft-editor-menus" popup="true" text="明源云" description="明源云-开发工具箱">-->
+        <!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
+        <!--        </group>-->
 
     </actions>
 

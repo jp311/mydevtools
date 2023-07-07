@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.intellij.openapi.project.Project;
-import com.mysoft.devtools.utils.psi.ProjectExtension;
+import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
 import lombok.Data;
 import lombok.experimental.ExtensionMethod;
 

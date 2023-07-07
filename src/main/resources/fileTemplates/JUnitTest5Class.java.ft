@@ -1,0 +1,13 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+
+#parse("File Header.java")
+public class ${NAME} {
+@InjectMocks
+private ${OriginalName} ${originalName};
+
+
+}

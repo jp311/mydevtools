@@ -12,13 +12,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.FileUtil;
-import com.mysoft.devtools.utils.psi.MapperUtil;
-import com.mysoft.devtools.utils.psi.ProjectExtension;
-import com.mysoft.devtools.utils.psi.PsiClassExtension;
-import com.mysoft.devtools.utils.psi.VirtualFileExtension;
+import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -55,9 +55,15 @@ public class NewMapperIntentionJavaFile extends JavaFileBaseIntention {
         }
 
         PsiClass psiClass = getPsiClass(project, editor, file);
+        if (!psiClass.isInheritors(mapperPsiClass)) {
+            return false;
+        }
 
+        //todo hezd mapper生成器，这里需要按xml的命名空间查询才准确
+        VirtualFile resources = project.getResourcePath(file);
+        String fileName = FileUtil.combine(resources.getPath(), "mapper", psiClass.getName() + "Mapper.xml");
 
-        return !MapperUtil.findMappers(project, psiClass).isEmpty();
+        return !new File(fileName).exists();
     }
 
     @Override

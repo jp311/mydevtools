@@ -1,4 +1,4 @@
-package com.mysoft.devtools.utils.psi;
+package com.mysoft.devtools.utils.idea.psi;
 
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.ModuleUtil;

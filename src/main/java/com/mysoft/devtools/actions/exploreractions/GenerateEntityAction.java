@@ -6,7 +6,7 @@ import com.mysoft.devtools.medatas.EntityDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.utils.CollectExtension;
 import com.mysoft.devtools.utils.MetadataUtil;
-import com.mysoft.devtools.utils.psi.VirtualFileExtension;
+import com.mysoft.devtools.utils.idea.psi.VirtualFileExtension;
 import lombok.experimental.ExtensionMethod;
 
 import java.util.List;

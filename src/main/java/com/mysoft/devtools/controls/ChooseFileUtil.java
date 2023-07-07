@@ -6,7 +6,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.util.Consumer;
-import com.mysoft.devtools.utils.psi.IdeaContext;
+import com.mysoft.devtools.utils.idea.psi.IdeaContext;
 
 /**
  * @author hezd   2023/6/7

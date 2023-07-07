@@ -6,13 +6,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiMethod;
 import com.intellij.util.IncorrectOperationException;
-import com.mysoft.devtools.aimodeling.AITextGenerationClient;
+import com.mysoft.devtools.jobs.UnitTestBackgroundJob;
+import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 单元测试意图
@@ -22,12 +20,12 @@ import java.security.NoSuchAlgorithmException;
 public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
     @Override
     public @IntentionName @NotNull String getText() {
-        return "AI生成测试";
+        return "AI生成单元测试";
     }
 
     @Override
     public @NotNull @IntentionFamilyName String getFamilyName() {
-        return "AI生成测试";
+        return "AI生成单元测试";
     }
 
     @Override
@@ -38,13 +36,16 @@ public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
 
-        try {
-            PsiClass psiClass = getPsiClass(project, editor, file);
-            String unittestCode = AITextGenerationClient.getInstance().invoke(psiClass.getText());
-            System.out.println(unittestCode);
-        } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
-            throw new RuntimeException(e);
+        PsiClass psiClass = getPsiClass(project, editor, file);
+        if (psiClass == null) {
+            return;
         }
+        //String unittestCode = AITextGenerationClient.getInstance().invoke(psiClass.getText());
+
+        PsiMethod[] methods = psiClass.getMethods();
+        BackgroundJobUtil.run(new UnitTestBackgroundJob(project, methods));
+
+        //System.out.println(unittestCode);
     }
 
     @Override
