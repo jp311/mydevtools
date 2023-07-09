@@ -52,14 +52,7 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
             String simpleName = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> method.getSimpleName());
             String methodCode = ApplicationManager.getApplication().runReadAction((Computable<String>) method::getText);
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    var unittestCode = "public void test(){}";
-                    PsiClass testPsiClass = UnitTestUtil.createOrOpenTestPsiClass(method.getContainingClass());
-                    PsiEditorExtension.openInEditor(project, testPsiClass.getContainingFile().getVirtualFile());
-                    UnitTestUtil.appendCode(testPsiClass, unittestCode);
-                });
-            });
+
             try {
                 indicator.setFraction((double) (i + 1) / methods.length);
                 indicator.setText(MessageFormat.format("Processing:{0}/{1}", (i + 1), methods.length));
@@ -70,6 +63,7 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     ApplicationManager.getApplication().runWriteAction(() -> {
                         PsiClass testPsiClass = UnitTestUtil.createOrOpenTestPsiClass(method.getContainingClass());
+                        PsiEditorExtension.openInEditor(project, testPsiClass.getContainingFile().getVirtualFile());
                         UnitTestUtil.appendCode(testPsiClass, unittestCode);
                     });
                 });

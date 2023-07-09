@@ -1,12 +1,15 @@
 package com.mysoft.devtools.utils.idea;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.DocumentUtil;
 import com.mysoft.devtools.utils.StringExtension;
 import com.mysoft.devtools.utils.idea.psi.*;
 import lombok.experimental.ExtensionMethod;
@@ -49,24 +52,43 @@ public class UnitTestUtil {
         String testSimpleName = getTestSimpleName(psiClass);
         String testPackageName = getTestPackage(psiClass);
         try {
-            String importStr = psiClass.getPackageName() + "." + psiClass.getName();
+            //业务类import
+            StringBuilder importStr = new StringBuilder();
+            importStr.append(psiClass.getPackageName()).append(".").append(psiClass.getName()).append(";");
+
+            //业务类文件中声明的import
+            PsiImportList psiImportList = PsiTreeUtil.findChildOfType(psiClass.getContainingFile(), PsiImportList.class);
+            if (psiImportList != null) {
+                for (PsiImportStatementBase imp : psiImportList.getAllImportStatements()) {
+                    importStr.append(imp.getText() + System.lineSeparator());
+                }
+            }
+
+            //构建代码模板必须的参数
             String content = CodeTemplateUtil.getText(project, "JUnitTest5Class", x -> {
                 x.put("OriginalName", psiClass.getName());
                 x.put("originalName", StringExtension.firstLowerCase(psiClass.getName()));
                 x.put("NAME", testSimpleName);
                 x.put("PACKAGE_NAME", testPackageName);
-                x.put("IMPORTS", importStr);
+                x.put("IMPORTS", importStr.toString());
             });
 
+            //当前Module
             Module module = ModuleUtil.findModuleForFile(psiClass.getContainingFile());
 
+            //获取或创建单测文件目录
             PsiDirectory baseDir = PsiModuleExtension.findOrCreateTestDir(module);
+
+            //按单测类命名空间查找目录，如不存在则创建
             PsiDirectory directory = PackageExtension.findOrCreateDirectoryForPackage(module, testPackageName, baseDir, true);
             if (directory == null) {
                 directory = PsiDirectoryExtension.createSubdirectorys(baseDir, testPackageName.replace("\\.", "\\/"));
             }
+
+            //按代码模板创建单测类
             PsiFile file = directory.createFile(testSimpleName + ".java");
 
+            //将AI生成的单测代码保存到单测类中
             VfsUtil.saveText(file.getVirtualFile(), content);
 
             return PsiTreeUtil.findChildOfType(file, PsiClass.class);
@@ -85,12 +107,24 @@ public class UnitTestUtil {
 
     public static void appendCode(PsiClass testClass, String code) {
         Project project = testClass.getProject();
-        PsiElementFactory elementFactory = JavaPsiFacade.getElementFactory(project);
-        PsiMethod element = elementFactory.createMethodFromText(code, null);
-        ApplicationManager.getApplication().invokeLater(() -> {
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                testClass.addAfter(element, null);
-            });
+        PsiFile psiFile = testClass.getContainingFile();
+        Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+
+        DocumentUtil.writeInRunUndoTransparentAction(() -> {
+            PsiMethod[] methods = testClass.getMethods();
+            if (methods.length == 0) {
+                int startOffsetInParent = testClass.getRBrace().getTextOffset() - 1;
+                document.insertString(startOffsetInParent, "\n" + code);
+            } else {
+                PsiMethod lastMethod = methods[methods.length - 1];
+                TextRange lastMethodRange = lastMethod.getTextRange();
+                int offset = lastMethodRange.getEndOffset();
+                document.insertString(offset, "\n" + code);
+            }
+
+            PsiDocumentManager.getInstance(project).commitDocument(document);
+            CodeStyleManager.getInstance(project).reformat(psiFile);
         });
     }
 }
+

@@ -40,6 +40,7 @@ public class AITextGenerationClient extends AIModelingBaseClient<Map<String, Obj
         variables.add(KeyValuePair.builder().key("collectionName").value("").build());
         variables.add(KeyValuePair.builder().key("promptTemplate").value("JavaTest").build());
         variables.add(KeyValuePair.builder().key("input").value(Base64Util.encode(code)).build());
+        variables.add(KeyValuePair.builder().key("messageId").value("").build());
         data.put("variables", variables);
         return Base64Util.decode(postJson(data));
     }

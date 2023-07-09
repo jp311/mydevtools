@@ -3,12 +3,14 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-#if (${IMPORTS} && ${IMPORTS} != "")import ${IMPORTS};#end
+import static org.mockito.Mockito.*;
+
+#if (${IMPORTS} && ${IMPORTS} != "")import ${IMPORTS}#end
 
 #parse("File Header.java")
 public class ${NAME} {
 @InjectMocks
-private ${OriginalName} ${originalName};
+private ${OriginalName} serviceTest;
 
 
-}
+        }
