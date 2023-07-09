@@ -6,7 +6,7 @@ import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.controls.ChooseFileUtil;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 
 import javax.swing.*;
 import java.awt.*;

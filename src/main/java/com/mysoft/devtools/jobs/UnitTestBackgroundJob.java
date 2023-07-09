@@ -15,8 +15,9 @@ import com.mysoft.devtools.aimodeling.AITextGenerationClient;
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MyAnAction;
 import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
+import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 import com.mysoft.devtools.utils.idea.UnitTestUtil;
-import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.PsiEditorExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
@@ -49,8 +50,16 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
             PsiMethod method = methods[i];
 
             String simpleName = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> method.getSimpleName());
-            String methodCode = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> method.getText());
+            String methodCode = ApplicationManager.getApplication().runReadAction((Computable<String>) method::getText);
 
+            ApplicationManager.getApplication().invokeLater(() -> {
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    var unittestCode = "public void test(){}";
+                    PsiClass testPsiClass = UnitTestUtil.createOrOpenTestPsiClass(method.getContainingClass());
+                    PsiEditorExtension.openInEditor(project, testPsiClass.getContainingFile().getVirtualFile());
+                    UnitTestUtil.appendCode(testPsiClass, unittestCode);
+                });
+            });
             try {
                 indicator.setFraction((double) (i + 1) / methods.length);
                 indicator.setText(MessageFormat.format("Processing:{0}/{1}", (i + 1), methods.length));
@@ -58,9 +67,11 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
 
                 String unittestCode = AITextGenerationClient.getInstance().invoke(methodCode);
 
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    PsiClass testPsiClass = UnitTestUtil.createOrOpenTestPsiClass(method.getContainingClass());
-                    UnitTestUtil.appendCode(testPsiClass, unittestCode);
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    ApplicationManager.getApplication().runWriteAction(() -> {
+                        PsiClass testPsiClass = UnitTestUtil.createOrOpenTestPsiClass(method.getContainingClass());
+                        UnitTestUtil.appendCode(testPsiClass, unittestCode);
+                    });
                 });
 
                 IdeaNotifyUtil.notifyInfo(LocalBundle.message("ai.backgroundjob.unittest.title") + "成功", simpleName, project);
@@ -69,7 +80,7 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
 
                 Notification notification = new Notification(
                         "mysoft-balloon",
-                        LocalBundle.message("ai.backgroundjob.unittest.title") + "成功",
+                        LocalBundle.message("ai.backgroundjob.unittest.title") + "失败",
                         content,
                         NotificationType.ERROR
                 );

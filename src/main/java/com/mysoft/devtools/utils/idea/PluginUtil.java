@@ -4,7 +4,6 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.project.Project;
 import com.mysoft.devtools.utils.FileUtil;
-import com.mysoft.devtools.utils.idea.psi.IdeaContext;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

@@ -1,4 +1,4 @@
-package com.mysoft.devtools.utils.idea.psi;
+package com.mysoft.devtools.utils.idea;
 
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.CommonDataKeys;

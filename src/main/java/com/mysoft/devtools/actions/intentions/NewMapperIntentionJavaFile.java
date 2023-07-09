@@ -2,8 +2,6 @@ package com.mysoft.devtools.actions.intentions;
 
 import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
-import com.intellij.ide.fileTemplates.FileTemplate;
-import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -12,6 +10,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import com.mysoft.devtools.dtos.QualifiedNames;
 import com.mysoft.devtools.utils.FileUtil;
+import com.mysoft.devtools.utils.idea.CodeTemplateUtil;
 import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.idea.psi.VirtualFileExtension;
@@ -20,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * 根据dao生成mapper
@@ -70,12 +68,8 @@ public class NewMapperIntentionJavaFile extends JavaFileBaseIntention {
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         PsiClass psiClass = getPsiClass(project, editor, file);
 
-        FileTemplate template = FileTemplateManager.getInstance(project).getTemplate("mybatis-mapper");
         try {
-            Properties properties = new Properties();
-            properties.put("FULLNAME", psiClass.getQualifiedName());
-
-            String content = template.getText(properties);
+            String content = CodeTemplateUtil.getText(project, "mybatis-mapper", x -> x.put("FULLNAME", psiClass.getQualifiedName()));
 
             VirtualFile resources = project.getResourcePath(file);
             String fileName = FileUtil.combine(resources.getPath(), "mapper", psiClass.getName() + "Mapper.xml");

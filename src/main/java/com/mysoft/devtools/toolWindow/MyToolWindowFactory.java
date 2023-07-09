@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
-import com.mysoft.devtools.utils.idea.psi.IdeaSdkAdapter;
+import com.mysoft.devtools.utils.idea.IdeaSdkAdapter;
 import com.mysoft.devtools.views.toolwindows.MiddlewareToolWindow;
 import org.jetbrains.annotations.NotNull;
 

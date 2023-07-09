@@ -3,6 +3,10 @@ package com.mysoft.devtools.utils.idea.psi;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 
@@ -10,6 +14,10 @@ import com.intellij.psi.util.PsiTreeUtil;
  * @author hezd   2023/7/7
  */
 public class PsiEditorExtension {
+    public static FileEditor[] openInEditor(Project project, VirtualFile virtualFile) {
+        return FileEditorManager.getInstance(project).openFile(virtualFile, true);
+    }
+
     public static PsiClass getActivePsiClass(Editor editor) {
         PsiFile psiFile = getPsiFile(editor);
         if (psiFile instanceof PsiJavaFile) {

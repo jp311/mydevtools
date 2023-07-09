@@ -12,7 +12,7 @@ import com.mysoft.devtools.dtos.GenerateContextDTO;
 import com.mysoft.devtools.dtos.GenerateDialogDTO;
 import com.mysoft.devtools.dtos.MyVector;
 import com.mysoft.devtools.utils.FreeMarkerUtil;
-import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 import com.mysoft.devtools.utils.idea.psi.VirtualFileExtension;
 import com.mysoft.devtools.views.users.GenerateCodeDialog;
 import lombok.experimental.ExtensionMethod;

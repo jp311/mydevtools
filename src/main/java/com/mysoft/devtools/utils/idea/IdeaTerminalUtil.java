@@ -1,4 +1,4 @@
-package com.mysoft.devtools.utils.idea.psi;
+package com.mysoft.devtools.utils.idea;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.plugins.terminal.ShellTerminalWidget;

@@ -25,17 +25,6 @@ public class VirtualFileExtension {
         }
     }
 
-    public static String getPackageName(VirtualFile file) {
-        StringBuilder packageName = new StringBuilder();
-        VirtualFile directory = file.isDirectory() ? file : file.getParent();
-        while (directory != null && !"src".equals(directory.getName())) {
-            packageName.insert(0, "." + directory.getName());
-            directory = directory.getParent();
-        }
-        packageName = new StringBuilder(packageName.substring(1));
-        return packageName.toString().replaceAll("main\\.java\\.", "");
-    }
-
     public static  GenerateContextDTO getContext(VirtualFile file) {
         MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
 
@@ -45,7 +34,7 @@ public class VirtualFileExtension {
         } else {
             context.setFilePath(file.getParent().getPath());
         }
-        context.setPackageName(getPackageName(file));
+        context.setPackageName(PackageExtension.findPackageByPath(file));
 
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

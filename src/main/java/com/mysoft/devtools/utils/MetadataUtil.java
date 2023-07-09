@@ -5,7 +5,7 @@ import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.medatas.EntityDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
-import com.mysoft.devtools.utils.idea.psi.IdeaContext;
+import com.mysoft.devtools.utils.idea.IdeaContext;
 
 import java.io.File;
 import java.io.IOException;

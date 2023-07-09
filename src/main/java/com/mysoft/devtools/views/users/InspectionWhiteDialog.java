@@ -2,7 +2,7 @@ package com.mysoft.devtools.views.users;
 
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.utils.InspectionWhiteUtil;
-import com.mysoft.devtools.utils.idea.psi.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 
 import javax.swing.*;
 import java.awt.*;
