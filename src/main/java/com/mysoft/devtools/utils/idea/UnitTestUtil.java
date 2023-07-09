@@ -11,7 +11,10 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.DocumentUtil;
 import com.mysoft.devtools.utils.StringExtension;
-import com.mysoft.devtools.utils.idea.psi.*;
+import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiDirectoryExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiModuleExtension;
 import lombok.experimental.ExtensionMethod;
 
 import java.io.IOException;
@@ -60,7 +63,7 @@ public class UnitTestUtil {
             PsiImportList psiImportList = PsiTreeUtil.findChildOfType(psiClass.getContainingFile(), PsiImportList.class);
             if (psiImportList != null) {
                 for (PsiImportStatementBase imp : psiImportList.getAllImportStatements()) {
-                    importStr.append(imp.getText() + System.lineSeparator());
+                    importStr.append(imp.getText()).append(System.lineSeparator());
                 }
             }
 
@@ -80,13 +83,17 @@ public class UnitTestUtil {
             PsiDirectory baseDir = PsiModuleExtension.findOrCreateTestDir(module);
 
             //按单测类命名空间查找目录，如不存在则创建
-            PsiDirectory directory = PackageExtension.findOrCreateDirectoryForPackage(module, testPackageName, baseDir, true);
-            if (directory == null) {
-                directory = PsiDirectoryExtension.createSubdirectorys(baseDir, testPackageName.replace("\\.", "\\/"));
-            }
+            PsiDirectory directory = PsiDirectoryExtension.createSubdirectorys(baseDir, testPackageName.replaceAll("\\.", "/"));
+
+            String fileName = testSimpleName + ".java";
 
             //按代码模板创建单测类
-            PsiFile file = directory.createFile(testSimpleName + ".java");
+            PsiFile file = directory.findFile(fileName);
+            if (file != null) {
+                return PsiTreeUtil.findChildOfType(file, PsiClass.class);
+            }
+
+            file = directory.createFile(fileName);
 
             //将AI生成的单测代码保存到单测类中
             VfsUtil.saveText(file.getVirtualFile(), content);
