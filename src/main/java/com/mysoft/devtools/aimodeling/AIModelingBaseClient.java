@@ -3,7 +3,9 @@ package com.mysoft.devtools.aimodeling;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.services.AppSettingsStateService;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -33,7 +35,7 @@ import java.util.List;
  * @author hezd   2023/7/6
  */
 public abstract class AIModelingBaseClient<TRequest, TResponse> {
-    protected static final String HOST = "http://10.20.180.85:9020";
+    protected static final String HOST = AppSettingsStateService.getInstance().getState().aiConfigurable.getHost();
     private static final Gson GSON = new Gson();
 
     private static final Integer CONNECTION_TIMEOUT = 3000;
@@ -147,6 +149,7 @@ public abstract class AIModelingBaseClient<TRequest, TResponse> {
     }
 
     @Data
+    @EqualsAndHashCode
     public static class BaseResponse {
         @SerializedName("error")
         private String error;

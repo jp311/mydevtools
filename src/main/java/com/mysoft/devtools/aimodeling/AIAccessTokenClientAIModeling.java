@@ -1,7 +1,8 @@
 package com.mysoft.devtools.aimodeling;
 
 import com.google.gson.annotations.SerializedName;
-import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.dtos.MysoftSettingsDTO;
+import com.mysoft.devtools.services.AppSettingsStateService;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.http.NameValuePair;
@@ -45,6 +46,7 @@ public class AIAccessTokenClientAIModeling extends AIModelingBaseClient<List<? e
         return false;
     }
 
+
     public AccessTokenResponse getToken() throws IOException, NoSuchAlgorithmException, KeyManagementException {
         if (tokenCache != null) {
             //防止时间差提前5分钟重新获取
@@ -52,12 +54,15 @@ public class AIAccessTokenClientAIModeling extends AIModelingBaseClient<List<? e
                 return tokenCache;
             }
         }
+
+        MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
+
         List<BasicHeader> params = new ArrayList<>();
         params.add(new BasicHeader("client_id", "AIModeling_App"));
         params.add(new BasicHeader("grant_type", "password"));
         params.add(new BasicHeader("scope", "AIModeling"));
-        params.add(new BasicHeader("username", LocalBundle.message("token.username")));
-        params.add(new BasicHeader("password", LocalBundle.message("token.password")));
+        params.add(new BasicHeader("username", settings.aiConfigurable.getUserName()));
+        params.add(new BasicHeader("password", settings.aiConfigurable.getPassword()));
         AccessTokenResponse accessTokenResponse = super.post(params);
 
         if (accessTokenResponse.getErrorDescription() != null && !accessTokenResponse.getErrorDescription().isEmpty()) {
@@ -71,7 +76,7 @@ public class AIAccessTokenClientAIModeling extends AIModelingBaseClient<List<? e
     }
 
     @Data
-    @EqualsAndHashCode
+    @EqualsAndHashCode(callSuper = false)
     public static final class AccessTokenResponse extends BaseResponse implements Serializable {
         @SerializedName("access_token")
         private String accessToken;

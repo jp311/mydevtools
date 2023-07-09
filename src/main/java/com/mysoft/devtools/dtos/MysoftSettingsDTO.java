@@ -25,6 +25,7 @@ public class MysoftSettingsDTO {
         entityTemplate = FileUtil.readResourceContent("freemarker/entity.ftl");
         jsProxyTemplate = FileUtil.readResourceContent("freemarker/jsproxy.ftl");
         entityDtoTemplate = FileUtil.readResourceContent("freemarker/entitydto.ftl");
+        aiConfigurable = new AIConfigurableDTO();
     }
 
     /**
@@ -36,4 +37,5 @@ public class MysoftSettingsDTO {
     public String entityDtoTemplate;
     public String jsProxyTemplate;
     public List<DbLinkDTO> dataSources;
+    public AIConfigurableDTO aiConfigurable;
 }

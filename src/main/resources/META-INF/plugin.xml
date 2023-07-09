@@ -74,6 +74,8 @@
                           key="devtools.settings.datasource.name"
                           instance="com.mysoft.devtools.settings.DataSourceConfigurable"/>
 
+            <configurable id="setting-ai" bundle="messages.LocalBundle" key="ai.configurable.title"
+                          instance="com.mysoft.devtools.settings.AIConfigurable"/>
         </projectConfigurable>
 
         <!-- lombok扩展方法代码提示 -->

@@ -21,6 +21,7 @@ public class DbLinkDTO {
 
     private String userName;
 
+
     private String password;
 
     private String dbName;
