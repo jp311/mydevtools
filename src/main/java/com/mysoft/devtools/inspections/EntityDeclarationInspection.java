@@ -41,7 +41,10 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
         return new JavaElementVisitor() {
             @Override
             public void visitClass(PsiClass aClass) {
-                Project project = aClass.getProject();
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
                 if (aClass.getName() == null) {
                     return;
                 }
@@ -167,7 +170,7 @@ public class EntityDeclarationInspection extends AbstractBaseJavaLocalInspection
     }
 
     private final static class AddWhiteQuickFix implements LocalQuickFix {
-        private String scope;
+        private final String scope;
 
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {

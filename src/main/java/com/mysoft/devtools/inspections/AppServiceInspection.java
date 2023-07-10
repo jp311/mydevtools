@@ -29,8 +29,11 @@ public class AppServiceInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitClass(PsiClass aClass) {
-                Project project = aClass.getProject();
-                if (aClass.getName() == null) {
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
+                if (aClass == null || aClass.getName() == null) {
                     return;
                 }
 

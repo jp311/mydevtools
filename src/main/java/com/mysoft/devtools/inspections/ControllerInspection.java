@@ -48,6 +48,10 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
             @Override
             public void visitClass(PsiClass aClass) {
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
                 if (!isController(aClass, aClass.getProject())) {
                     return;
                 }
@@ -310,7 +314,6 @@ public class ControllerInspection extends AbstractBaseJavaLocalInspectionTool {
 
         if (valueAttr.getValue().replace("/", "").isNullOrEmpty()) {
             holder.registerProblem(aMethod.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.controller.problem.pubservice.pubaction.valueempty.descriptor"), ProblemHighlightType.ERROR);
-            return;
         }
     }
 

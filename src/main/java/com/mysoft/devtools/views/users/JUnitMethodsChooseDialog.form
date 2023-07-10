@@ -19,20 +19,10 @@
         </children>
       </grid>
       <grid id="6916a" layout-manager="FormLayout">
-        <rowspec value="center:d:grow"/>
-        <colspec value="fill:d:grow"/>
         <constraints border-constraint="Center"/>
         <properties/>
         <border type="none"/>
-        <children>
-          <component id="bb4e3" class="com.intellij.ui.components.JBTreeTable" binding="treeClass" custom-create="true">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-              <forms/>
-            </constraints>
-            <properties/>
-          </component>
-        </children>
+        <children/>
       </grid>
     </children>
   </grid>

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * DomainService 检查（前置条件：继承自DomainService的子类）：
  * 1、非abstract类必须增加@Service注解
+ *
  * @author hezd 2023/4/27
  */
 @ExtensionMethod({PsiClassExtension.class, PsiElementExtension.class})
@@ -26,8 +27,11 @@ public class DomainServiceInspection extends AbstractBaseJavaLocalInspectionTool
         return new JavaElementVisitor() {
             @Override
             public void visitClass(PsiClass aClass) {
-                Project project = aClass.getProject();
-                if (aClass.getName() == null) {
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
+                if (aClass == null || aClass.getName() == null) {
                     return;
                 }
 

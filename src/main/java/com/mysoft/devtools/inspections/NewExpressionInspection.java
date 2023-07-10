@@ -43,6 +43,10 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
         return new JavaElementVisitor() {
             @Override
             public void visitNewExpression(@NotNull PsiNewExpression expression) {
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
                 PsiType type = expression.getType();
                 if (type == null) {
                     return;
@@ -55,7 +59,6 @@ public class NewExpressionInspection extends AbstractBaseJavaLocalInspectionTool
                 if (psiClass.isEnum() || psiClass.isInterface() || psiClass.isAnnotationType() || psiClass.isRecord()) {
                     return;
                 }
-                Project project = psiClass.getProject();
                 newEntityChecker(expression, psiClass, project, holder);
 
                 newServiceChecker(expression, psiClass, project, holder);
