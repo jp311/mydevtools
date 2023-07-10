@@ -22,7 +22,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -97,7 +100,8 @@ public class CheckUpdateBackgroundJob extends Task.Backgroundable {
             String lastVersion = Arrays.stream(result).map(VersionResult::getVersion).max(String::compareTo).orElse(null);
             String versionName = PluginManager.getPluginByClass(CheckUpdateBackgroundJob.class).getVersion();
 
-            if (lastVersion != null && !Objects.equals(lastVersion, versionName)) {
+
+            if (lastVersion != null && parseVersion(versionName) < parseVersion(lastVersion)) {
                 IdeaNotifyUtil.notifyInfo(LocalBundle.message("devtools.jobs.checkupdate.title"),
                         LocalBundle.message("devtools.jobs.checkupdate.message", lastVersion)
                         , project);
@@ -110,5 +114,9 @@ public class CheckUpdateBackgroundJob extends Task.Backgroundable {
     @Data
     private static final class VersionResult {
         private String version;
+    }
+
+    private Integer parseVersion(String versionString) {
+        return Integer.parseInt(versionString.replaceAll("\\.", ""));
     }
 }

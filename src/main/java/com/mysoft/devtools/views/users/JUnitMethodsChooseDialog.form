@@ -7,23 +7,10 @@
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="28308" layout-manager="BorderLayout" hgap="0" vgap="0">
-        <constraints border-constraint="North"/>
-        <properties/>
-        <border type="none"/>
-        <children>
-          <component id="2ae59" class="com.intellij.ui.SearchTextField">
-            <constraints border-constraint="Center"/>
-            <properties/>
-          </component>
-        </children>
-      </grid>
-      <grid id="6916a" layout-manager="FormLayout">
+      <component id="d7cbe" class="com.intellij.ui.components.JBViewport" binding="report">
         <constraints border-constraint="Center"/>
         <properties/>
-        <border type="none"/>
-        <children/>
-      </grid>
+      </component>
     </children>
   </grid>
 </form>

@@ -223,7 +223,6 @@
         <!--        <group id="mysoft-editor-menus" popup="true" text="明源云" description="明源云-开发工具箱">-->
         <!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
         <!--        </group>-->
-
     </actions>
 
     <actions>
@@ -242,6 +241,11 @@
         <action id="GenerateEntityDtoAction"
                 class="com.mysoft.devtools.actions.exploreractions.GenerateEntityDtoAction" text="生成EntityDto"
                 description="生成EntityDto">
+            <add-to-group group-id="mysoft-explorer-menus"/>
+        </action>
+
+        <action id="UnitTextAction" description="AI生成单元测试"
+                class="com.mysoft.devtools.actions.exploreractions.UnitTextAction" text="AI生成单元测试">
             <add-to-group group-id="mysoft-explorer-menus"/>
         </action>
 
