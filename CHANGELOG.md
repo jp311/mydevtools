@@ -3,18 +3,13 @@
 # mydevtools Changelog
 
 ## [Unreleased]
-
-## [1.2.3]
-
-- 修复关闭项目时报错：项目已关闭释放
-
-## [1.3.0]
-
 - Dao 增加一键生成Mapper意图（灯泡建议）
 - 接入AI，已对接AI生成单元测试
 
-## [1.2.2]
+## [1.2.3]
+- 修复关闭项目时报错：项目已关闭释放
 
+## [1.2.2]
 - bug fix :
 - 代码生成器筛选后全选会将所有的文件都生成，没有按过滤后选择数据生成
 
@@ -204,6 +199,26 @@
 [Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
 
 [1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.2.3
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
+
+[1.3.0]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.3.0
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.3.0...v1.2.3
 
 [1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
 
