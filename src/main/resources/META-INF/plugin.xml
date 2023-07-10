@@ -104,10 +104,6 @@
             <className>com.mysoft.devtools.actions.intentions.UnitTestIntentionJavaFile</className>
         </intentionAction>
 
-        <intentionAction>
-            <className>com.mysoft.devtools.actions.intentions.NewMapperIntentionJavaFile</className>
-        </intentionAction>
-
         <!--启动活动-->
         <postStartupActivity implementation="com.mysoft.devtools.listeners.MyStartupActivity"/>
 

@@ -8,6 +8,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.util.IncorrectOperationException;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.jobs.UnitTestBackgroundJob;
 import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +21,12 @@ import org.jetbrains.annotations.NotNull;
 public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
     @Override
     public @IntentionName @NotNull String getText() {
-        return "AI生成单元测试";
+        return LocalBundle.message("devtools.ai.backgroundjob.unittest.title");
     }
 
     @Override
     public @NotNull @IntentionFamilyName String getFamilyName() {
-        return "AI生成单元测试";
+        return LocalBundle.message("devtools.ai.backgroundjob.unittest.title");
     }
 
     @Override
@@ -40,12 +41,9 @@ public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
         if (psiClass == null) {
             return;
         }
-        //String unittestCode = AITextGenerationClient.getInstance().invoke(psiClass.getText());
 
         PsiMethod[] methods = psiClass.getMethods();
         BackgroundJobUtil.run(new UnitTestBackgroundJob(project, methods));
-
-        //System.out.println(unittestCode);
     }
 
     @Override
