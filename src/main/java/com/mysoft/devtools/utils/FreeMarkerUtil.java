@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class FreeMarkerUtil {
         InputStream inputStream = FreeMarkerUtil.class.getClassLoader().getResourceAsStream("freemarker/problem_email.ftl");
         InputStreamReader reader = null;
         if (inputStream != null) {
-            reader = new InputStreamReader(inputStream);
+            reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         }
         Template template = new Template("problem_email", reader, cfg);
 
