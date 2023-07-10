@@ -11,7 +11,7 @@ public class AIConfigurable extends BaseConfigurable<AIComponent> {
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
-        return LocalBundle.message("ai.configurable.title");
+        return LocalBundle.message("devtools.settings.ai.name");
     }
 
     @Override

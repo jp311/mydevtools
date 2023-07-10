@@ -64,7 +64,7 @@ public abstract class AIModelingBaseClient<TRequest, TResponse> {
         int statusCode = response.getStatusLine().getStatusCode();
 
         if (statusCode != 200) {
-            throw new HttpResponseException(statusCode, LocalBundle.message("ai.server.http.fail"));
+            throw new HttpResponseException(statusCode, LocalBundle.message("devtools.ai.server.http.fail"));
         }
         // 获取响应实体
         HttpEntity entity = response.getEntity();
@@ -99,7 +99,7 @@ public abstract class AIModelingBaseClient<TRequest, TResponse> {
         int statusCode = response.getStatusLine().getStatusCode();
 
         if (statusCode != 200) {
-            throw new HttpResponseException(statusCode, LocalBundle.message("ai.server.http.fail"));
+            throw new HttpResponseException(statusCode, LocalBundle.message("devtools.ai.server.http.fail"));
         }
         // 获取响应实体
         HttpEntity entity = response.getEntity();

@@ -38,7 +38,7 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
     private PsiMethod[] methods;
 
     public UnitTestBackgroundJob(@Nullable Project project, PsiMethod... methods) {
-        super(project, LocalBundle.message("ai.backgroundjob.unittest.title"));
+        super(project, LocalBundle.message("devtools.ai.backgroundjob.unittest.title"));
         this.methods = methods;
     }
 
@@ -56,7 +56,7 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
             try {
                 indicator.setFraction((double) (i + 1) / methods.length);
                 indicator.setText(MessageFormat.format("Processing:{0}/{1}", (i + 1), methods.length));
-                indicator.setText2(LocalBundle.message("ai.backgroundjob.unittest.title") + "：" + simpleName);
+                indicator.setText2(LocalBundle.message("devtools.ai.backgroundjob.unittest.title") + "：" + simpleName);
 
                 String unittestCode = AITextGenerationClient.getInstance().invoke(methodCode);
 
@@ -68,13 +68,13 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
                     });
                 });
 
-                IdeaNotifyUtil.notifyInfo(LocalBundle.message("ai.backgroundjob.unittest.title") + "成功", simpleName, project);
+                IdeaNotifyUtil.notifyInfo(LocalBundle.message("devtools.ai.backgroundjob.unittest.title") + "成功", simpleName, project);
             } catch (IOException | NoSuchAlgorithmException | KeyManagementException e) {
                 String content = MessageFormat.format("方法：{0}<br/>原因：{1}", simpleName, e.getMessage());
 
                 Notification notification = new Notification(
                         "mysoft-balloon",
-                        LocalBundle.message("ai.backgroundjob.unittest.title") + "失败",
+                        LocalBundle.message("devtools.ai.backgroundjob.unittest.title") + "失败",
                         content,
                         NotificationType.ERROR
                 );

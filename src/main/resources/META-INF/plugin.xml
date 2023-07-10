@@ -62,6 +62,10 @@
                              key="devtools.settings.home.name"
                              instance="com.mysoft.devtools.settings.HomeConfigurable">
 
+            <configurable id="setting-preferences" bundle="messages.LocalBundle"
+                          key="devtools.settings.preferences.name"
+                          instance="com.mysoft.devtools.settings.PreferencesConfigurable"/>
+
             <configurable id="setting-metadata" bundle="messages.LocalBundle"
                           key="devtools.settings.metadata.name"
                           instance="com.mysoft.devtools.settings.MetadataConfigurable"/>
@@ -74,7 +78,7 @@
                           key="devtools.settings.datasource.name"
                           instance="com.mysoft.devtools.settings.DataSourceConfigurable"/>
 
-            <configurable id="setting-ai" bundle="messages.LocalBundle" key="ai.configurable.title"
+            <configurable id="setting-ai" bundle="messages.LocalBundle" key="devtools.settings.ai.name"
                           instance="com.mysoft.devtools.settings.AIConfigurable"/>
         </projectConfigurable>
 
