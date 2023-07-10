@@ -32,10 +32,14 @@ public class EnumInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitClass(PsiClass aClass) {
-                if (aClass.getNameIdentifier() == null) {
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
                     return;
                 }
 
+                if (aClass.getNameIdentifier() == null) {
+                    return;
+                }
 
                 if (aClass.hasAnnotation(QualifiedNames.ENUM_OPTION_QUALIFIED_NAME)) {
                     if (!aClass.isEnum()) {
@@ -60,7 +64,6 @@ public class EnumInspection extends AbstractBaseJavaLocalInspectionTool {
 
                 if (aClass.isEnum() && aClass.hasAnnotation(QualifiedNames.ENUM_OPTION_QUALIFIED_NAME) && !aClass.isImpl(QualifiedNames.ENUM_FIELD_INTERFACE_QUALIFIED_NAME)) {
                     holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.enum.nointerface.problem.descriptor"), ProblemHighlightType.ERROR, addEnumFieldInterfaceQuickFix);
-                    return;
                 }
             }
         };

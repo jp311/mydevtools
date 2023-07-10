@@ -9,14 +9,14 @@
 - 增加检查更新提醒功能
 - 增加AI生成单元测试
 
+## [1.2.3]
+- 修复关闭项目时报错：项目已关闭释放
+
 ## [1.2.2]
-
-**bug fix :**
-
+- bug fix :
 - 代码生成器筛选后全选会将所有的文件都生成，没有按过滤后选择数据生成
 
 ## [1.2.1]
-
 - bug fix
 - 增加文件模板、实时模板
 - LambdaWrapper检查更名为Dao检查，增加列名不能用Lambda表达式检查及一键修复
@@ -130,6 +130,118 @@
 [0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
 
 [Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.2...HEAD
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.2...HEAD
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.3
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.3...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.2.3
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.2.3
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.2.3
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
+
+[1.3.0]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.3.0
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.3.0...v1.2.3
+
+[1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
+
+[1.2.1]: https://github.com/h598937749/mydevtools/compare/v1.1.0...v1.2.1
+
+[1.1.0]: https://github.com/h598937749/mydevtools/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/h598937749/mydevtools/compare/v0.0.3...v1.0.0
+
+[0.0.3]: https://github.com/h598937749/mydevtools/compare/v0.0.2...v0.0.3
+
+[0.0.2]: https://github.com/h598937749/mydevtools/compare/v0.0.1...v0.0.2
+
+[0.0.1]: https://github.com/h598937749/mydevtools/commits/v0.0.1
+
+[Unreleased]: https://github.com/h598937749/mydevtools/compare/v1.2.3...HEAD
+
+[1.3.0]: https://github.com/h598937749/mydevtools/compare/v1.2.2...v1.3.0
+
+[1.2.3]: https://github.com/h598937749/mydevtools/compare/v1.3.0...v1.2.3
 
 [1.2.2]: https://github.com/h598937749/mydevtools/compare/v1.2.1...v1.2.2
 

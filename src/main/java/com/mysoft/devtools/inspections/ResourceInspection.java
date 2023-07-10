@@ -36,6 +36,11 @@ public class ResourceInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitField(PsiField field) {
+                Project project = holder.getProject();
+                if (project.isDisposed() || !project.isOpen()) {
+                    return;
+                }
+
                 if (!field.hasAnnotation(QualifiedNames.AUTOWIRED_QUALIFIED_NAME) && !field.hasAnnotation(QualifiedNames.RESOURCE_QUALIFIED_NAME)) {
                     super.visitField(field);
                     return;

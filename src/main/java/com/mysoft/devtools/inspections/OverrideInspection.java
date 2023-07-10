@@ -14,8 +14,12 @@ import java.util.List;
  */
 public class OverrideInspection {
     private static boolean IS_OVERRIDE = false;
+
     public static void doOverride(Project project) {
         if (project == null) {
+            return;
+        }
+        if (project.isDisposed() || !project.isOpen()) {
             return;
         }
         if (IS_OVERRIDE) {

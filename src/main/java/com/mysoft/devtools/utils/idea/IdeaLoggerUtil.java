@@ -18,6 +18,8 @@ public class IdeaLoggerUtil {
 
     public static void error(String message) {
         //LOGGER.error(message);
+//        ConsoleView console = TextConsoleBuilderFactory.getInstance().createBuilder(IdeaContext.getActiveProject()).getConsole();
+//        console.print(message, ConsoleViewContentType.ERROR_OUTPUT);
         System.out.println(message);
     }
 
