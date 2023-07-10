@@ -1,7 +1,5 @@
 package com.mysoft.devtools.views.users;
 
-import com.intellij.ui.components.JBTreeTable;
-
 import javax.swing.*;
 
 /**
@@ -9,7 +7,6 @@ import javax.swing.*;
  */
 public class JUnitMethodsChooseDialog {
     private JPanel contentPanel;
-    private JBTreeTable treeClass;
 
     private void createUIComponents() {
 

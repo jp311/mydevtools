@@ -14,12 +14,8 @@ import org.jetbrains.annotations.NotNull;
 public class MyStartupActivity implements StartupActivity {
     @Override
     public void runActivity(@NotNull Project project) {
-        StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
+        StartupManager.getInstance(project).runAfterOpened(() -> {
             OverrideInspection.doOverride(project);
-
-            //ActionManager.getInstance().registerAction("UnitTestAction", new UnitTestAction());
-
-//            IntentionManager.getInstance().addAction(new UnitTestIntentionJavaFile());
         });
     }
 }
