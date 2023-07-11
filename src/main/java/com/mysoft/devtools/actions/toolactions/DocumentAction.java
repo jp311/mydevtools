@@ -2,6 +2,7 @@ package com.mysoft.devtools.actions.toolactions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,5 +26,11 @@ public class DocumentAction extends AnAction {
         } catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        Presentation presentation = e.getPresentation();
+        presentation.setVisible(true);
     }
 }

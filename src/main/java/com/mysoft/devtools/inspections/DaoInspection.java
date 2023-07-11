@@ -80,16 +80,19 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         }
         PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
 
-        if (psiClass == null || !psiClass.isInheritors(getBaseMapperPsiClass(checkerDTO.getProject()))) {
+        Project project = checkerDTO.getProject();
+        if (project.isDisposed() || !project.isOpen()) {
             return;
         }
 
-
+        if (psiClass == null || !psiClass.isInheritors(getBaseMapperPsiClass(project))) {
+            return;
+        }
         PsiType columnPsiType = checkerDTO.getSignParameters()[checkerDTO.getColumnIndex()].getType();
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
 
         //兼容这种写法SFunction<T, R> keyFunc
-        if (columnTypeClass == null || !columnTypeClass.isInheritors(getSFunctionPsiClass(checkerDTO.getProject()))) {
+        if (columnTypeClass == null || !columnTypeClass.isInheritors(getSFunctionPsiClass(project))) {
             return;
         }
 
@@ -103,6 +106,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
      * 检查 LambdaQueryWrapper 的方法调用规范
      */
     private void checkerLambdaQueryWrapper(CheckerDTO checkerDTO) {
+        Project project = checkerDTO.getProject();
         if (checkerDTO.getColumnIndex() == -1 || checkerDTO.getColumnIndex() + 1 >= checkerDTO.getSignParameters().length) {
             return;
         }
@@ -133,7 +137,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
 
         //兼容这种写法SFunction<T, R> keyFunc
-        if (columnTypeClass != null && columnTypeClass.isInheritors(getSFunctionPsiClass(checkerDTO.getProject()))) {
+        if (columnTypeClass != null && columnTypeClass.isInheritors(getSFunctionPsiClass(project))) {
             if (columnPsiType instanceof PsiClassReferenceType) {
                 PsiType[] parameters = ((PsiClassReferenceType) columnPsiType).getParameters();
                 if (parameters.length == 2) {
@@ -179,17 +183,19 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                         valuePsiType = parameters[0];
                     }
                 }
-
-
                 break;
             default:
                 valuePsiType = valuePsiExpression.tryGetPsiType();
                 break;
         }
 
+        if (project.isDisposed() || !project.isOpen()) {
+            return;
+        }
         if (Objects.equals(valuePsiExpression.getText(), "null")) {
             checkerDTO.getHolder().registerProblem(checkerDTO.getExpression(), InspectionBundle.message("inspection.platform.service.dao.problem.null.descriptor"), ProblemHighlightType.ERROR);
         }
+
         if (columnPsiType != null && valuePsiType != null && !PsiTypeExtension.compareTypes(columnPsiType, valuePsiType) && !"?".equals(valuePsiType.getPresentableText())) {
             checkerDTO.getHolder().registerProblem(valuePsiExpression, InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
                     , columnPsiType.getPresentableText(), valuePsiType.getPresentableText()), ProblemHighlightType.ERROR);
