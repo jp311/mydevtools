@@ -7,7 +7,7 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="d7cbe" class="com.intellij.ui.components.JBViewport" binding="report">
+      <component id="d7866" class="com.intellij.ui.treeStructure.Tree" binding="tree1">
         <constraints border-constraint="Center"/>
         <properties/>
       </component>

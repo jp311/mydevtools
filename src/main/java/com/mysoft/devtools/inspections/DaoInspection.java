@@ -41,8 +41,6 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
     private static PsiType SFUNCTION_PSITYPE;
     private static PsiClass BASE_MAPPER_PSICLASS;
 
-    private static PsiClass LAMBDA_QUERY_WRAPPER_PSICLASS;
-
     private static PsiClass getSFunctionPsiClass(Project project) {
         if (SFUNCTION_PSICLASS == null) {
             SFUNCTION_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.S_FUNCTION_QUALIFIED_NAME);
@@ -62,13 +60,6 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
             BASE_MAPPER_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.BASE_MAPPER_QUALIFIED_NAME);
         }
         return BASE_MAPPER_PSICLASS;
-    }
-
-    private static PsiClass getLambdaQueryWrapperPsiClass(Project project) {
-        if (LAMBDA_QUERY_WRAPPER_PSICLASS == null) {
-            LAMBDA_QUERY_WRAPPER_PSICLASS = PsiClassExtension.getPsiClass(project, QualifiedNames.LAMBDA_QUERY_WRAPPER_QUALIFIED_NAME);
-        }
-        return LAMBDA_QUERY_WRAPPER_PSICLASS;
     }
 
     /**
@@ -107,13 +98,13 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
      */
     private void checkerLambdaQueryWrapper(CheckerDTO checkerDTO) {
         Project project = checkerDTO.getProject();
+        if (project.isDisposed() || !project.isOpen()) {
+            return;
+        }
         if (checkerDTO.getColumnIndex() == -1 || checkerDTO.getColumnIndex() + 1 >= checkerDTO.getSignParameters().length) {
             return;
         }
         PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
-//        if (psiClass == null || !psiClass.isInheritors(getLambdaQueryWrapperPsiClass(checkerDTO.getProject()))) {
-//            return;
-//        }
 
         if (!Objects.equals(psiClass.getPackageName(), "com.baomidou.mybatisplus.core.conditions.interfaces")) {
             return;

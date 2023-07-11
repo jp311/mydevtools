@@ -1,26 +1,20 @@
 package com.mysoft.devtools.views.users;
 
-import com.intellij.ide.structureView.StructureView;
-import com.intellij.ide.structureView.StructureViewModel;
-import com.intellij.ide.structureView.impl.StructureViewFactoryImpl;
-import com.intellij.ide.structureView.impl.java.JavaFileTreeModel;
-import com.intellij.ide.structureView.newStructureView.StructureViewComponent;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.codeInsight.intention.impl.config.IntentionActionMetaData;
+import com.intellij.ide.ui.search.SearchUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.util.PsiEditorUtil;
+import com.intellij.ui.CheckboxTree;
+import com.intellij.ui.CheckedTreeNode;
+import com.intellij.ui.FilterComponent;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBViewport;
+import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.UIUtil;
 import com.mysoft.devtools.bundles.LocalBundle;
-import com.mysoft.devtools.utils.idea.IdeaContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 
 /**
@@ -28,9 +22,12 @@ import java.awt.*;
  */
 public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     private JPanel contentPanel;
+    private Tree tree1;
     private JBViewport report;
     private Module module;
     private Project project;
+
+    private FilterComponent myFilter;
 
     public JUnitMethodsChooseDialog(Module module) {
         this.module = module;
@@ -41,36 +38,51 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
         contentPanel.setPreferredSize(new Dimension(960, 600));
     }
 
-    private void createUIComponents() {
-
-
+    private static String getNodeText(CheckedTreeNode node) {
+        final Object userObject = node.getUserObject();
+        String text;
+        if (userObject instanceof String) {
+            text = (String) userObject;
+        } else if (userObject instanceof IntentionActionMetaData) {
+            text = ((IntentionActionMetaData) userObject).getFamily();
+        } else {
+            text = "???";
+        }
+        return text;
     }
 
     @Override
     protected JComponent createCenterPanel() {
-        VirtualFile selectedFile = IdeaContext.getSelectedFiles()[0];
-        PsiJavaFile psiJavaFile = (PsiJavaFile) PsiManager.getInstance(project).findFile(selectedFile);
+        tree1.setCellRenderer(new CheckboxTree.CheckboxTreeCellRenderer(true, false) {
+            @Override
+            public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                if (!(value instanceof CheckedTreeNode)) {
+                    return;
+                }
 
-        Editor editor = PsiEditorUtil.findEditor(psiJavaFile);
-        JavaFileTreeModel model = new JavaFileTreeModel(psiJavaFile, editor);
-        FileEditor selectedEditor = FileEditorManager.getInstance(project).getSelectedEditor();
-        StructureView structureView = StructureViewFactoryImpl.getInstance(project).createStructureView(selectedEditor, model, project);
-        report.setView(structureView.getComponent());
+                CheckedTreeNode node = (CheckedTreeNode) value;
+                SimpleTextAttributes attributes = node.getUserObject() instanceof IntentionActionMetaData ? SimpleTextAttributes.REGULAR_ATTRIBUTES : SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+                final String text = getNodeText(node);
+                Color background = UIUtil.getTreeBackground(selected, true);
+                UIUtil.changeBackGround(this, background);
+                SearchUtil.appendFragments(myFilter != null ? myFilter.getFilter() : null,
+                        text,
+                        attributes.getStyle(),
+                        attributes.getFgColor(),
+                        background,
+                        getTextRenderer());
+            }
+        });
+
+        CheckedTreeNode root = new CheckedTreeNode("Root");
+        root.add(new CheckedTreeNode("测试1"));
+
+        DefaultTreeModel model = new DefaultTreeModel(root);
+        tree1.setModel(model);
+        tree1.setShowsRootHandles(true);
+        //IntentionSettingsTree.java
         return contentPanel;
     }
 
-    private final class MyStructureViewComponent extends StructureViewComponent {
-        public MyStructureViewComponent() {
-            super(null, null, null, false);
-        }
 
-        public MyStructureViewComponent(@Nullable FileEditor editor, @NotNull StructureViewModel structureViewModel, @NotNull Project project, boolean showRootNode) {
-            super(editor, structureViewModel, project, showRootNode);
-        }
-
-        @Override
-        public boolean isCycleRoot() {
-            return super.isCycleRoot();
-        }
-    }
 }
