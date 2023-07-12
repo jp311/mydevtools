@@ -188,6 +188,13 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         }
 
         if (columnPsiType != null && valuePsiType != null && !PsiTypeExtension.compareTypes(columnPsiType, valuePsiType) && !"?".equals(valuePsiType.getPresentableText())) {
+            //特殊场景兼容 Date --> LocalDateTime
+            if ("Date".equals(columnPsiType.getPresentableText()) && "LocalDateTime".equals(valuePsiType.getPresentableText())) {
+                return;
+            }
+            if ("String".equals(columnPsiType.getPresentableText()) && "UUID".equals(valuePsiType.getPresentableText())) {
+                return;
+            }
             checkerDTO.getHolder().registerProblem(valuePsiExpression, InspectionBundle.message("inspection.platform.service.dao.problem.type.discord.descriptor"
                     , columnPsiType.getPresentableText(), valuePsiType.getPresentableText()), ProblemHighlightType.ERROR);
         }
