@@ -27,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author hezd   2023/7/9
@@ -39,6 +40,8 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
     private CheckboxTree myTree;
 
+    private final List<CheckedTreeNode> datas = new ArrayList<>();
+
     public JUnitMethodsChooseDialog(Module module) {
         this.module = module;
         this.project = module.getProject();
@@ -50,25 +53,16 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
     @Override
     protected void doOKAction() {
-        TreePath[] selectionPaths = myTree.getSelectionModel().getSelectionPaths();
-        List<PsiMethod> selectMethods = new ArrayList<>();
-        for (TreePath treePath : selectionPaths) {
-            Object node = treePath.getLastPathComponent();
-            if (node instanceof DefaultMutableTreeNode == false) {
-                continue;
-            }
-            Object userObject = ((DefaultMutableTreeNode) node).getUserObject();
-            if (userObject instanceof PsiMethod) {
-                PsiMethod method = (PsiMethod) userObject;
-                selectMethods.add(method);
-            }
-        }
+        List<PsiMethod> selectMethods = datas.stream().filter(CheckedTreeNode::isChecked)
+                .map(x -> (PsiMethod) x.getUserObject())
+                .collect(Collectors.toList());
 
-        if (selectionPaths.length == 0) {
+        if (selectMethods.size() == 0) {
             IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.ai.backgroundjob.unittest.validate.nodata"));
             return;
         }
         BackgroundJobUtil.run(new UnitTestBackgroundJob(project, selectMethods.toArray(new PsiMethod[0])));
+        close(0);
     }
 
     @Override
@@ -111,10 +105,6 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
             }
         }, root);
 
-        myTree.getSelectionModel().addTreeSelectionListener(e -> {
-
-        });
-
         //双击展开/折叠子节点
         myTree.addMouseListener(new MouseAdapter() {
             @Override
@@ -140,16 +130,6 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
             }
         });
 
-//        DefaultActionGroup group = new DefaultActionGroup();
-//        CommonActionsManager actionManager = CommonActionsManager.getInstance();
-//        TreeExpander treeExpander = new DefaultTreeExpander(myTree);
-//        group.add(actionManager.createExpandAllAction(treeExpander, myTree));
-//        group.add(actionManager.createCollapseAllAction(treeExpander, myTree));
-//
-//        ActionToolbar treeToolbar = ActionManager.getInstance().createActionToolbar("JUnit5TestTree", group, true);
-//        treeToolbar.setTargetComponent(myTree);
-//
-//        HintUpdateSupply.installDataContextHintUpdateSupply(myTree);
 
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(myTree);
         contentPanel.add(scrollPane);
@@ -160,7 +140,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
      * 获取当前module下所有类及公开非抽象的方法
      */
     private CheckedTreeNode loadCurrentModuleClasses() {
-        CheckedTreeNode root = new CheckedTreeNode("root");
+        CheckedTreeNode root = new CheckedTreeNode(null);
         //获取当前Module下所有java文件
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.moduleScope(module));
         for (VirtualFile virtualFile : virtualFiles) {
@@ -191,6 +171,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                     CheckedTreeNode methodNode = new CheckedTreeNode(method);
                     methodNode.setChecked(false);
                     classNode.add(methodNode);
+                    datas.add(methodNode);
                 }
                 //排除没有任何方法的类
                 if (classNode.getChildCount() > 0) {
