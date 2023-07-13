@@ -1,12 +1,20 @@
 package com.mysoft.devtools.views.users;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.CommonActionsManager;
+import com.intellij.ide.DefaultTreeExpander;
+import com.intellij.ide.TreeExpander;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.ui.search.SearchUtil;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.PsiClassImpl;
+import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.*;
@@ -15,7 +23,10 @@ import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.jobs.UnitTestBackgroundJob;
 import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
 import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
+import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.ExtensionMethod;
 
 import javax.swing.*;
@@ -32,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * @author hezd   2023/7/9
  */
-@ExtensionMethod({PsiMethodExtension.class})
+@ExtensionMethod({PsiClassExtension.class, PsiMethodExtension.class})
 public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     private JPanel contentPanel;
     private final Module module;
@@ -67,7 +78,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
     @Override
     protected JComponent createCenterPanel() {
-        CheckedTreeNode root = loadCurrentModuleClasses();
+        MyCheckedTreeNode root = loadCurrentModuleClasses();
         myTree = new CheckboxTree(new CheckboxTree.CheckboxTreeCellRenderer(true) {
             @Override
             public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -75,26 +86,16 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                 Color background = UIUtil.getTreeBackground(selected, true);
                 UIUtil.changeBackGround(this, background);
 
-                if (!(value instanceof CheckedTreeNode)) {
+                if (!(value instanceof MyCheckedTreeNode)) {
                     return;
                 }
 
-                Object userObject = ((CheckedTreeNode) value).getUserObject();
-                String text = null;
-
                 ColoredTreeCellRenderer textRenderer = getTextRenderer();
+                MyCheckedTreeNode node = (MyCheckedTreeNode) value;
 
-                if (userObject instanceof PsiClass) {
-                    text = ((PsiClass) userObject).getName();
-                    textRenderer.setIcon(AllIcons.Nodes.Class);
-                }
-
-                if (userObject instanceof PsiMethod) {
-                    text = ((PsiMethod) userObject).getName();
-                    textRenderer.setIcon(AllIcons.Nodes.Method);
-
-                }
-
+                String text = node.getName();
+                String hint = node.getHint();
+                textRenderer.setIcon(node.getIcon());
 
                 SearchUtil.appendFragments(null,
                         text,
@@ -102,6 +103,16 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                         attributes.getFgColor(),
                         background,
                         textRenderer);
+
+                if (hint != null) {
+                    SearchUtil.appendFragments(null,
+                            " " + hint,
+                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getStyle(),
+                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getFgColor(),
+                            background,
+                            textRenderer);
+                }
+
             }
         }, root);
 
@@ -130,17 +141,38 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
             }
         });
 
+        DefaultActionGroup group = new DefaultActionGroup();
+        CommonActionsManager actionManager = CommonActionsManager.getInstance();
+        TreeExpander treeExpander = new DefaultTreeExpander(myTree);
+        group.add(actionManager.createExpandAllAction(treeExpander, myTree));
+        group.add(actionManager.createCollapseAllAction(treeExpander, myTree));
+
+        ActionToolbar treeToolbar = ActionManager.getInstance().createActionToolbar("JUnit5TestTree", group, true);
+        treeToolbar.setTargetComponent(myTree);
+
 
         JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(myTree);
-        contentPanel.add(scrollPane);
+
+        JComponent toolbarComponent = treeToolbar.getComponent();
+        Dimension preferredSize = toolbarComponent.getPreferredSize();
+        preferredSize.height = 50;
+
+        Panel toolbarPanel = new Panel();
+        toolbarPanel.setPreferredSize(preferredSize);
+        toolbarPanel.setLayout(new BorderLayout());
+        toolbarPanel.setBackground(contentPanel.getBackground());
+        toolbarPanel.add(toolbarComponent, BorderLayout.CENTER);
+
+        contentPanel.add(toolbarPanel, BorderLayout.NORTH);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
         return contentPanel;
     }
 
     /**
      * 获取当前module下所有类及公开非抽象的方法
      */
-    private CheckedTreeNode loadCurrentModuleClasses() {
-        CheckedTreeNode root = new CheckedTreeNode(null);
+    private MyCheckedTreeNode loadCurrentModuleClasses() {
+        MyCheckedTreeNode root = new MyCheckedTreeNode(null);
         //获取当前Module下所有java文件
         Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.moduleScope(module));
         for (VirtualFile virtualFile : virtualFiles) {
@@ -158,7 +190,10 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                     continue;
                 }
 
-                CheckedTreeNode classNode = new CheckedTreeNode(psiClass);
+                MyCheckedTreeNode classNode = new MyCheckedTreeNode(psiClass);
+                classNode.setName(psiClass.getName());
+                classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(1));
+                classNode.setHint(psiClass.getPackageName());
                 classNode.setChecked(false);
 
                 //获取类的所有方法
@@ -168,7 +203,15 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                     if (!method.isPublic() || method.isAbstract()) {
                         continue;
                     }
-                    CheckedTreeNode methodNode = new CheckedTreeNode(method);
+                    MyCheckedTreeNode methodNode = new MyCheckedTreeNode(method);
+                    methodNode.setName(method.getName());
+                    if (method instanceof PsiMethodImpl) {
+                        methodNode.setIcon(((PsiMethodImpl) method).getIcon(1));
+                    } else {
+                        methodNode.setIcon(AllIcons.Nodes.Method);
+                    }
+
+                    methodNode.setHint(method.getSignature());
                     methodNode.setChecked(false);
                     classNode.add(methodNode);
                     datas.add(methodNode);
@@ -180,5 +223,19 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
             }
         }
         return root;
+    }
+
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    private static final class MyCheckedTreeNode extends CheckedTreeNode {
+        public MyCheckedTreeNode(Object userObject) {
+            super(userObject);
+        }
+
+        private Icon icon;
+
+        private String hint;
+
+        private String name;
     }
 }

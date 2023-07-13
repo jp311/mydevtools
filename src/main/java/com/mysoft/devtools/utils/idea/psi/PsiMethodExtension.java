@@ -55,6 +55,23 @@ public class PsiMethodExtension {
         return className + "." + method.getName();
     }
 
+    public static String getSignature(PsiMethod method) {
+        StringBuilder sb = new StringBuilder();
+        if (method.getReturnType() == null) {
+            sb.append("void ");
+        } else {
+            sb.append(method.getReturnType().getPresentableText()).append(" ");
+        }
+
+        sb.append(method.getName()).append(" (");
+
+        String params = Arrays.stream(method.getParameterList().getParameters()).map(x -> x.getType().getPresentableText() + " " + x.getName()).collect(Collectors.joining(", "));
+        sb.append(params);
+        sb.append(" )");
+        long end = System.currentTimeMillis();
+        return sb.toString();
+    }
+
     public static String getSimpleName(PsiMethod method) {
         PsiClass aClass = method.getContainingClass();
         return aClass == null ? "" : aClass.getName() + "." + method.getName();
