@@ -31,6 +31,7 @@ import lombok.experimental.ExtensionMethod;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -50,6 +51,8 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     private final Project project;
 
     private CheckboxTree myTree;
+    private SearchTextField txtSearch;
+    private JPanel toolbarPanel;
 
     private final List<CheckedTreeNode> datas = new ArrayList<>();
 
@@ -79,67 +82,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     @Override
     protected JComponent createCenterPanel() {
         MyCheckedTreeNode root = loadCurrentModuleClasses();
-        myTree = new CheckboxTree(new CheckboxTree.CheckboxTreeCellRenderer(true) {
-            @Override
-            public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                SimpleTextAttributes attributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
-                Color background = UIUtil.getTreeBackground(selected, true);
-                UIUtil.changeBackGround(this, background);
-
-                if (!(value instanceof MyCheckedTreeNode)) {
-                    return;
-                }
-
-                ColoredTreeCellRenderer textRenderer = getTextRenderer();
-                MyCheckedTreeNode node = (MyCheckedTreeNode) value;
-
-                String text = node.getName();
-                String hint = node.getHint();
-                textRenderer.setIcon(node.getIcon());
-
-                SearchUtil.appendFragments(null,
-                        text,
-                        attributes.getStyle(),
-                        attributes.getFgColor(),
-                        background,
-                        textRenderer);
-
-                if (hint != null) {
-                    SearchUtil.appendFragments(null,
-                            " " + hint,
-                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getStyle(),
-                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getFgColor(),
-                            background,
-                            textRenderer);
-                }
-
-            }
-        }, root);
-
-        //双击展开/折叠子节点
-        myTree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    TreePath treePath = myTree.getPathForLocation(e.getX(), e.getY());
-                    if (treePath != null) {
-                        Object node = treePath.getLastPathComponent();
-                        if (node instanceof DefaultMutableTreeNode) {
-                            DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode) node;
-                            if (!mutableTreeNode.isLeaf()) {
-                                if (myTree.isExpanded(treePath)) {
-                                    // 收起节点
-                                    myTree.collapsePath(treePath);
-                                } else {
-                                    // 展开节点
-                                    myTree.expandPath(treePath);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        myTree.setModel(new DefaultTreeModel(root));
 
         DefaultActionGroup group = new DefaultActionGroup();
         CommonActionsManager actionManager = CommonActionsManager.getInstance();
@@ -149,22 +92,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
         ActionToolbar treeToolbar = ActionManager.getInstance().createActionToolbar("JUnit5TestTree", group, true);
         treeToolbar.setTargetComponent(myTree);
-
-
-        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(myTree);
-
-        JComponent toolbarComponent = treeToolbar.getComponent();
-        Dimension preferredSize = toolbarComponent.getPreferredSize();
-        preferredSize.height = 50;
-
-        Panel toolbarPanel = new Panel();
-        toolbarPanel.setPreferredSize(preferredSize);
-        toolbarPanel.setLayout(new BorderLayout());
-        toolbarPanel.setBackground(contentPanel.getBackground());
-        toolbarPanel.add(toolbarComponent, BorderLayout.CENTER);
-
-        contentPanel.add(toolbarPanel, BorderLayout.NORTH);
-        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        toolbarPanel.add(treeToolbar.getComponent(), BorderLayout.CENTER);
         return contentPanel;
     }
 
@@ -223,6 +151,70 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
             }
         }
         return root;
+    }
+
+    private void createUIComponents() {
+        myTree = new CheckboxTree();
+        myTree.setCellRenderer(new CheckboxTree.CheckboxTreeCellRenderer(true) {
+            @Override
+            public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                SimpleTextAttributes attributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
+                Color background = UIUtil.getTreeBackground(selected, true);
+                UIUtil.changeBackGround(this, background);
+
+                if (!(value instanceof MyCheckedTreeNode)) {
+                    return;
+                }
+
+                ColoredTreeCellRenderer textRenderer = getTextRenderer();
+                MyCheckedTreeNode node = (MyCheckedTreeNode) value;
+
+                String text = node.getName();
+                String hint = node.getHint();
+                textRenderer.setIcon(node.getIcon());
+
+                SearchUtil.appendFragments(null,
+                        text,
+                        attributes.getStyle(),
+                        attributes.getFgColor(),
+                        background,
+                        textRenderer);
+
+                if (hint != null) {
+                    SearchUtil.appendFragments(null,
+                            " " + hint,
+                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getStyle(),
+                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getFgColor(),
+                            background,
+                            textRenderer);
+                }
+
+            }
+        });
+        //双击展开/折叠子节点
+        myTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    TreePath treePath = myTree.getPathForLocation(e.getX(), e.getY());
+                    if (treePath != null) {
+                        Object node = treePath.getLastPathComponent();
+                        if (node instanceof DefaultMutableTreeNode) {
+                            DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode) node;
+                            if (!mutableTreeNode.isLeaf()) {
+                                if (myTree.isExpanded(treePath)) {
+                                    // 收起节点
+                                    myTree.collapsePath(treePath);
+                                } else {
+                                    // 展开节点
+                                    myTree.expandPath(treePath);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Data

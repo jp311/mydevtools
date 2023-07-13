@@ -6,6 +6,31 @@
     </constraints>
     <properties/>
     <border type="none"/>
-    <children/>
+    <children>
+      <grid id="5db19" binding="toolbarPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="153f4" class="com.intellij.ui.SearchTextField" binding="txtSearch">
+            <constraints border-constraint="West"/>
+            <properties>
+              <preferredSize width="300" height="38"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <scrollpane id="e1b8b" class="com.intellij.ui.components.JBScrollPane">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="7f804" class="com.intellij.ui.CheckboxTree" binding="myTree" custom-create="true">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
+    </children>
   </grid>
 </form>
