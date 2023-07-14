@@ -1,6 +1,6 @@
 package com.mysoft.devtools.views.users;
 
-import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.SearchTextField;
 import com.intellij.ui.table.JBTable;
 import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.GenerateDialogDTO;
@@ -12,6 +12,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
@@ -27,7 +29,7 @@ import java.util.regex.Pattern;
 public class GenerateCodeDialog extends BaseDialogComponent {
     private JPanel contentPanel;
     private JBTable table;
-    private JBTextField txtFilter;
+    private SearchTextField txtFilter;
     GenerateDialogDTO generateDialogDTO;
 
     public GenerateCodeDialog(GenerateDialogDTO generateDialogDTO) {
@@ -51,8 +53,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     }
 
     private void createUIComponents() {
-        txtFilter = new JBTextField();
-
+        txtFilter = new SearchTextField();
         table = new JBTable();
         CheckTableModel tableModel = new CheckTableModel(txtFilter, generateDialogDTO.getDataSource(), generateDialogDTO.getHeaders());
         table.setModel(tableModel);
@@ -72,8 +73,16 @@ public class GenerateCodeDialog extends BaseDialogComponent {
         table.setRowSorter(sorter);
 
         // 为文本框添加监听器，每当文本框内容发生变化时，过滤行
-        txtFilter.setTextToTriggerEmptyTextStatus("输入关键字可对数据过滤");
-        txtFilter.getDocument().addDocumentListener(new DocumentListener() {
+
+        txtFilter.addKeyboardListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    e.consume();
+                }
+            }
+        });
+        txtFilter.addDocumentListener(new DocumentListener() {
             private final Timer timer = new Timer(500, evt -> newFilter());
 
             @Override
@@ -205,9 +214,9 @@ public class GenerateCodeDialog extends BaseDialogComponent {
     }
 
     private static final class CheckTableModel extends DefaultTableModel {
-        private JBTextField txtFilter;
+        private final SearchTextField txtFilter;
 
-        public CheckTableModel(JBTextField txtFilter, MyVector data, MyVector columnNames) {
+        public CheckTableModel(SearchTextField txtFilter, MyVector data, MyVector columnNames) {
             super(data, columnNames);
             this.txtFilter = txtFilter;
         }
@@ -224,7 +233,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
                 if (Objects.equals(filterText, "")) {
                     this.setValueAt(value, i, 0);
                 } else {
-                    String text = String.valueOf(this.getValueAt(i, 1)) + String.valueOf(this.getValueAt(i, 2));
+                    String text = this.getValueAt(i, 1) + String.valueOf(this.getValueAt(i, 2));
                     Pattern regex = Pattern.compile("(?i)" + filterText);
                     Matcher matcher = regex.matcher(text);
                     if (matcher.find()) {

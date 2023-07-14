@@ -7,15 +7,15 @@
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="5db19" binding="toolbarPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+      <grid id="5db19" binding="toolbarPanel" layout-manager="BorderLayout" hgap="40" vgap="40">
         <constraints border-constraint="North"/>
         <properties/>
         <border type="none"/>
         <children>
-          <component id="153f4" class="com.intellij.ui.SearchTextField" binding="txtSearch">
+          <component id="153f4" class="com.intellij.ui.SearchTextField" binding="txtFilter">
             <constraints border-constraint="West"/>
             <properties>
-              <preferredSize width="300" height="38"/>
+              <preferredSize width="320" height="40"/>
             </properties>
           </component>
         </children>
