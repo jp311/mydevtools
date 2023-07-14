@@ -34,6 +34,15 @@ public class PsiClassExtension {
         return modifierList.hasModifierProperty(PsiModifier.ABSTRACT);
     }
 
+    public static boolean isPublic(PsiClass psiClass) {
+        PsiModifierList modifierList = psiClass.getModifierList();
+        if (modifierList == null) {
+            return false;
+        }
+
+        return modifierList.hasModifierProperty(PsiModifier.PUBLIC);
+    }
+
     public static String getComment(PsiClass psiClass) {
         PsiDocComment docComment = psiClass.getDocComment();
         if (docComment == null) {

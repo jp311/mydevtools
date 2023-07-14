@@ -1,6 +1,7 @@
 package com.mysoft.devtools.aimodeling;
 
 import com.google.gson.annotations.SerializedName;
+import com.mysoft.devtools.dtos.MysoftProjectContext;
 import com.mysoft.devtools.utils.Base64Util;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,7 @@ public class AITextGenerationClient extends AIModelingBaseClient<Map<String, Obj
     public String invoke(String code) throws IOException, NoSuchAlgorithmException, KeyManagementException {
         Map<String, Object> data = new HashMap<>();
         List<KeyValuePair> variables = new ArrayList<>();
-        variables.add(KeyValuePair.builder().key("collectionName").value("").build());
+        variables.add(KeyValuePair.builder().key("collectionName").value("JavaTest_" + MysoftProjectContext.getAppCode()).build());
         variables.add(KeyValuePair.builder().key("promptTemplate").value("JavaTest").build());
         variables.add(KeyValuePair.builder().key("input").value(Base64Util.encode(code)).build());
         variables.add(KeyValuePair.builder().key("messageId").value("").build());

@@ -5,12 +5,12 @@ import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.DefaultTreeExpander;
 import com.intellij.ide.TreeExpander;
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.ide.ui.search.SearchUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiClassImpl;
@@ -28,18 +28,16 @@ import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.ExtensionMethod;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,21 +47,18 @@ import java.util.stream.Collectors;
 @ExtensionMethod({PsiClassExtension.class, PsiMethodExtension.class})
 public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     private JPanel contentPanel;
-    private final Module module;
+    private final Object context;
     private final Project project;
 
     private CheckboxTree myTree;
-    private SearchTextField txtFilter;
-    private JPanel toolbarPanel;
 
     private final List<CheckedTreeNode> datas = new ArrayList<>();
 
-    private final MyCheckedTreeNode rootNode = new MyCheckedTreeNode("root");
+    private TreeSpeedSearch treeSpeedSearch = null;
 
-    public JUnitMethodsChooseDialog(Module module) {
-        this.module = module;
-        this.project = module.getProject();
-
+    public JUnitMethodsChooseDialog(Project project, Object context) {
+        this.context = context;
+        this.project = project;
         setTitle(LocalBundle.message("devtools.ai.backgroundjob.unittest.title"));
         init();
         contentPanel.setPreferredSize(new Dimension(800, 600));
@@ -86,34 +81,121 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     @Override
     protected JComponent createCenterPanel() {
         MyCheckedTreeNode root = loadCurrentModuleClasses();
-        myTree.setModel(new DefaultTreeModel(root));
+
+
+        myTree = new CheckboxTree(new CheckboxTree.CheckboxTreeCellRenderer(true) {
+            @Override
+            public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                SimpleTextAttributes attributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
+                Color background = UIUtil.getTreeBackground(selected, true);
+                UIUtil.changeBackGround(this, background);
+
+                if (!(value instanceof MyCheckedTreeNode)) {
+                    return;
+                }
+
+                ColoredTreeCellRenderer textRenderer = getTextRenderer();
+                MyCheckedTreeNode node = (MyCheckedTreeNode) value;
+
+                String text = node.getName();
+                String hint = node.getHint();
+                textRenderer.setIcon(node.getIcon());
+
+                String filterString = null;
+                if (treeSpeedSearch != null) {
+                    filterString = treeSpeedSearch.getEnteredPrefix();
+                }
+                SearchUtil.appendFragments(filterString,
+                        text,
+                        attributes.getStyle(),
+                        attributes.getFgColor(),
+                        background,
+                        textRenderer);
+
+                if (hint != null) {
+                    SearchUtil.appendFragments(null,
+                            " " + hint,
+                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getStyle(),
+                            SimpleTextAttributes.GRAYED_ATTRIBUTES.getFgColor(),
+                            background,
+                            textRenderer);
+                }
+
+            }
+        }, root);
+
+        treeSpeedSearch = new TreeSpeedSearch(myTree) {
+            @Override
+            protected boolean isMatchingElement(Object element, String pattern) {
+                if (element instanceof TreePath) {
+                    Object lastComponent = ((TreePath) element).getLastPathComponent();
+                    if (lastComponent instanceof DefaultMutableTreeNode) {
+                        Object userObject = ((DefaultMutableTreeNode) lastComponent).getUserObject();
+                        if (userObject instanceof PsiClass) {
+                            String pkg = ((PsiClass) userObject).getName();
+                            return pkg != null && pkg.contains(pattern);
+                        }
+
+                        if (userObject instanceof PsiMethod) {
+                            String pkg = ((PsiMethod) userObject).getName();
+                            return pkg.contains(pattern);
+                        }
+                    }
+                }
+                return false;
+            }
+        };
+
+        //双击展开/折叠子节点
+        myTree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    TreePath treePath = myTree.getPathForLocation(e.getX(), e.getY());
+                    if (treePath != null) {
+                        Object node = treePath.getLastPathComponent();
+                        if (node instanceof DefaultMutableTreeNode) {
+                            DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode) node;
+                            if (!mutableTreeNode.isLeaf()) {
+                                if (myTree.isExpanded(treePath)) {
+                                    // 收起节点
+                                    myTree.collapsePath(treePath);
+                                } else {
+                                    // 展开节点
+                                    myTree.expandPath(treePath);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
         DefaultActionGroup group = new DefaultActionGroup();
         CommonActionsManager actionManager = CommonActionsManager.getInstance();
         TreeExpander treeExpander = new DefaultTreeExpander(myTree);
+
         group.add(actionManager.createExpandAllAction(treeExpander, myTree));
         group.add(actionManager.createCollapseAllAction(treeExpander, myTree));
 
         ActionToolbar treeToolbar = ActionManager.getInstance().createActionToolbar("JUnit5TestTree", group, true);
         treeToolbar.setTargetComponent(myTree);
-        toolbarPanel.add(treeToolbar.getComponent(), BorderLayout.CENTER);
 
-        txtFilter.addDocumentListener(new DocumentAdapter() {
-            @Override
-            protected void textChanged(@NotNull DocumentEvent e) {
-                doFilter(rootNode, txtFilter.getText());
-            }
-        });
 
-        txtFilter.addKeyboardListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    e.consume();
-                }
-            }
-        });
+        JScrollPane scrollPane = ScrollPaneFactory.createScrollPane(myTree);
 
+        JComponent toolbarComponent = treeToolbar.getComponent();
+        Dimension preferredSize = toolbarComponent.getPreferredSize();
+        preferredSize.height = 50;
+
+        Panel toolbarPanel = new Panel();
+        toolbarPanel.setPreferredSize(preferredSize);
+        toolbarPanel.setLayout(new BorderLayout());
+        toolbarPanel.setBackground(contentPanel.getBackground());
+        toolbarPanel.add(toolbarComponent, BorderLayout.CENTER);
+
+        contentPanel.add(toolbarPanel, BorderLayout.NORTH);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
         return contentPanel;
     }
 
@@ -121,8 +203,19 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
      * 获取当前module下所有类及公开非抽象的方法
      */
     private MyCheckedTreeNode loadCurrentModuleClasses() {
-        //获取当前Module下所有java文件
-        Collection<VirtualFile> virtualFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.moduleScope(module));
+        MyCheckedTreeNode root = new MyCheckedTreeNode(null);
+        Collection<VirtualFile> virtualFiles;
+        if (context instanceof Module) {
+            //获取当前Module下所有java文件
+            virtualFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.moduleScope((Module) context))
+                    .stream().sorted(Comparator.comparing(VirtualFile::getName)).collect(Collectors.toList());
+        } else if (context instanceof VirtualFile) {
+            virtualFiles = new ArrayList<>();
+            virtualFiles.add((VirtualFile) context);
+        } else {
+            throw new RuntimeException("unknown context type!");
+        }
+
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
             //保险起见做个判断
@@ -140,7 +233,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
                 MyCheckedTreeNode classNode = new MyCheckedTreeNode(psiClass);
                 classNode.setName(psiClass.getName());
-                classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(Iconable.ICON_FLAG_VISIBILITY));
+                classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(1));
                 classNode.setHint(psiClass.getPackageName());
                 classNode.setChecked(false);
 
@@ -154,7 +247,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                     MyCheckedTreeNode methodNode = new MyCheckedTreeNode(method);
                     methodNode.setName(method.getName());
                     if (method instanceof PsiMethodImpl) {
-                        methodNode.setIcon(((PsiMethodImpl) method).getIcon(Iconable.ICON_FLAG_VISIBILITY));
+                        methodNode.setIcon(((PsiMethodImpl) method).getIcon(1));
                     } else {
                         methodNode.setIcon(AllIcons.Nodes.Method);
                     }
@@ -166,84 +259,11 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                 }
                 //排除没有任何方法的类
                 if (classNode.getChildCount() > 0) {
-                    rootNode.add(classNode);
+                    root.add(classNode);
                 }
             }
         }
-        return rootNode;
-    }
-
-    private void createUIComponents() {
-        myTree = new MyCheckboxTree();
-
-        myTree.setCellRenderer(new CheckboxTree.CheckboxTreeCellRenderer(true) {
-            @Override
-            public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                if (!(value instanceof MyCheckedTreeNode)) {
-                    return;
-                }
-
-                MyCheckedTreeNode node = (MyCheckedTreeNode) value;
-
-                Color background = UIUtil.getTreeBackground(selected, true);
-                UIUtil.changeBackGround(this, background);
-
-                String text = node.getName();
-                String hint = node.getHint();
-
-                ColoredTreeCellRenderer textRenderer = getTextRenderer();
-                textRenderer.setIcon(node.getIcon());
-
-                if (text != null) {
-                    getTextRenderer().append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-                }
-
-                if (hint != null) {
-                    getTextRenderer().append(" " + text, SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                }
-            }
-        });
-    }
-
-    private void doFilter(MyCheckedTreeNode node, String keyword) {
-        if (keyword == null || keyword.isEmpty()) {
-            return;
-        }
-//        int childCount = node.getChildCount();
-//        for (int i = 0; i < childCount; i++) {
-//            MyCheckedTreeNode childNode = (MyCheckedTreeNode) node.getChildAt(i);
-//
-//            // 判断节点是否匹配过滤条件
-//            childNode.setVisible(childNode.getName().contains(keyword));
-//            // 根据匹配结果隐藏或显示节点
-//
-////            TreePath childPath = new TreePath(childNode.getPath());
-////            myTree.getModel().valueForPathChanged(childPath, childNode.getUserObject());
-//
-//            // 递归过滤子节点
-//            doFilter(childNode, keyword);
-//        }
-    }
-
-    private static final class MyCheckboxTree extends CheckboxTree {
-
-        @Override
-        protected void onDoubleClick(CheckedTreeNode treeNode) {
-            TreePath treePath = new TreePath(treeNode.getPath());
-            Object node = treePath.getLastPathComponent();
-            if (node instanceof DefaultMutableTreeNode) {
-                DefaultMutableTreeNode mutableTreeNode = (DefaultMutableTreeNode) node;
-                if (!mutableTreeNode.isLeaf()) {
-                    if (this.isExpanded(treePath)) {
-                        // 收起节点
-                        this.collapsePath(treePath);
-                    } else {
-                        // 展开节点
-                        this.expandPath(treePath);
-                    }
-                }
-            }
-        }
+        return root;
     }
 
     @Data
@@ -258,7 +278,5 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
         private String hint;
 
         private String name;
-
-        private boolean visible;
     }
 }

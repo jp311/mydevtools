@@ -120,6 +120,7 @@ public class GenerateCodeDialog extends BaseDialogComponent {
                     ex.printStackTrace();
                 }
                 sorter.setRowFilter(rowFilter);
+                timer.stop();
             }
         });
 

@@ -25,10 +25,10 @@ repositories {
 dependencies {
 //    implementation(libs.annotations)
     //jacksonxml
-    implementation("com.fasterxml.jackson.core:jackson-core:2.11.4")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.11.4")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.11.4")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.4")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
 
     //freemaker
     implementation("com.quhaodian.discover:discover-freemaker:1.8.2")
@@ -39,6 +39,9 @@ dependencies {
 
     //mail
     implementation("com.sun.mail:jakarta.mail:2.0.1")
+
+    //yaml
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2")
 
     //lib folder
     implementation(fileTree("lib").include("*.jar"))

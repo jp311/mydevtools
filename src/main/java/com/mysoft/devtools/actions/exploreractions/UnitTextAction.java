@@ -20,7 +20,7 @@ public class UnitTextAction extends AnAction {
         PsiElement psiElement = e.getDataContext().getData(CommonDataKeys.PSI_ELEMENT);
         Module module = ModuleUtil.findModuleForPsiElement(psiElement);
 
-        JUnitMethodsChooseDialog dialog = new JUnitMethodsChooseDialog(module);
+        JUnitMethodsChooseDialog dialog = new JUnitMethodsChooseDialog(module.getProject(), module);
         dialog.show();
     }
 }

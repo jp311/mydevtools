@@ -3,6 +3,7 @@ package com.mysoft.devtools.listeners;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import com.intellij.openapi.startup.StartupManager;
+import com.mysoft.devtools.dtos.MysoftProjectContext;
 import com.mysoft.devtools.inspections.OverrideInspection;
 import com.mysoft.devtools.jobs.CheckUpdateBackgroundJob;
 import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
@@ -21,6 +22,7 @@ public class MyStartupActivity implements StartupActivity {
         StartupManager.getInstance(project).runWhenProjectIsInitialized(() -> {
             OverrideInspection.doOverride(project);
             BackgroundJobUtil.run(new CheckUpdateBackgroundJob(project));
+            MysoftProjectContext.init(project);
             //ActionManager.getInstance().registerAction("UnitTestAction", new UnitTestAction());
         });
 
