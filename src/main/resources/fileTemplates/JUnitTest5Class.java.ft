@@ -1,17 +1,26 @@
 #if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
 
-import org.junit.jupiter.api.Assertions;
+/***************************单测import BEGIN***************************/
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import static org.mockito.Mockito.*;
-import java.util.*;
+/***************************单测import END***************************/
 
+/***************************业务类import BEGIN***************************/
 #if (${IMPORTS} && ${IMPORTS} != "")import ${IMPORTS}#end
+/***************************业务类import END***************************/
 
 #parse("File Header.java")
 public class ${NAME} {
+
+    /*
+        该类是由AI基于Junit5 Mockito AssertJ Hamcrest JSONassert 等框架生成
+        单测文档：https://docs.mingyuanyun.com/pages/viewpage.action?pageId=145768585
+        插件文档：https://gitee.com/he-zhangdi/mysoft-devtools/wikis/pages?sort_id=8267893&doc_id=4149338
+    */
 @InjectMocks
-private ${OriginalName} serviceTest;
+private ${ORIGINAL_NAME} serviceTest;
 
-
+        /***************************业务类Fields BEGIN***************************/
+    ${CLASS_FIELDS}
+        /***************************业务类Fields END***************************/
         }

@@ -63,7 +63,9 @@ public class UnitTestBackgroundJob extends Task.Backgroundable {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     ApplicationManager.getApplication().runWriteAction(() -> {
                         PsiClass testPsiClass = UnitTestUtil.createOrOpenTestPsiClass(method.getContainingClass());
-                        PsiEditorExtension.openInEditor(project, testPsiClass.getContainingFile().getVirtualFile());
+                        if (!PsiEditorExtension.isOpenInEditor(project, testPsiClass.getContainingFile())) {
+                            PsiEditorExtension.openInEditor(project, testPsiClass.getContainingFile().getVirtualFile());
+                        }
                         UnitTestUtil.appendCode(testPsiClass, unittestCode);
                     });
                 });

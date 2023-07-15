@@ -10,7 +10,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.DocumentUtil;
-import com.mysoft.devtools.utils.StringExtension;
 import com.mysoft.devtools.utils.idea.psi.ProjectExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiDirectoryExtension;
@@ -19,6 +18,8 @@ import lombok.experimental.ExtensionMethod;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * @author hezd   2023/7/8
@@ -67,13 +68,17 @@ public class UnitTestUtil {
                 }
             }
 
+            //业务类文件中的字段
+            Collection<PsiField> psiFields = PsiTreeUtil.findChildrenOfAnyType(psiClass.getContainingFile(), PsiField.class);
+            String fieldsStr = psiFields.stream().map(PsiElement::getText).collect(Collectors.joining(System.lineSeparator()));
+
             //构建代码模板必须的参数
             String content = CodeTemplateUtil.getText(project, "JUnitTest5Class", x -> {
-                x.put("OriginalName", psiClass.getName());
-                x.put("originalName", StringExtension.firstLowerCase(psiClass.getName()));
+                x.put("ORIGINAL_NAME", psiClass.getName());
                 x.put("NAME", testSimpleName);
                 x.put("PACKAGE_NAME", testPackageName);
                 x.put("IMPORTS", importStr.toString());
+                x.put("CLASS_FIELDS", fieldsStr);
             });
 
             //当前Module

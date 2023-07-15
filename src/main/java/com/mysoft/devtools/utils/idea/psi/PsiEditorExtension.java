@@ -18,6 +18,19 @@ public class PsiEditorExtension {
         return FileEditorManager.getInstance(project).openFile(virtualFile, true);
     }
 
+    public static boolean isOpenInEditor(Project project, PsiFile file) {
+        FileEditorManager editorManager = FileEditorManager.getInstance(project);
+        FileEditor[] editors = editorManager.getAllEditors();
+
+        for (FileEditor editor : editors) {
+            if (editor.getFile().equals(file.getVirtualFile())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static PsiClass getActivePsiClass(Editor editor) {
         PsiFile psiFile = getPsiFile(editor);
         if (psiFile instanceof PsiJavaFile) {
