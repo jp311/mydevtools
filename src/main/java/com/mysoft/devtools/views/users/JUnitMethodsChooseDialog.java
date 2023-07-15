@@ -4,19 +4,16 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.CommonActionsManager;
 import com.intellij.ide.DefaultTreeExpander;
 import com.intellij.ide.TreeExpander;
-import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.ui.search.SearchUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiMethodImpl;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.*;
 import com.intellij.util.ui.UIUtil;
 import com.mysoft.devtools.bundles.LocalBundle;
@@ -24,6 +21,7 @@ import com.mysoft.devtools.jobs.UnitTestBackgroundJob;
 import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
 import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
+import com.mysoft.devtools.utils.idea.psi.PsiDirectoryExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,14 +35,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author hezd   2023/7/9
  */
-@ExtensionMethod({PsiClassExtension.class, PsiMethodExtension.class})
+@ExtensionMethod({PsiClassExtension.class, PsiMethodExtension.class, PsiDirectoryExtension.class})
 public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     private JPanel contentPanel;
     private final Object context;
@@ -205,10 +202,11 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
     private MyCheckedTreeNode loadCurrentModuleClasses() {
         MyCheckedTreeNode root = new MyCheckedTreeNode(null);
         Collection<VirtualFile> virtualFiles;
-        if (context instanceof Module) {
-            //获取当前Module下所有java文件
-            virtualFiles = FileTypeIndex.getFiles(JavaFileType.INSTANCE, GlobalSearchScope.moduleScope((Module) context))
-                    .stream().sorted(Comparator.comparing(VirtualFile::getName)).collect(Collectors.toList());
+        if (context instanceof PsiDirectory) {
+            PsiDirectory directory = (PsiDirectory) context;
+
+            virtualFiles = directory.getVirtualFiles(PsiJavaFile.class);
+
         } else if (context instanceof VirtualFile) {
             virtualFiles = new ArrayList<>();
             virtualFiles.add((VirtualFile) context);
@@ -233,7 +231,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
                 MyCheckedTreeNode classNode = new MyCheckedTreeNode(psiClass);
                 classNode.setName(psiClass.getName());
-                classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(1));
+                classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(Iconable.ICON_FLAG_VISIBILITY));
                 classNode.setHint(psiClass.getPackageName());
                 classNode.setChecked(false);
 
@@ -247,7 +245,7 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                     MyCheckedTreeNode methodNode = new MyCheckedTreeNode(method);
                     methodNode.setName(method.getName());
                     if (method instanceof PsiMethodImpl) {
-                        methodNode.setIcon(((PsiMethodImpl) method).getIcon(1));
+                        methodNode.setIcon(((PsiMethodImpl) method).getIcon(Iconable.ICON_FLAG_VISIBILITY));
                     } else {
                         methodNode.setIcon(AllIcons.Nodes.Method);
                     }
