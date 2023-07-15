@@ -12,6 +12,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.compiled.ClsClassImpl;
 import com.intellij.psi.impl.source.PsiClassImpl;
 import com.intellij.psi.impl.source.PsiMethodImpl;
 import com.intellij.ui.*;
@@ -231,7 +232,13 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
 
                 MyCheckedTreeNode classNode = new MyCheckedTreeNode(psiClass);
                 classNode.setName(psiClass.getName());
-                classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(Iconable.ICON_FLAG_VISIBILITY));
+                if (psiClass instanceof PsiClassImpl) {
+                    classNode.setIcon(((PsiClassImpl) psiClass).getElementIcon(Iconable.ICON_FLAG_VISIBILITY));
+                } else if (psiClass instanceof ClsClassImpl) {
+                    classNode.setIcon(((ClsClassImpl) psiClass).getElementIcon(Iconable.ICON_FLAG_VISIBILITY));
+                } else {
+                    classNode.setIcon(AllIcons.Nodes.Class);
+                }
                 classNode.setHint(psiClass.getPackageName());
                 classNode.setChecked(false);
 
