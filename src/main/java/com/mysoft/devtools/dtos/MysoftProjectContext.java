@@ -66,6 +66,9 @@ public class MysoftProjectContext {
      * 系统名称，如果Cgztb
      */
     public static String getAppName() {
+        if (appName == null) {
+            return "";
+        }
         return appName.get(appCode);
     }
 

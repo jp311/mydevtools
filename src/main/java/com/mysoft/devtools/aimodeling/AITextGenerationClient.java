@@ -1,12 +1,15 @@
 package com.mysoft.devtools.aimodeling;
 
 import com.google.gson.annotations.SerializedName;
+import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.dtos.MysoftProjectContext;
 import com.mysoft.devtools.utils.Base64Util;
+import com.mysoft.devtools.utils.StringExtension;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.ExtensionMethod;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -20,6 +23,7 @@ import java.util.Map;
 /**
  * @author hezd   2023/7/6
  */
+@ExtensionMethod({StringExtension.class})
 public class AITextGenerationClient extends AIModelingBaseClient<Map<String, Object>, String> {
     private static AITextGenerationClient cache;
 
@@ -36,6 +40,9 @@ public class AITextGenerationClient extends AIModelingBaseClient<Map<String, Obj
 
 
     public String invoke(String code) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+        if (MysoftProjectContext.getAppCode().isNullOrEmpty()) {
+            throw new RuntimeException(LocalBundle.message("devtools.explorer.ai.settings.fail.appcode"));
+        }
         Map<String, Object> data = new HashMap<>();
         List<KeyValuePair> variables = new ArrayList<>();
         variables.add(KeyValuePair.builder().key("collectionName").value("JavaTest_" + MysoftProjectContext.getAppCode()).build());
