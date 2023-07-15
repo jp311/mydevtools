@@ -4,12 +4,19 @@ import com.intellij.codeInspection.util.IntentionFamilyName;
 import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
 import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.jobs.UnitTestBackgroundJob;
+import com.mysoft.devtools.services.AppSettingsStateService;
+import com.mysoft.devtools.settings.AIConfigurable;
+import com.mysoft.devtools.utils.StringExtension;
 import com.mysoft.devtools.utils.idea.BackgroundJobUtil;
+import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 import com.mysoft.devtools.utils.idea.psi.PsiClassExtension;
 import com.mysoft.devtools.utils.idea.psi.PsiMethodExtension;
 import com.mysoft.devtools.views.users.JUnitMethodsChooseDialog;
@@ -21,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @author hezd   2023/7/5
  */
-@ExtensionMethod({PsiClassExtension.class, PsiMethodExtension.class})
+@ExtensionMethod({PsiClassExtension.class, PsiMethodExtension.class, StringExtension.class})
 public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
     @Override
     public @IntentionName @NotNull String getText() {
@@ -53,6 +60,19 @@ public class UnitTestIntentionJavaFile extends JavaFileBaseIntention {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+        MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
+        if (settings == null || settings.aiConfigurable == null
+                || settings.aiConfigurable.getHost().isNullOrEmpty()
+                || settings.aiConfigurable.getUserName().isNullOrEmpty()
+                || settings.aiConfigurable.getPassword().isNullOrEmpty()) {
+            int res = IdeaNotifyUtil.dialogQuestion(LocalBundle.message("devtools.explorer.ai.settings.fail"));
+            if (Messages.NO == res) {
+                return;
+            }
+            ShowSettingsUtil.getInstance().showSettingsDialog(project, AIConfigurable.class);
+            return;
+        }
+
         //这里如何获取光标出PsiElement
         int offset = editor.getCaretModel().getOffset();
         PsiElement psiElement = file.findElementAt(offset);

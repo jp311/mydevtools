@@ -205,7 +205,8 @@
     <!-- 定义菜单组 https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html#idea-plugin__actions-->
     <actions resource-bundle="messages.mysoft">
         <!--工具菜单-->
-        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true">
+        <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true"
+               class="com.mysoft.devtools.actions.toolactions.MysoftToolRootActionGroup">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
         </group>
 
@@ -215,14 +216,16 @@
         </group>
 
         <!--资源管理器-->
-        <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱">
+        <group id="mysoft-explorer-menus" popup="true" text="明源云" description="明源云-开发工具箱"
+               class="com.mysoft.devtools.actions.exploreractions.MysoftExplorerRootActionGroup">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </group>
 
         <!--代码编辑器-->
-        <!--        <group id="mysoft-editor-menus" popup="true" text="明源云" description="明源云-开发工具箱">-->
-        <!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
-        <!--        </group>-->
+        <group id="mysoft-editor-menus" popup="true" text="明源云" description="明源云-开发工具箱" searchable="true"
+               class="com.mysoft.devtools.actions.editoractions.MysoftEditorRootActionGroup">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
     </actions>
 
     <actions>
