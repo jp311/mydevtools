@@ -269,5 +269,11 @@
         </action>
 
         <!--代码编辑器-->
+
+        <!--代码编辑器 - 选项卡-->
+        <action id="com.mysoft.devtools.actions.editortabs.CopyFullNameAction"
+                class="com.mysoft.devtools.actions.editortabs.CopyFullNameAction" text="复制完整名称（含包名）">
+            <add-to-group group-id="EditorTabPopupMenu" anchor="after" relative-to-action="CopyPaths"/>
+        </action>
     </actions>
 </idea-plugin>
