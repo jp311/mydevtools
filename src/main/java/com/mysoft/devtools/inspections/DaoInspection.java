@@ -196,7 +196,6 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-                long begin = System.currentTimeMillis();
                 Project project = holder.getProject();
                 if (project.isDisposed() || !project.isOpen()) {
                     return;
@@ -252,13 +251,6 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                 } catch (Exception ex) {
                     IdeaLoggerUtil.error(MessageFormat.format("【{0}】检查出错：", method.getName()));
                     ex.printStackTrace();
-                } finally {
-                    long end = System.currentTimeMillis();
-                    if (end - begin > 0) {
-                        long lineNumber = expression.getOriginalElement().getLineNumber();
-                        String psiKeygen = holder.getFile().getName() + "." + method.getName() + ":" + lineNumber;
-                        IdeaLoggerUtil.error(MessageFormat.format("Dao检查器完成【{0}】，耗时：{1}....", psiKeygen, end - begin));
-                    }
                 }
 
             }
