@@ -69,16 +69,12 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         if (checkerDTO.getColumnIndex() == -1) {
             return;
         }
-        PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
 
         Project project = checkerDTO.getProject();
         if (project.isDisposed() || !project.isOpen()) {
             return;
         }
 
-        if (psiClass == null || !psiClass.isInheritors(getBaseMapperPsiClass(project))) {
-            return;
-        }
         PsiType columnPsiType = checkerDTO.getSignParameters()[checkerDTO.getColumnIndex()].getType();
         PsiClass columnTypeClass = PsiTypesUtil.getPsiClass(columnPsiType);
 
@@ -104,12 +100,6 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         if (checkerDTO.getColumnIndex() == -1 || checkerDTO.getColumnIndex() + 1 >= checkerDTO.getSignParameters().length) {
             return;
         }
-        PsiClass psiClass = checkerDTO.getMethod().getContainingClass();
-
-        if (!Objects.equals(psiClass.getPackageName(), "com.baomidou.mybatisplus.core.conditions.interfaces")) {
-            return;
-        }
-
         PsiType valueType = checkerDTO.getSignParameters()[checkerDTO.getColumnIndex() + 1].getType();
         if (!VALUE_TYPES.contains(valueType.getPresentableText())) {
             return;
@@ -206,18 +196,21 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
             @Override
             public void visitMethodCallExpression(PsiMethodCallExpression expression) {
-
+                long begin = System.currentTimeMillis();
                 Project project = holder.getProject();
                 if (project.isDisposed() || !project.isOpen()) {
                     return;
                 }
 
-                PsiClass psiClass = PsiTreeUtil.getParentOfType(expression, PsiClass.class);
-                if (psiClass == null) {
-                    return;
-                }
                 PsiMethod method = expression.resolveMethod();
                 if (method == null) {
+                    return;
+                }
+
+                PsiClass methodOwnerClass = method.getContainingClass();
+                if (!Objects.equals(methodOwnerClass.getPackageName(), "com.baomidou.mybatisplus.core.conditions.interfaces")
+                        && !methodOwnerClass.isInheritors(getBaseMapperPsiClass(project))
+                ) {
                     return;
                 }
                 PsiExpression[] expressions = expression.getArgumentList().getExpressions();
@@ -237,6 +230,10 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                     }
                 }
 
+                if (columnIndex == -1) {
+                    return;
+                }
+
                 CheckerDTO checkerDTO = CheckerDTO.builder()
                         .project(project)
                         .columnIndex(columnIndex)
@@ -248,7 +245,7 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                         .expression(expression)
                         .build();
 
-                long begin = System.currentTimeMillis();
+
                 try {
                     checkerLambdaQueryWrapper(checkerDTO);
                     checkerBaseMapper(checkerDTO);
@@ -257,9 +254,9 @@ public class DaoInspection extends AbstractBaseJavaLocalInspectionTool {
                     ex.printStackTrace();
                 } finally {
                     long end = System.currentTimeMillis();
-                    if (end - begin > 50) {
+                    if (end - begin > 0) {
                         long lineNumber = expression.getOriginalElement().getLineNumber();
-                        String psiKeygen = psiClass.getName() + "." + method.getName() + ":" + lineNumber;
+                        String psiKeygen = holder.getFile().getName() + "." + method.getName() + ":" + lineNumber;
                         IdeaLoggerUtil.error(MessageFormat.format("Dao检查器完成【{0}】，耗时：{1}....", psiKeygen, end - begin));
                     }
                 }
