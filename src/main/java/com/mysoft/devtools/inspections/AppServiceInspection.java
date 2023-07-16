@@ -30,10 +30,12 @@ public class AppServiceInspection extends AbstractBaseJavaLocalInspectionTool {
             @Override
             public void visitClass(PsiClass aClass) {
                 Project project = holder.getProject();
+                //如果项目未打开获已关闭则忽略
                 if (project.isDisposed() || !project.isOpen()) {
                     return;
                 }
-                if (aClass == null || aClass.getName() == null) {
+                //非空判断，有可能是匿名类等场景
+                if (aClass == null || aClass.getNameIdentifier() == null) {
                     return;
                 }
 
@@ -42,23 +44,24 @@ public class AppServiceInspection extends AbstractBaseJavaLocalInspectionTool {
                     return;
                 }
 
-
-                PsiAnnotation serviceAnnotation = aClass.getAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME);
-                PsiAnnotation componentAnnotation = aClass.getAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME);
-
+                //抽象类类不处理
                 if (!aClass.isAbstract()) {
+                    //查找@Service注解
+                    PsiAnnotation serviceAnnotation = aClass.getAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME);
+                    //查找@Component注解
+                    PsiAnnotation componentAnnotation = aClass.getAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME);
                     if (serviceAnnotation == null && componentAnnotation == null) {
+                        //注册问题，向开发提示问题原因及严重级别
                         holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.appservice.problem.notfoundserviceannotation.descriptor"), ProblemHighlightType.ERROR, addAnnotationQuickFix);
                     }
                 }
-
-//                if (!aClass.getName().endsWith("AppService")) {
-//                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.appservice.problem.name.descriptor"), ProblemHighlightType.WARNING);
-//                }
             }
         };
     }
 
+    /**
+     * 添加注解修复类
+     */
     private final static class AddAnnotationQuickFix implements LocalQuickFix {
         @Override
         public @IntentionFamilyName @NotNull String getFamilyName() {

@@ -31,7 +31,7 @@ public class DomainServiceInspection extends AbstractBaseJavaLocalInspectionTool
                 if (project.isDisposed() || !project.isOpen()) {
                     return;
                 }
-                if (aClass == null || aClass.getName() == null) {
+                if (aClass == null || aClass.getNameIdentifier() == null) {
                     return;
                 }
 
@@ -40,19 +40,13 @@ public class DomainServiceInspection extends AbstractBaseJavaLocalInspectionTool
                     return;
                 }
 
-
-                PsiAnnotation serviceAnnotation = aClass.getAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME);
-                PsiAnnotation componentAnnotation = aClass.getAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME);
-
                 if (!aClass.isAbstract()) {
+                    PsiAnnotation serviceAnnotation = aClass.getAnnotation(QualifiedNames.SERVICE_QUALIFIED_NAME);
+                    PsiAnnotation componentAnnotation = aClass.getAnnotation(QualifiedNames.COMPONENT_QUALIFIED_NAME);
                     if (serviceAnnotation == null && componentAnnotation == null) {
                         holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.domainservice.problem.notfoundserviceannotation.descriptor"), ProblemHighlightType.ERROR, addAnnotationQuickFix);
                     }
                 }
-
-//                if (!aClass.getName().endsWith("DomainService")) {
-//                    holder.registerProblem(aClass.getNameIdentifier(), InspectionBundle.message("inspection.platform.service.domainservice.problem.name.descriptor"), ProblemHighlightType.WARNING);
-//                }
             }
         };
     }
