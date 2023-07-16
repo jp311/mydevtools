@@ -30,6 +30,7 @@ import lombok.experimental.ExtensionMethod;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -81,7 +82,35 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
         MyCheckedTreeNode root = loadCurrentModuleClasses();
 
 
-        myTree = new CheckboxTree(new CheckboxTree.CheckboxTreeCellRenderer(true) {
+        myTree = new CheckboxTree();
+        myTree.setRootVisible(false);
+
+        treeSpeedSearch = new TreeSpeedSearch(myTree) {
+            @Override
+            protected boolean isMatchingElement(Object element, String pattern) {
+                if (pattern == null) {
+                    return false;
+                }
+                if (element instanceof TreePath) {
+                    Object lastComponent = ((TreePath) element).getLastPathComponent();
+                    if (lastComponent instanceof DefaultMutableTreeNode) {
+                        Object userObject = ((DefaultMutableTreeNode) lastComponent).getUserObject();
+                        String pkg = null;
+                        if (userObject instanceof PsiClass) {
+                            pkg = ((PsiClass) userObject).getName();
+                        }
+
+                        if (userObject instanceof PsiMethod) {
+                            pkg = ((PsiMethod) userObject).getName();
+                        }
+                        pkg = pkg == null ? "" : pkg;
+                        return pkg.toLowerCase().contains(pattern.toLowerCase());
+                    }
+                }
+                return false;
+            }
+        };
+        myTree.setCellRenderer(new CheckboxTree.CheckboxTreeCellRenderer(true) {
             @Override
             public void customizeRenderer(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 SimpleTextAttributes attributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
@@ -120,29 +149,8 @@ public class JUnitMethodsChooseDialog extends BaseDialogComponent {
                 }
 
             }
-        }, root);
-
-        treeSpeedSearch = new TreeSpeedSearch(myTree) {
-            @Override
-            protected boolean isMatchingElement(Object element, String pattern) {
-                if (element instanceof TreePath) {
-                    Object lastComponent = ((TreePath) element).getLastPathComponent();
-                    if (lastComponent instanceof DefaultMutableTreeNode) {
-                        Object userObject = ((DefaultMutableTreeNode) lastComponent).getUserObject();
-                        if (userObject instanceof PsiClass) {
-                            String pkg = ((PsiClass) userObject).getName();
-                            return pkg != null && pkg.contains(pattern);
-                        }
-
-                        if (userObject instanceof PsiMethod) {
-                            String pkg = ((PsiMethod) userObject).getName();
-                            return pkg.contains(pattern);
-                        }
-                    }
-                }
-                return false;
-            }
-        };
+        });
+        myTree.setModel(new DefaultTreeModel(root));
 
         //双击展开/折叠子节点
         myTree.addMouseListener(new MouseAdapter() {
