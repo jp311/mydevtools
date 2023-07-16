@@ -38,7 +38,7 @@ public class FreeMarkerUtil {
 
     public static String sendEmail(ProblemEmailDTO context) throws TemplateException, IOException {
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
-        //cfg.setDefaultEncoding("UTF-8");
+        cfg.setDefaultEncoding("UTF-8");
         // 加载模板文件
         InputStream inputStream = FreeMarkerUtil.class.getClassLoader().getResourceAsStream("freemarker/problem_email.ftl");
         InputStreamReader reader = null;
