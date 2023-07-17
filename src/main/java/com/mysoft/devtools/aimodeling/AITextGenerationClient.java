@@ -40,6 +40,7 @@ public class AITextGenerationClient extends AIModelingBaseClient<Map<String, Obj
 
 
     public String invoke(String code) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+
         if (MysoftProjectContext.getAppCode().isNullOrEmpty()) {
             throw new RuntimeException(LocalBundle.message("devtools.explorer.ai.settings.fail.appcode"));
         }

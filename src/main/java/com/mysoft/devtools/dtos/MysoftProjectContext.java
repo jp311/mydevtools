@@ -3,10 +3,13 @@ package com.mysoft.devtools.dtos;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.mysoft.devtools.utils.idea.IdeaContext;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,7 +25,12 @@ import java.util.Map;
 public class MysoftProjectContext {
 
     public static void init(Project project) {
-        VirtualFile bootstrapFile = FilenameIndex.getVirtualFilesByName("bootstrap.yml", GlobalSearchScope.allScope(project)).stream().findAny().orElse(null);
+        VirtualFile bootstrapFile = FilenameIndex.getVirtualFilesByName("bootstrap.yml", GlobalSearchScope.allScope(project)).stream()
+                .filter(VirtualFile::isInLocalFileSystem).findFirst().orElse(null);
+        if (bootstrapFile == null) {
+            //有时候项目还没加载完成搜不到文件
+            return;
+        }
         appName = new HashMap<>() {{
             put("0000", "platform");
             put("0201", "cbxt");
@@ -36,19 +44,17 @@ public class MysoftProjectContext {
             put("0801", "tzsy");
         }};
 
-        if (bootstrapFile != null) {
-            // 创建 ObjectMapper 对象，并使用 YAMLFactory 初始化
-            ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        // 创建 ObjectMapper 对象，并使用 YAMLFactory 初始化
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-            // 加载 YAML 文件并将其转换为 PersonDTO 对象
-            File file = new File(bootstrapFile.getPath());
-            try {
-                YamlRoot bootstrap = mapper.readValue(file, YamlRoot.class);
-                appCode = bootstrap.mysoft.application.code;
+        // 加载 YAML 文件并将其转换为 PersonDTO 对象
+        File file = new File(bootstrapFile.getPath());
+        try {
+            YamlRoot bootstrap = mapper.readValue(file, YamlRoot.class);
+            appCode = bootstrap.mysoft.application.code;
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -59,6 +65,10 @@ public class MysoftProjectContext {
      * 系统编号，如：0220
      */
     public static String getAppCode() {
+        if (appCode == null) {
+            Project project = ApplicationManager.getApplication().runReadAction((Computable<Project>) IdeaContext::getActiveProject);
+            init(project);
+        }
         return appCode;
     }
 
@@ -67,7 +77,8 @@ public class MysoftProjectContext {
      */
     public static String getAppName() {
         if (appName == null) {
-            return "";
+            Project project = ApplicationManager.getApplication().runReadAction((Computable<Project>) IdeaContext::getActiveProject);
+            init(project);
         }
         return appName.get(appCode);
     }

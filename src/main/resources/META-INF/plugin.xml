@@ -253,27 +253,32 @@
         </action>
 
         <!--工具菜单-->
-        <action id="com.mysoft.devtools.actions.toolactions.MetadataSyncAction"
+        <action id="MetadataSyncAction"
                 class="com.mysoft.devtools.actions.toolactions.MetadataSyncAction" text="元数据同步">
             <add-to-group group-id="mysoft-tool-menus-database"/>
         </action>
 
-        <action id="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction"
+        <action id="ExecuteSqlAction"
                 class="com.mysoft.devtools.actions.toolactions.ExecuteSqlAction" text="执行Sql">
             <add-to-group group-id="mysoft-tool-menus-database"/>
         </action>
 
-        <action id="com.mysoft.devtools.actions.toolactions.DocumentAction"
+        <action id="DocumentAction"
                 class="com.mysoft.devtools.actions.toolactions.DocumentAction" text="帮助文档">
             <add-to-group group-id="mysoft-tool-menus" anchor="last"/>
         </action>
 
         <!--代码编辑器-->
+        <!--        <action id="CopyFieldNamesAction"-->
+        <!--                class="com.mysoft.devtools.actions.editoractions.CopyFieldsAction" text="复制字段列">-->
+        <!--            <add-to-group group-id="Copy.Paste.Special" relative-to-action="CopyReference" anchor="before"/>-->
+        <!--        </action>-->
 
         <!--代码编辑器 - 选项卡-->
-        <action id="com.mysoft.devtools.actions.editortabs.CopyFullNameAction"
-                class="com.mysoft.devtools.actions.editortabs.CopyFullNameAction" text="复制完整名称（含包名）">
-            <add-to-group group-id="EditorTabPopupMenu" anchor="after" relative-to-action="CopyPaths"/>
+        <action id="CopyFullNameAction"
+                class="com.mysoft.devtools.actions.editortabs.CopyFullNameAction" text="复制引用">
+            <add-to-group group-id="CopyFileReference" anchor="after" relative-to-action="CopyFileName"/>
+
         </action>
     </actions>
 </idea-plugin>
