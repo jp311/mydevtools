@@ -1,27 +1,27 @@
 package com.mysoft.devtools.actions.editortabs;
 
-import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.codeInsight.TargetElementUtilBase;
+import com.intellij.ide.actions.CopyReferenceAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiJavaFile;
-import com.intellij.psi.PsiPackageStatement;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.mysoft.devtools.bundles.LocalBundle;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.datatransfer.StringSelection;
+import java.util.List;
 
 /**
  * @author hezd   2023/7/16
  */
-public class CopyFullNameAction extends AnAction {
+public class CopyFullNameAction extends CopyReferenceAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
@@ -53,6 +53,28 @@ public class CopyFullNameAction extends AnAction {
         strs[1] = psiClass == null ? "" : psiClass.getName();
 
         return String.join(".", strs);
+    }
+
+    @Override
+    protected String getQualifiedName(Editor editor, List<? extends PsiElement> elements) {
+        PsiElement element;
+        if (editor != null) {
+            PsiReference reference = TargetElementUtilBase.findReference(editor, editor.getCaretModel().getOffset());
+            if (reference == null) {
+                return "";
+            }
+            element = reference.getElement();
+        } else {
+            element = elements.stream().findFirst().orElse(null);
+        }
+        if (element == null) {
+            return "";
+        }
+        PsiFile psiFile = element.getContainingFile();
+        if (psiFile == null) {
+            return "";
+        }
+        return getRef(psiFile);
     }
 }
 

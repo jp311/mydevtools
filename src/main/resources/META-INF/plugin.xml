@@ -269,10 +269,11 @@
         </action>
 
         <!--代码编辑器-->
-        <!--        <action id="CopyFieldNamesAction"-->
-        <!--                class="com.mysoft.devtools.actions.editoractions.CopyFieldsAction" text="复制字段列">-->
-        <!--            <add-to-group group-id="Copy.Paste.Special" relative-to-action="CopyReference" anchor="before"/>-->
-        <!--        </action>-->
+        <action id="CopyFieldNamesAction"
+                class="com.mysoft.devtools.actions.editoractions.CopyFieldsAction"
+                text="复制字段二维表（注释、类型、名称）">
+            <add-to-group group-id="Copy.Paste.Special" relative-to-action="CopyReference" anchor="before"/>
+        </action>
 
         <!--代码编辑器 - 选项卡-->
         <action id="CopyFullNameAction"

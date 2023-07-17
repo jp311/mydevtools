@@ -138,5 +138,14 @@ public class UnitTestUtil {
             CodeStyleManager.getInstance(project).reformat(psiFile);
         });
     }
+
+    /**
+     * 优化import
+     *
+     * @param psiClass
+     */
+    public static void optimizeImports(PsiClass psiClass) {
+
+    }
 }
 
