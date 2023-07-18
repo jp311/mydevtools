@@ -8,8 +8,6 @@ import java.util.List;
  * @author hezd 2023/4/30
  */
 public class MysoftSettingsDTO {
-    public String sqlPath;
-
     /**
      * 元数据路径
      */
@@ -18,8 +16,7 @@ public class MysoftSettingsDTO {
     public String sqlToolPath;
 
     public MysoftSettingsDTO() {
-        metadataPath = FileUtil.combine("data", "_metadata");
-        sqlPath = FileUtil.combine("data", "sql");
+        metadataPath = FileUtil.combine("data", "metadata", "_metadata");
         author = System.getProperty("user.name");
 
         entityTemplate = FileUtil.readResourceContent("freemarker/entity.ftl");

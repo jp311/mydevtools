@@ -6,6 +6,8 @@ import com.mysoft.devtools.bundles.LocalBundle;
 import com.mysoft.devtools.controls.ChooseFileUtil;
 import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.services.AppSettingsStateService;
+import com.mysoft.devtools.utils.FileUtil;
+import com.mysoft.devtools.utils.MetadataUtil;
 import com.mysoft.devtools.utils.idea.IdeaNotifyUtil;
 
 import javax.swing.*;
@@ -26,7 +28,6 @@ public class MetadataComponent extends BaseSettingsComponent {
     private ContextHelpLabel contextHelpLabel1;
     private ExtendableTextField txtMetadataSyncClient;
     private ContextHelpLabel contextHelpLabel2;
-    private ExtendableTextField txtSqlPath;
     private ExtendableTextField txtSqlToolPath;
 
     private MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
@@ -36,15 +37,9 @@ public class MetadataComponent extends BaseSettingsComponent {
         contentPanel.setBorder(null);
 
         txtMedataPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.settings.metadata.tooltip"), path -> txtMedataPath.setText(path)));
-        txtMedataPath.setEditable(false);
         txtMedataPath.setText(settings.metadataPath);
 
         txtMetadataSyncClient.addExtension(ChooseFileUtil.getChooseSingeFileExtension(LocalBundle.message("devtools.settings.metadata.sync.client.tooltip"), fileName -> txtMetadataSyncClient.setText(fileName)));
-
-
-        txtSqlPath.addExtension(ChooseFileUtil.getChooseSingleFolderExtension(LocalBundle.message("devtools.menutools.executesql.choose.sqlpath.tooltip"), path -> txtSqlPath.setText(path)));
-        txtSqlPath.setEditable(false);
-        txtSqlPath.setText(settings.sqlPath);
 
         txtSqlToolPath.addExtension(ChooseFileUtil.getChooseSingeFileExtension(LocalBundle.message("devtools.settings.metadata.sqltool.tooltip"), fileName -> txtSqlToolPath.setText(fileName)));
         return contentPanel;
@@ -59,17 +54,33 @@ public class MetadataComponent extends BaseSettingsComponent {
     public boolean isModified() {
         return !Objects.equals(settings.metadataPath, txtMedataPath.getText())
                 || !Objects.equals(settings.metadataSyncClientPath, txtMetadataSyncClient.getText())
-                || !Objects.equals(settings.sqlPath, txtSqlPath.getText())
                 || !Objects.equals(settings.sqlToolPath, txtSqlToolPath.getText())
                 ;
     }
 
     @Override
     public void apply() {
+        String metadataRootPath = txtMedataPath.getText();
+        if (!FileUtil.isExist(metadataRootPath)) {
+            if (!FileUtil.isExist(FileUtil.combine(MetadataUtil.getRootPath(), metadataRootPath))) {
+                IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.settings.metadata.validate.metadata.fail"));
+                return;
+            }
+        }
+
+        if (!FileUtil.isExist(txtMetadataSyncClient.getText())) {
+            IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.settings.metadata.validate.metadatas.synctools.fail"));
+            return;
+        }
+
+        if (!FileUtil.isExist(txtSqlToolPath.getText())) {
+            IdeaNotifyUtil.dialogError(LocalBundle.message("devtools.settings.metadata.validate.sqltools.fail"));
+            return;
+        }
+
         settings.metadataPath = txtMedataPath.getText();
         settings.metadataSyncClientPath = txtMetadataSyncClient.getText();
         settings.sqlToolPath = txtSqlToolPath.getText();
-        settings.sqlPath = txtSqlPath.getText();
         AppSettingsStateService.getInstance().loadState(settings);
     }
 
@@ -77,7 +88,6 @@ public class MetadataComponent extends BaseSettingsComponent {
     public void reset() {
         txtMedataPath.setText(settings.metadataPath);
         txtMetadataSyncClient.setText(settings.metadataSyncClientPath);
-        txtSqlPath.setText(settings.sqlPath);
         txtSqlToolPath.setText(settings.sqlToolPath);
     }
 

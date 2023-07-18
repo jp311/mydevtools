@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.psi.*;
@@ -42,6 +43,9 @@ public class CopyFullNameAction extends CopyReferenceAction {
         PsiFile psiFile = e.getDataContext().getData(CommonDataKeys.PSI_FILE);
         Presentation presentation = e.getPresentation();
         presentation.setEnabledAndVisible(psiFile instanceof PsiJavaFile);
+
+        String ref = getRef(psiFile);
+        presentation.putClientProperty(Key.create("QUALIFIED_NAME"), ref);
     }
 
 

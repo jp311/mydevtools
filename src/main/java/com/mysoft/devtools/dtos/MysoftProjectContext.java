@@ -25,8 +25,11 @@ import java.util.Map;
 public class MysoftProjectContext {
 
     public static void init(Project project) {
+        if (project == null || project.getBasePath() == null) {
+            return;
+        }
         VirtualFile bootstrapFile = FilenameIndex.getVirtualFilesByName("bootstrap.yml", GlobalSearchScope.allScope(project)).stream()
-                .filter(VirtualFile::isInLocalFileSystem).findFirst().orElse(null);
+                .filter(x -> x.isInLocalFileSystem() && x.getPath().startsWith(project.getBasePath())).findFirst().orElse(null);
         if (bootstrapFile == null) {
             //有时候项目还没加载完成搜不到文件
             return;
@@ -51,7 +54,9 @@ public class MysoftProjectContext {
         File file = new File(bootstrapFile.getPath());
         try {
             YamlRoot bootstrap = mapper.readValue(file, YamlRoot.class);
-            appCode = bootstrap.mysoft.application.code;
+            if (bootstrap != null && bootstrap.mysoft != null && bootstrap.mysoft.application != null && bootstrap.mysoft.application.code != null) {
+                appCode = bootstrap.mysoft.application.code;
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
