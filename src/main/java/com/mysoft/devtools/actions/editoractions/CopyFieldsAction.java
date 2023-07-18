@@ -61,5 +61,6 @@ public class CopyFieldsAction extends AnAction {
         Presentation presentation = e.getPresentation();
         boolean enable = project != null && psiFile instanceof PsiJavaFile;
         presentation.setEnabledAndVisible(enable);
+        presentation.setDescription(LocalBundle.message("devtools.editor.copyfields.description"));
     }
 }
