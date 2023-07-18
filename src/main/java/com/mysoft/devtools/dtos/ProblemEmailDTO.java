@@ -9,9 +9,12 @@ import lombok.Data;
 @Data
 @Builder
 public class ProblemEmailDTO {
+    private String mysoftAppInfo;
+
     private String pluginUrl;
 
     private String pluginVersion;
+
     //IntelliJ IDEA （IU） 2022.3.1
     private String ideInfo;
 

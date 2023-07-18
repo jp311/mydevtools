@@ -78,6 +78,18 @@
                                 <tr>
                                     <th>
                                         <div style="margin:0;width:112px;height:36px;line-height:36px;color:#222;font-weight:normal;font-size:14px;text-align:left;overflow:hidden;">
+                                            用户信息：
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <div style="margin:0;width:668px;line-height:36px;color:#666;font-size:14px;text-align:left;overflow:hidden;">
+                                            ${context.osUser}
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div style="margin:0;width:112px;height:36px;line-height:36px;color:#222;font-weight:normal;font-size:14px;text-align:left;overflow:hidden;">
                                             国家/地区：
                                         </div>
                                     </th>
@@ -90,12 +102,12 @@
                                 <tr>
                                     <th>
                                         <div style="margin:0;width:112px;height:36px;line-height:36px;color:#222;font-weight:normal;font-size:14px;text-align:left;overflow:hidden;">
-                                            OS账号：
+                                            产品信息：
                                         </div>
                                     </th>
                                     <td>
                                         <div style="margin:0;width:668px;line-height:36px;color:#666;font-size:14px;text-align:left;overflow:hidden;">
-                                            ${context.osUser}
+                                            ${context.mysoftAppInfo}
                                         </div>
                                     </td>
                                 </tr>

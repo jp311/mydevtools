@@ -7,7 +7,10 @@ import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.util.Consumer;
 import com.mysoft.devtools.bundles.LocalBundle;
+import com.mysoft.devtools.dtos.MysoftProjectContext;
+import com.mysoft.devtools.dtos.MysoftSettingsDTO;
 import com.mysoft.devtools.dtos.ProblemEmailDTO;
+import com.mysoft.devtools.services.AppSettingsStateService;
 import com.mysoft.devtools.utils.FreeMarkerUtil;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
@@ -71,7 +74,10 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
             ) {
                 stack.append(event.toString()).append(System.lineSeparator());
             }
-
+            MysoftSettingsDTO settings = AppSettingsStateService.getInstance().getState();
+            if (settings == null) {
+                settings = new MysoftSettingsDTO();
+            }
             ApplicationInfo application = ApplicationInfo.getInstance();
             ProblemEmailDTO problemEmailDTO = ProblemEmailDTO.builder()
                     .pluginUrl("https://plugins.jetbrains.com/plugin/21811-mysoft-devtools/versions")
@@ -80,9 +86,10 @@ public class MyErrorReportSubmitter extends ErrorReportSubmitter {
                     .osInfo(MessageFormat.format("{0} （{1}）", System.getProperty("os.name"), System.getProperty("os.arch")))
                     .jvmInfo(MessageFormat.format("{0} （{1}）", System.getProperty("java.vm.name"), System.getProperty("java.vm.version")))
                     .area(MessageFormat.format("{0}/{1}", System.getProperty("user.language"), System.getProperty("user.country")))
-                    .osUser(System.getProperty("user.name"))
+                    .osUser(settings.author == null ? System.getProperty("user.name") : settings.author)
                     .operateTime(getOperateTime())
                     .additionalInfo(additionalInfo == null ? "" : additionalInfo)
+                    .mysoftAppInfo(MessageFormat.format("{0} ( {1} )", MysoftProjectContext.getAppName(), MysoftProjectContext.getAppCode()))
                     .stack(stack.toString())
                     .build();
             String content = FreeMarkerUtil.sendEmail(problemEmailDTO);

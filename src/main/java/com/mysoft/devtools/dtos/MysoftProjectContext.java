@@ -85,6 +85,9 @@ public class MysoftProjectContext {
             Project project = ApplicationManager.getApplication().runReadAction((Computable<Project>) IdeaContext::getActiveProject);
             init(project);
         }
+        if (!appName.containsKey(appCode)) {
+            return "";
+        }
         return appName.get(appCode);
     }
 
