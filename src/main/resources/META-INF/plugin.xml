@@ -207,7 +207,7 @@
         <!--工具菜单-->
         <group id="mysoft-tool-menus" text="明源云" description="明源云-开发工具箱" searchable="true"
                class="com.mysoft.devtools.actions.toolactions.MysoftToolRootActionGroup">
-            <add-to-group group-id="MainMenu" anchor="after" relative-to-action="ToolsMenu"/>
+            <add-to-group group-id="ToolsMenu" anchor="last" />
         </group>
 
         <group id="mysoft-tool-menus-database" text="数据库" popup="true" description="明源云-开发工具箱"
